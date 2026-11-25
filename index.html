@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MellstroyGift</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <script id="tc-script" src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     :root {
       --bg: #0c0c12;
@@ -235,8 +235,19 @@
 
     .wallet-box {
       background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
-      padding: 10px 12px; margin-bottom: 12px;
+      padding: 12px; margin-bottom: 12px;
     }
+
+    .wallet-apps-row {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;
+    }
+
+    .wallet-app-btn {
+      background: #14141f; border: 1px solid var(--border); border-radius: 10px;
+      padding: 9px 10px; color: var(--text); font-size: 12px; font-weight: 700;
+      cursor: pointer; text-align: center;
+    }
+    .wallet-app-btn:active { border-color: var(--accent); }
 
     .drop-choice-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
 
@@ -389,17 +400,24 @@
   <div class="modal-backdrop" id="wallet-modal">
     <div class="modal-sheet">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">Пополнение баланса</h2>
+        <h2 style="margin:0;">Кошелек и пополнение</h2>
         <button class="btn-small" onclick="closeWalletModal()">✕</button>
       </div>
 
       <div class="wallet-box">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
           <div>
-            <div style="font-size:12px; font-weight:700;" id="tc-status">TON Connect не подключен</div>
-            <div style="font-size:11px; color:var(--muted);" id="tc-address">Telegram Wallet / Tonkeeper / MyTonWallet</div>
+            <div style="font-size:12px; font-weight:700;" id="tc-status">Кошелек не привязан</div>
+            <div style="font-size:11px; color:var(--muted);" id="tc-address">Выберите кошелек для перехода и подтверждения</div>
           </div>
-          <button class="btn-small" id="tc-connect-btn" onclick="toggleTonConnect()">Подключить</button>
+          <button class="btn-small" id="tc-connect-btn" onclick="openTonConnectModal()">Подключить</button>
+        </div>
+
+        <div class="wallet-apps-row" id="wallet-quick-apps">
+          <button class="wallet-app-btn" onclick="connectSpecificWallet('tonkeeper')">🦎 Tonkeeper</button>
+          <button class="wallet-app-btn" onclick="connectSpecificWallet('telegram-wallet')">✈️ Telegram Wallet</button>
+          <button class="wallet-app-btn" onclick="connectSpecificWallet('mytonwallet')">💼 MyTonWallet</button>
+          <button class="wallet-app-btn" onclick="openTonConnectModal()">🔗 Все кошельки</button>
         </div>
       </div>
 
@@ -409,10 +427,10 @@
         <button id="tab-gifts" onclick="switchWalletTab('gifts')">🎁 Подарками</button>
       </div>
 
-      <!-- Реальный перевод через TON Connect -->
+      <!-- Депозит через привязанный кошелек -->
       <div id="panel-ton">
         <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
-          Сумма депозита в TON (отправится транзакция в кошелек-получатель):
+          Сумма депозита в TON (откроет подтверждение в подключенном кошельке):
         </div>
         <input type="number" step="0.05" min="0.05" class="input-box" id="ton-deposit-amount" value="0.2" />
         <div class="chips-row">
@@ -421,7 +439,7 @@
           <button class="chip" onclick="setTonAmount(0.5)">0.5 TON</button>
           <button class="chip" onclick="setTonAmount(1)">1 TON</button>
         </div>
-        <button class="btn-primary" onclick="sendRealTonDeposit()">Отправить депозит через TON Connect</button>
+        <button class="btn-primary" onclick="sendRealTonDeposit()">Отправить депозит через кошелек</button>
       </div>
 
       <!-- Пополнение через Telegram Stars -->
@@ -442,7 +460,7 @@
       <!-- Пополнение подарками -->
       <div id="panel-gifts" style="display:none;">
         <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">
-          Выберите подарок и отправьте его боту/аккаунту проекта, затем нажмите «Подтвердить отправку»:
+          Выберите подарок и отправьте заявку боту на зачисление:
         </div>
         <select class="input-box" id="deposit-gift-select"></select>
         <button class="btn-primary" onclick="requestGiftDeposit()">Отправить заявку на внесение подарка</button>
@@ -451,10 +469,14 @@
   </div>
 
   <script>
-    // УКАЖИ СВОЙ АДРЕС КОШЕЛЬКА-ПОЛУЧАТЕЛЯ (в формате EQ... или UQ...)
     const RECEIVER_TON_ADDRESS = "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO";
-    // УКАЖИ USERNAME ТВОЕГО БОТА (без @) для приема Stars и подарков
     const BOT_USERNAME = "your_mellstroy_bot";
+    const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
+
+    const TC_CDNS = [
+      "https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js",
+      "https://cdn.jsdelivr.net/npm/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"
+    ];
 
     const tg = window.Telegram?.WebApp;
     let userHandle = "@player";
@@ -473,44 +495,96 @@
       }
     }
 
-    // Настоящий TON Connect UI
     let tonConnectUI = null;
-    try {
-      tonConnectUI = new TONCONNECT_UI.TonConnectUI({
-        manifestUrl: "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json"
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.onload = () => resolve(true);
+        s.onerror = () => reject(new Error("Failed to load " + src));
+        document.head.appendChild(s);
       });
+    }
+
+    async function ensureTonConnectUI() {
+      if (tonConnectUI) return tonConnectUI;
+
+      if (!window.TONCONNECT_UI?.TonConnectUI) {
+        for (const url of TC_CDNS) {
+          try {
+            await loadScript(url);
+            if (window.TONCONNECT_UI?.TonConnectUI) break;
+          } catch (_) {}
+        }
+      }
+
+      if (!window.TONCONNECT_UI?.TonConnectUI) {
+        throw new Error("TON Connect SDK unavailable");
+      }
+
+      tonConnectUI = new window.TONCONNECT_UI.TonConnectUI({
+        manifestUrl: MANIFEST_URL,
+        actionsConfiguration: {
+          twaReturnUrl: `https://t.me/${BOT_USERNAME}`
+        }
+      });
+
       tonConnectUI.onStatusChange((wallet) => {
         updateTonWalletStatus(wallet);
       });
-    } catch (e) {
-      console.warn("TON Connect init error:", e);
+
+      updateTonWalletStatus(tonConnectUI.wallet);
+      return tonConnectUI;
     }
 
     function updateTonWalletStatus(wallet) {
       const statusEl = document.getElementById("tc-status");
       const addrEl = document.getElementById("tc-address");
       const btnEl = document.getElementById("tc-connect-btn");
+      const quickAppsEl = document.getElementById("wallet-quick-apps");
 
       if (wallet?.account?.address) {
         const addr = wallet.account.address;
-        const shortAddr = `${addr.slice(0, 5)}...${addr.slice(-4)}`;
-        statusEl.textContent = "Кошелек подключен";
-        addrEl.textContent = `${wallet.device?.appName || "TON Wallet"} · ${shortAddr}`;
+        const shortAddr = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+        const walletName = wallet.device?.appName || "TON Wallet";
+        statusEl.textContent = `Привязан: ${walletName}`;
+        addrEl.textContent = `Адрес игрока: ${shortAddr}`;
         btnEl.textContent = "Отключить";
+        quickAppsEl.style.display = "none";
       } else {
-        statusEl.textContent = "TON Connect не подключен";
-        addrEl.textContent = "Telegram Wallet / Tonkeeper / MyTonWallet";
+        statusEl.textContent = "Кошелек не привязан";
+        addrEl.textContent = "Выберите кошелек для перехода и подтверждения";
         btnEl.textContent = "Подключить";
+        quickAppsEl.style.display = "grid";
       }
     }
 
-    async function toggleTonConnect() {
-      if (!tonConnectUI) return showToast("TON Connect не загрузился");
-      if (tonConnectUI.account) {
-        await tonConnectUI.disconnect();
-        showToast("Кошелек отключен");
-      } else {
-        await tonConnectUI.openModal();
+    async function openTonConnectModal() {
+      try {
+        const ui = await ensureTonConnectUI();
+        if (ui.account) {
+          await ui.disconnect();
+          showToast("Кошелек отключен");
+        } else {
+          await ui.openModal();
+        }
+      } catch (e) {
+        showToast("Не удалось загрузить TON Connect. Проверь интернет или кэш");
+      }
+    }
+
+    async function connectSpecificWallet(appKey) {
+      try {
+        const ui = await ensureTonConnectUI();
+        try {
+          await ui.openSingleWalletModal(appKey);
+        } catch (_) {
+          await ui.openModal();
+        }
+      } catch (e) {
+        showToast("Не удалось загрузить TON Connect");
       }
     }
 
@@ -518,17 +592,25 @@
     function setStarsAmount(v) { document.getElementById("stars-deposit-amount").value = v; }
 
     async function sendRealTonDeposit() {
-      if (!tonConnectUI?.account) {
-        showToast("Сначала подключи кошелек через TON Connect");
-        await tonConnectUI?.openModal();
+      let ui;
+      try {
+        ui = await ensureTonConnectUI();
+      } catch (e) {
+        return showToast("TON Connect не загрузился");
+      }
+
+      if (!ui.account) {
+        showToast("Сначала выбери кошелек и подтверди привязку");
+        await ui.openModal();
         return;
       }
+
       const tonVal = parseFloat(document.getElementById("ton-deposit-amount").value);
       if (!tonVal || tonVal < 0.05) return showToast("Минимум 0.05 TON");
 
       const nanoAmount = Math.round(tonVal * 1e9).toString();
       try {
-        const res = await tonConnectUI.sendTransaction({
+        await ui.sendTransaction({
           validUntil: Math.floor(Date.now() / 1000) + 300,
           messages: [
             {
@@ -537,14 +619,13 @@
             }
           ]
         });
-        // В продакшене отправь res.boc на бэкенд для проверки транзакции в блокчейне TON перед начислением!
-        showToast("Транзакция отправлена в кошелек!");
+        showToast("Подтверди перевод в кошельке — проверяем транзакцию");
         tonDeposited += tonVal;
         starsBalance += Math.round(tonVal * 120);
         updateBalances();
         closeWalletModal();
       } catch (err) {
-        showToast("Транзакция отклонена или отменена");
+        showToast("Перевод отменен или отклонен");
       }
     }
 
@@ -572,7 +653,6 @@
       }
     }
 
-    // Обычные подарки (isNft: false) и NFT-подарки (isNft: true)
     const GIFTS = [
       { id: "bear", emoji: "🧸", name: "Plush Bear", isNft: false, price: 15, sellStars: 12 },
       { id: "rose", emoji: "🌹", name: "Neon Rose", isNft: false, price: 20, sellStars: 16 },
@@ -922,12 +1002,15 @@
       switchTab("screen-upgrade");
     }
 
-    function openWalletModal(tab = "ton") {
+    async function openWalletModal(tab = "ton") {
       document.getElementById("deposit-gift-select").innerHTML = GIFTS.map(g =>
         `<option value="${g.id}">${g.emoji} ${g.name} (${g.isNft ? "NFT" : "Обычный"} · ${g.price} ⭐)</option>`
       ).join("");
       switchWalletTab(tab);
       document.getElementById("wallet-modal").classList.add("open");
+      try {
+        await ensureTonConnectUI();
+      } catch (_) {}
     }
 
     function closeWalletModal() { document.getElementById("wallet-modal").classList.remove("open"); }
@@ -943,6 +1026,7 @@
     renderCases();
     selectCase("mell-king");
     switchTab("screen-home");
+    ensureTonConnectUI().catch(() => {});
   </script>
 </body>
 </html>
