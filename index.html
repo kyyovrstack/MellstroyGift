@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MellstroyGift</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script id="tc-script" src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     :root {
       --bg: #0c0c12;
@@ -473,10 +472,11 @@
     const BOT_USERNAME = "your_mellstroy_bot";
     const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
 
-    const TC_CDNS = [
-      "https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js",
-      "https://cdn.jsdelivr.net/npm/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"
-    ];
+    const WALLET_DEEPLINKS = {
+      "tonkeeper": "https://app.tonkeeper.com/ton-connect",
+      "telegram-wallet": "https://t.me/wallet",
+      "mytonwallet": "https://my.mytonwallet.org/"
+    };
 
     const tg = window.Telegram?.WebApp;
     let userHandle = "@player";
@@ -497,34 +497,26 @@
 
     let tonConnectUI = null;
 
-    function loadScript(src) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        s.src = src;
-        s.async = true;
-        s.onload = () => resolve(true);
-        s.onerror = () => reject(new Error("Failed to load " + src));
-        document.head.appendChild(s);
-      });
-    }
-
     async function ensureTonConnectUI() {
       if (tonConnectUI) return tonConnectUI;
 
-      if (!window.TONCONNECT_UI?.TonConnectUI) {
-        for (const url of TC_CDNS) {
-          try {
-            await loadScript(url);
-            if (window.TONCONNECT_UI?.TonConnectUI) break;
-          } catch (_) {}
-        }
+      let UISDK = window.TONCONNECT_UI?.TonConnectUI || window.TonConnectUI;
+
+      if (!UISDK) {
+        try {
+          const mod = await import("https://esm.sh/@tonconnect/ui@latest");
+          UISDK = mod.TonConnectUI || mod.default?.TonConnectUI;
+          if (UISDK) {
+            window.TONCONNECT_UI = { ...(window.TONCONNECT_UI || {}), TonConnectUI: UISDK };
+          }
+        } catch (_) {}
       }
 
-      if (!window.TONCONNECT_UI?.TonConnectUI) {
+      if (!UISDK) {
         throw new Error("TON Connect SDK unavailable");
       }
 
-      tonConnectUI = new window.TONCONNECT_UI.TonConnectUI({
+      tonConnectUI = new UISDK({
         manifestUrl: MANIFEST_URL,
         actionsConfiguration: {
           twaReturnUrl: `https://t.me/${BOT_USERNAME}`
@@ -571,7 +563,10 @@
           await ui.openModal();
         }
       } catch (e) {
-        showToast("Не удалось загрузить TON Connect. Проверь интернет или кэш");
+        showToast("Открываю Tonkeeper...");
+        const link = WALLET_DEEPLINKS["tonkeeper"];
+        if (tg?.openLink) tg.openLink(link);
+        else window.open(link, "_blank");
       }
     }
 
@@ -584,7 +579,10 @@
           await ui.openModal();
         }
       } catch (e) {
-        showToast("Не удалось загрузить TON Connect");
+        const fallbackUrl = WALLET_DEEPLINKS[appKey] || WALLET_DEEPLINKS["tonkeeper"];
+        showToast("Переход в кошелек...");
+        if (tg?.openLink) tg.openLink(fallbackUrl);
+        else window.open(fallbackUrl, "_blank");
       }
     }
 
