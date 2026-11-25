@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MellstroyGift</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #0f0f14;
+      --card: #181822;
+      --card-border: #282838;
+      --accent: #7c5cff;
+      --accent-glow: rgba(124, 92, 255, 0.35);
+      --gold: #ffb800;
+      --text: #f5f5fa;
+      --muted: #8e8ea0;
+      --success: #2ed573;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 78px;
+      user-select: none;
+    }
+
+    /* Шапка */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(15, 15, 20, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .user-meta {
+      overflow: hidden;
+    }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .balance-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .topup-mini {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Live лента */
+    .live-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--card-border);
+      scrollbar-width: none;
+    }
+    .live-strip::-webkit-scrollbar { display: none; }
+
+    .live-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--success);
+      background: rgba(46, 213, 115, 0.12);
+      border: 1px solid rgba(46, 213, 115, 0.3);
+      padding: 4px 8px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .live-item {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Экраны */
+    .screen {
+      display: none;
+      padding: 16px;
+    }
+    .screen.active {
+      display: block;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .case-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .case-card:active {
+      transform: scale(0.97);
+      border-color: var(--accent);
+    }
+
+    .case-icon {
+      font-size: 38px;
+      margin-bottom: 8px;
+    }
+
+    .case-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .price-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    /* Рулетка открытия кейса */
+    .card-box {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .roulette-window {
+      position: relative;
+      height: 96px;
+      overflow: hidden;
+      background: #111118;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      margin: 12px 0 16px;
+    }
+
+    .roulette-pointer {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--gold);
+      box-shadow: 0 0 10px var(--gold);
+      z-index: 5;
+    }
+
+    .roulette-track {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      gap: 8px;
+      padding: 0 10px;
+      transition: transform 3.2s cubic-bezier(0.12, 0.85, 0.22, 1);
+    }
+
+    .slot-item {
+      min-width: 78px;
+      height: 76px;
+      background: #1d1d29;
+      border: 1px solid #303044;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .slot-item span {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), #5b3df5);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Инвентарь */
+    .inv-item {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .inv-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .inv-emoji {
+      font-size: 28px;
+    }
+
+    .inv-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-small {
+      background: #252534;
+      color: #fff;
+      border: 1px solid #35354a;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Нижняя навигация */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: #14141c;
+      border-top: 1px solid var(--card-border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      z-index: 30;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    nav button.active {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    nav button .ico {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="user-box">
+      <div class="avatar" id="user-avatar">MG</div>
+      <div class="user-meta">
+        <div class="user-name" id="user-name">MellstroyGift</div>
+        <div class="user-sub" id="user-sub">Загрузка профиля...</div>
+      </div>
+    </div>
+    <div class="balance-pill">
+      <span>⭐ <span id="balance-val">100</span></span>
+      <button class="topup-mini" id="add-demo-balance">+50</button>
+    </div>
+  </header>
+
+  <div class="live-strip" id="live-strip">
+    <div class="live-badge">● LIVE</div>
+    <div class="live-item">👑 @alex · Golden Ring</div>
+    <div class="live-item">💎 @dima · +250 ⭐</div>
+    <div class="live-item">🚀 @kira · Pepe Gift</div>
+  </div>
+
+  <!-- Главная -->
+  <section id="screen-home" class="screen active">
+    <h2>Кейсы подарков</h2>
+    <div class="grid-2">
+      <div class="case-card" onclick="openCaseScreen('Starter Box', 25)">
+        <div class="case-icon">🎁</div>
+        <div class="case-title">Starter Box</div>
+        <div class="price-btn">25 ⭐</div>
+      </div>
+      <div class="case-card" onclick="openCaseScreen('Hype Drop', 50)">
+        <div class="case-icon">🔥</div>
+        <div class="case-title">Hype Drop</div>
+        <div class="price-btn">50 ⭐</div>
+      </div>
+      <div class="case-card" onclick="openCaseScreen('Rich Club', 100)">
+        <div class="case-icon">👑</div>
+        <div class="case-title">Rich Club</div>
+        <div class="price-btn">100 ⭐</div>
+      </div>
+      <div class="case-card" onclick="openCaseScreen('Secret Vault', 200)">
+        <div class="case-icon">💎</div>
+        <div class="case-title">Secret Vault</div>
+        <div class="price-btn">200 ⭐</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Открытие кейса -->
+  <section id="screen-case" class="screen">
+    <div class="card-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 id="active-case-title" style="margin:0;">Starter Box</h2>
+        <button class="btn-small" onclick="switchTab('screen-home')">← Назад</button>
+      </div>
+
+      <div class="roulette-window">
+        <div class="roulette-pointer"></div>
+        <div class="roulette-track" id="roulette-track"></div>
+      </div>
+
+      <button class="btn-primary" id="spin-btn">Открыть за 25 ⭐</button>
+      <p id="spin-result" style="text-align:center; color:var(--gold); font-weight:600; margin:12px 0 0;"></p>
+    </div>
+  </section>
+
+  <!-- Инвентарь -->
+  <section id="screen-inventory" class="screen">
+    <h2>Ваш инвентарь</h2>
+    <div id="inventory-list"></div>
+  </section>
+
+  <!-- Бонусы / Рефералы -->
+  <section id="screen-bonus" class="screen">
+    <div class="card-box">
+      <h2>Ежедневный бонус</h2>
+      <p style="color:var(--muted); font-size:13px;">Забирай бесплатные звезды раз в день для теста механики.</p>
+      <button class="btn-primary" id="daily-btn">Забрать +30 ⭐</button>
+    </div>
+    <div class="card-box">
+      <h2>Пригласить друзей</h2>
+      <p style="color:var(--muted); font-size:13px;">Позже сюда привяжем реферальную ссылку бота.</p>
+      <button class="btn-small" id="copy-ref-btn">Скопировать ссылку</button>
+    </div>
+  </section>
+
+  <nav>
+    <button data-target="screen-home" class="active">
+      <span class="ico">🏠</span>
+      <span>Главная</span>
+    </button>
+    <button data-target="screen-case">
+      <span class="ico">🎰</span>
+      <span>Кейс</span>
+    </button>
+    <button data-target="screen-inventory">
+      <span class="ico">🎒</span>
+      <span>Инвентарь</span>
+    </button>
+    <button data-target="screen-bonus">
+      <span class="ico">⚡</span>
+      <span>Награды</span>
+    </button>
+  </nav>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    let userNameLabel = "Игрок";
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      const u = tg.initDataUnsafe?.user;
+      if (u) {
+        userNameLabel = u.username ? `@${u.username}` : (u.first_name || "Игрок");
+        document.getElementById("user-name").textContent = [u.first_name, u.last_name].filter(Boolean).join(" ");
+        document.getElementById("user-sub").textContent = u.username ? `@${u.username}` : `ID: ${u.id}`;
+        document.getElementById("user-avatar").textContent = (u.first_name?.[0] || "M").toUpperCase();
+      } else {
+        document.getElementById("user-sub").textContent = "Демо-режим";
+      }
+    }
+
+    const ITEMS = [
+      { emoji: "🧸", name: "Plush Bear", price: 15 },
+      { emoji: "🌹", name: "Neon Rose", price: 25 },
+      { emoji: "💍", name: "Silver Ring", price: 45 },
+      { emoji: "🚀", name: "Rocket NFT", price: 80 },
+      { emoji: "👑", name: "Gold Crown", price: 150 },
+      { emoji: "🐸", name: "Rare Pepe", price: 300 }
+    ];
+
+    let balance = 100;
+    let currentCaseCost = 25;
+    let inventory = [];
+    let isSpinning = false;
+
+    function haptic(type = "light") {
+      try { tg?.HapticFeedback?.impactOccurred(type); } catch (e) {}
+    }
+
+    function updateBalanceUI() {
+      document.getElementById("balance-val").textContent = balance;
+    }
+
+    document.getElementById("add-demo-balance").addEventListener("click", () => {
+      balance += 50;
+      updateBalanceUI();
+      haptic("light");
+    });
+
+    function switchTab(targetId) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === targetId));
+      document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.target === targetId));
+    }
+
+    document.querySelectorAll("nav button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        switchTab(btn.dataset.target);
+        if (btn.dataset.target === "screen-inventory") renderInventory();
+      });
+    });
+
+    function buildRouletteTrack(winningItem = null) {
+      const track = document.getElementById("roulette-track");
+      track.style.transition = "none";
+      track.style.transform = "translateX(0px)";
+      track.innerHTML = "";
+
+      const list = [];
+      for (let i = 0; i < 32; i++) {
+        list.push(ITEMS[Math.floor(Math.random() * ITEMS.length)]);
+      }
+      if (winningItem) list[26] = winningItem;
+
+      list.forEach(item => {
+        const el = document.createElement("div");
+        el.className = "slot-item";
+        el.innerHTML = `${item.emoji}<span>${item.price} ⭐</span>`;
+        track.appendChild(el);
+      });
+    }
+
+    function openCaseScreen(title, cost) {
+      currentCaseCost = cost;
+      document.getElementById("active-case-title").textContent = title;
+      document.getElementById("spin-btn").textContent = `Открыть за ${cost} ⭐`;
+      document.getElementById("spin-result").textContent = "";
+      buildRouletteTrack();
+      switchTab("screen-case");
+    }
+
+    document.getElementById("spin-btn").addEventListener("click", () => {
+      if (isSpinning) return;
+      if (balance < currentCaseCost) {
+        document.getElementById("spin-result").textContent = "Недостаточно ⭐ — нажми +50 сверху для теста";
+        haptic("heavy");
+        return;
+      }
+
+      isSpinning = true;
+      balance -= currentCaseCost;
+      updateBalanceUI();
+      document.getElementById("spin-btn").disabled = true;
+      document.getElementById("spin-result").textContent = "Крутим...";
+      haptic("medium");
+
+      const winItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      buildRouletteTrack(winItem);
+
+      const track = document.getElementById("roulette-track");
+      const windowWidth = document.querySelector(".roulette-window").offsetWidth;
+      const slotStep = 86; // 78px + 8px gap
+      const targetOffset = (26 * slotStep) - (windowWidth / 2) + 39;
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          track.style.transition = "transform 3.2s cubic-bezier(0.12, 0.85, 0.22, 1)";
+          track.style.transform = `translateX(-${targetOffset}px)`;
+        });
+      });
+
+      setTimeout(() => {
+        isSpinning = false;
+        document.getElementById("spin-btn").disabled = false;
+        inventory.unshift({ ...winItem, id: Date.now() });
+        document.getElementById("spin-result").textContent = `Выпало: ${winItem.emoji} ${winItem.name} (${winItem.price} ⭐)`;
+        addLiveDrop(userNameLabel, winItem);
+        haptic("heavy");
+      }, 3300);
+    });
+
+    function addLiveDrop(user, item) {
+      const strip = document.getElementById("live-strip");
+      const badge = strip.querySelector(".live-badge");
+      const el = document.createElement("div");
+      el.className = "live-item";
+      el.textContent = `${item.emoji} ${user} · ${item.name}`;
+      badge.insertAdjacentElement("afterend", el);
+    }
+
+    function renderInventory() {
+      const box = document.getElementById("inventory-list");
+      if (!inventory.length) {
+        box.innerHTML = `<div class="card-box" style="color:var(--muted); text-align:center;">Инвентарь пуст. Открой первый кейс!</div>`;
+        return;
+      }
+      box.innerHTML = inventory.map((item, idx) => `
+        <div class="inv-item">
+          <div class="inv-left">
+            <div class="inv-emoji">${item.emoji}</div>
+            <div>
+              <div style="font-weight:700; font-size:14px;">${item.name}</div>
+              <div style="font-size:12px; color:var(--muted);">Ценность: ${item.price} ⭐</div>
+            </div>
+          </div>
+          <div class="inv-actions">
+            <button class="btn-small" onclick="sellItem(${idx})">Продать +${item.price} ⭐</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function sellItem(index) {
+      const item = inventory[index];
+      if (!item) return;
+      balance += item.price;
+      inventory.splice(index, 1);
+      updateBalanceUI();
+      renderInventory();
+      haptic("light");
+    }
+
+    document.getElementById("daily-btn").addEventListener("click", (e) => {
+      balance += 30;
+      updateBalanceUI();
+      e.target.disabled = true;
+      e.target.textContent = "Получено (+30 ⭐)";
+      haptic("medium");
+    });
+
+    document.getElementById("copy-ref-btn").addEventListener("click", (e) => {
+      navigator.clipboard?.writeText("https://t.me/your_bot?start=ref_demo");
+      e.target.textContent = "Скопировано!";
+      setTimeout(() => e.target.textContent = "Скопировать ссылку", 1500);
+    });
+
+    buildRouletteTrack();
+  </script>
+</body>
+</html>
