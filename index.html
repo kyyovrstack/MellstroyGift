@@ -166,7 +166,7 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 14px 12px;
+      padding: 10px;
       text-align: center;
       cursor: pointer;
       transition: transform 0.14s, border-color 0.14s, box-shadow 0.14s;
@@ -185,23 +185,45 @@
       top: 8px;
       right: 8px;
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 800;
       padding: 2px 7px;
       border-radius: 999px;
-      background: rgba(124, 92, 255, 0.2);
-      color: #c4b5fd;
+      background: rgba(15, 15, 22, 0.82);
+      border: 1px solid rgba(124, 92, 255, 0.45);
+      color: #e9d5ff;
+      z-index: 2;
     }
 
-    .case-icon { font-size: 38px; margin: 4px 0 6px; }
-    .case-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-    .case-desc { font-size: 11px; color: var(--muted); margin-bottom: 10px; min-height: 28px; }
+    .case-art-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #111119;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+    }
+
+    .case-art-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .case-title { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
+    .case-desc { font-size: 11px; color: var(--muted); margin-bottom: 8px; min-height: 26px; }
 
     .price-pill {
       display: inline-block;
       background: linear-gradient(135deg, var(--accent), #5d3df7);
       color: #fff;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       padding: 6px 14px;
       border-radius: 10px;
     }
@@ -492,12 +514,23 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 10px 12px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+    }
+
+    .wallet-connect-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
     }
+
+    .wallet-picker {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+    .wallet-picker.open { display: block; }
 
     .drop-choice-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
 
@@ -588,7 +621,7 @@
   <section id="screen-case" class="screen">
     <div class="card-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 id="active-case-title" style="margin:0;">Starter Box</h2>
+        <h2 id="active-case-title" style="margin:0;">Mell King</h2>
         <button class="btn-small" onclick="switchTab('screen-home')">← Кейсы</button>
       </div>
       <p id="active-case-desc" style="color:var(--muted); font-size:12px; margin:6px 0 0;"></p>
@@ -703,12 +736,26 @@
         <button class="btn-small" onclick="closeWalletModal()">✕</button>
       </div>
 
+      <!-- Подключение криптокошелька -->
       <div class="wallet-connect-box">
-        <div>
-          <div style="font-size:12px; font-weight:700;" id="wallet-conn-status">Кошелек не подключен</div>
-          <div style="font-size:11px; color:var(--muted);" id="wallet-conn-addr">TON Keeper / Wallet / Telegram Wallet</div>
+        <div class="wallet-connect-head">
+          <div>
+            <div style="font-size:12px; font-weight:700;" id="wallet-conn-status">Кошелек не подключен</div>
+            <div style="font-size:11px; color:var(--muted);" id="wallet-conn-addr">Tonkeeper / Telegram Wallet / TON-адрес</div>
+          </div>
+          <button class="btn-small" id="connect-wallet-btn" onclick="handleWalletAction()">Подключить</button>
         </div>
-        <button class="btn-small" id="connect-wallet-btn" onclick="toggleConnectWallet()">Подключить</button>
+
+        <div class="wallet-picker" id="wallet-picker">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:6px;">Выбери способ подключения:</div>
+          <div class="chips-row" style="margin-bottom:8px;">
+            <button class="chip" onclick="quickConnectWallet('Tonkeeper', 'UQDk...9mP1')">Tonkeeper</button>
+            <button class="chip" onclick="quickConnectWallet('Telegram Wallet', 'UQC9...4vL8')">Telegram Wallet</button>
+            <button class="chip" onclick="quickConnectWallet('MyTonWallet', 'UQB2...7xR3')">MyTonWallet</button>
+          </div>
+          <input type="text" class="input-box" id="custom-wallet-input" placeholder="Или вставь свой TON-адрес (UQ... / EQ...)" style="margin-bottom:6px;" />
+          <button class="btn-small" style="width:100%;" onclick="connectCustomAddress()">Сохранить адрес кошелька</button>
+        </div>
       </div>
 
       <div class="tabs-3">
@@ -780,14 +827,16 @@
       { id: "pepe", emoji: "🐸", name: "Rare Pepe", rarity: "Legendary", price: 240, sellStars: 190 }
     ];
 
-    // Веса подобраны под ~25-30% маржу владельца при частых мелких/средних дропах
+    // Мультяшные мемные кейсы с картинками (если файл еще не залит, сработает fallback на эмодзи)
     const CASES = [
       {
-        id: "starter",
-        title: "Starter Box",
-        tag: "ХИТ",
-        desc: "Частые подарки + шанс на Rocket и Crown",
+        id: "mell-king",
+        title: "Mell King",
+        tag: "MEME",
+        desc: "Мемный король дропов: подарки, алмазы и редкие NFT",
         price: 25,
+        img: "https://kyyovrstack.github.io/MellstroyGift/case-king.png",
+        fallbackEmoji: "👑",
         pool: [
           { giftId: "bear", weight: 52 },
           { giftId: "rose", weight: 28 },
@@ -797,11 +846,13 @@
         ]
       },
       {
-        id: "hype",
-        title: "Mellstroy Hype",
+        id: "mell-cash",
+        title: "Mell Cash",
         tag: "HOT",
-        desc: "Больше редких и эпических NFT-подарков",
+        desc: "Кэш-вайб и редкие подарки с повышенным тиром",
         price: 60,
+        img: "https://kyyovrstack.github.io/MellstroyGift/case-cash.png",
+        fallbackEmoji: "💸",
         pool: [
           { giftId: "rose", weight: 40 },
           { giftId: "ring", weight: 28 },
@@ -817,6 +868,8 @@
         tag: "RARE",
         desc: "Охота за короной, шлемом и редким Пепе",
         price: 150,
+        img: "https://kyyovrstack.github.io/MellstroyGift/case-king.png",
+        fallbackEmoji: "💎",
         pool: [
           { giftId: "ring", weight: 36 },
           { giftId: "visor", weight: 28 },
@@ -832,6 +885,8 @@
         tag: "MAX",
         desc: "Крупные NFT-подарки с контролем банка",
         price: 300,
+        img: "https://kyyovrstack.github.io/MellstroyGift/case-cash.png",
+        fallbackEmoji: "🚀",
         pool: [
           { giftId: "rocket", weight: 44 },
           { giftId: "helmet", weight: 30 },
@@ -844,6 +899,7 @@
     let starsBalance = 150;
     let gramBalance = 2.5;
     let walletConnected = false;
+    let walletProvider = "";
     let walletAddress = "";
     let currentCase = CASES[0];
     let isSpinning = false;
@@ -905,18 +961,17 @@
 
     function renderCases() {
       const grid = document.getElementById("cases-grid");
-      grid.innerHTML = CASES.map(c => {
-        const topGift = getGiftById(c.pool[c.pool.length - 1].giftId);
-        return `
-          <div class="case-card" onclick="selectCase('${c.id}')">
-            <div class="case-tag">${c.tag}</div>
-            <div class="case-icon">${topGift.emoji}</div>
-            <div class="case-title">${c.title}</div>
-            <div class="case-desc">${c.desc}</div>
-            <div class="price-pill">${c.price} ⭐</div>
+      grid.innerHTML = CASES.map(c => `
+        <div class="case-card" onclick="selectCase('${c.id}')">
+          <div class="case-tag">${c.tag}</div>
+          <div class="case-art-wrap">
+            <img src="${c.img}" alt="${c.title}" onerror="this.style.display='none'; this.parentElement.textContent='${c.fallbackEmoji}';" />
           </div>
-        `;
-      }).join("");
+          <div class="case-title">${c.title}</div>
+          <div class="case-desc">${c.desc}</div>
+          <div class="price-pill">${c.price} ⭐</div>
+        </div>
+      `).join("");
     }
 
     function selectCase(caseId) {
@@ -1106,7 +1161,6 @@
       renderUpgradeScreen();
     }
 
-    // Честный шанс с заложенной маржой (~25%) и бонусом защиты при неудаче
     function calcChance() {
       if (!inventory.length) return 0;
       const src = inventory[selectedUpgradeInvIndex];
@@ -1212,6 +1266,7 @@
       const sel = document.getElementById("deposit-gift-select");
       sel.innerHTML = GIFTS.map(g => `<option value="${g.id}">${g.emoji} ${g.name} (ценность ${g.price} ⭐)</option>`).join("");
       switchWalletTab(tab);
+      updateWalletUI();
       document.getElementById("wallet-modal").classList.add("open");
     }
 
@@ -1226,22 +1281,51 @@
       });
     }
 
-    function toggleConnectWallet() {
-      walletConnected = !walletConnected;
+    function updateWalletUI() {
+      const statusEl = document.getElementById("wallet-conn-status");
+      const addrEl = document.getElementById("wallet-conn-addr");
+      const btnEl = document.getElementById("connect-wallet-btn");
+      const pickerEl = document.getElementById("wallet-picker");
+
       if (walletConnected) {
-        walletAddress = "UQDr...8xK2";
-        document.getElementById("wallet-conn-status").textContent = "Кошелек подключен (TON)";
-        document.getElementById("wallet-conn-addr").textContent = walletAddress;
-        document.getElementById("connect-wallet-btn").textContent = "Отключить";
-        showToast("Кошелек подключен");
+        statusEl.textContent = `Подключен: ${walletProvider}`;
+        addrEl.textContent = walletAddress;
+        btnEl.textContent = "Отключить";
+        pickerEl.classList.remove("open");
       } else {
-        walletAddress = "";
-        document.getElementById("wallet-conn-status").textContent = "Кошелек не подключен";
-        document.getElementById("wallet-conn-addr").textContent = "TON Keeper / Wallet / Telegram Wallet";
-        document.getElementById("connect-wallet-btn").textContent = "Подключить";
-        showToast("Кошелек отключен");
+        statusEl.textContent = "Кошелек не подключен";
+        addrEl.textContent = "Tonkeeper / Telegram Wallet / TON-адрес";
+        btnEl.textContent = "Подключить";
       }
+    }
+
+    function handleWalletAction() {
       haptic("light");
+      if (walletConnected) {
+        walletConnected = false;
+        walletProvider = "";
+        walletAddress = "";
+        updateWalletUI();
+        showToast("Кошелек отключен");
+      } else {
+        document.getElementById("wallet-picker").classList.toggle("open");
+      }
+    }
+
+    function quickConnectWallet(provider, shortAddr) {
+      walletConnected = true;
+      walletProvider = provider;
+      walletAddress = shortAddr;
+      updateWalletUI();
+      showToast(`${provider} подключен`);
+      haptic("medium");
+    }
+
+    function connectCustomAddress() {
+      const raw = document.getElementById("custom-wallet-input").value.trim();
+      if (raw.length < 6) return showToast("Введите корректный TON-адрес");
+      const shortAddr = raw.length > 10 ? `${raw.slice(0, 4)}...${raw.slice(-4)}` : raw;
+      quickConnectWallet("TON Wallet", shortAddr);
     }
 
     function setGramAmount(val) { document.getElementById("gram-amount-input").value = val; }
@@ -1280,7 +1364,7 @@
 
     updateBalances();
     renderCases();
-    selectCase("starter");
+    selectCase("mell-king");
     switchTab("screen-home");
   </script>
 </body>
