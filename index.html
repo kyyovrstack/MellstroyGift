@@ -5,30 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MellstroyGift</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     :root {
-      --bg: #0d0d13;
-      --card: #171722;
-      --card-2: #1f1f2e;
-      --border: #2a2a3d;
+      --bg: #0c0c12;
+      --card: #161620;
+      --card-2: #1e1e2c;
+      --border: #29293b;
       --accent: #7c5cff;
-      --accent-2: #38bdf8;
-      --accent-glow: rgba(124, 92, 255, 0.35);
+      --accent-2: #3b82f6;
       --gold: #ffb800;
-      --text: #f6f6fb;
-      --muted: #8f8fa6;
+      --text: #f5f5fa;
+      --muted: #8e8ea6;
       --success: #2ed573;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(circle at top, #1a1530 0%, var(--bg) 52%);
+      background: radial-gradient(circle at top, #19142e 0%, var(--bg) 55%);
       color: var(--text);
       padding-bottom: 84px;
       user-select: none;
@@ -39,7 +36,7 @@
       position: sticky;
       top: 0;
       z-index: 30;
-      background: rgba(13, 13, 19, 0.9);
+      background: rgba(12, 12, 18, 0.92);
       backdrop-filter: blur(12px);
       padding: 12px 14px;
       border-bottom: 1px solid var(--border);
@@ -49,537 +46,218 @@
       gap: 8px;
     }
 
-    .user-box {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 0;
-    }
+    .user-box { display: flex; align-items: center; gap: 9px; min-width: 0; }
 
     .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 14px;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; flex-shrink: 0;
     }
 
     .user-meta { overflow: hidden; }
+    .user-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-sub { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .user-name {
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .user-sub {
-      font-size: 11px;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .wallet-bar {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
+    .wallet-bar { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
     .balance-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 13px;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--card); border: 1px solid var(--border);
+      padding: 6px 10px; border-radius: 12px; font-weight: 700; font-size: 13px;
       cursor: pointer;
     }
 
     .topup-btn {
-      background: linear-gradient(135deg, var(--accent), #5d3df7);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 7px 11px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 14px var(--accent-glow);
+      background: linear-gradient(135deg, var(--accent), #5b3df5);
+      color: #fff; border: none; border-radius: 10px;
+      padding: 7px 11px; font-size: 12px; font-weight: 700; cursor: pointer;
     }
 
     .live-strip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 14px;
-      overflow-x: auto;
-      border-bottom: 1px solid var(--border);
-      scrollbar-width: none;
+      display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+      overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none;
     }
     .live-strip::-webkit-scrollbar { display: none; }
 
     .live-badge {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--success);
-      background: rgba(46, 213, 115, 0.12);
-      border: 1px solid rgba(46, 213, 115, 0.35);
-      padding: 4px 8px;
-      border-radius: 8px;
-      flex-shrink: 0;
+      font-size: 11px; font-weight: 800; color: var(--success);
+      background: rgba(46, 213, 115, 0.12); border: 1px solid rgba(46, 213, 115, 0.35);
+      padding: 4px 8px; border-radius: 8px; flex-shrink: 0;
     }
 
     .live-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 5px 10px;
-      font-size: 12px;
-      white-space: nowrap;
-      flex-shrink: 0;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 5px 10px; font-size: 12px; white-space: nowrap; flex-shrink: 0;
     }
 
     .screen { display: none; padding: 14px; }
     .screen.active { display: block; }
-
     h2 { margin: 0 0 12px; font-size: 18px; }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
     .case-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.14s, border-color 0.14s, box-shadow 0.14s;
-      position: relative;
-      overflow: hidden;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 10px; text-align: center; cursor: pointer; position: relative; overflow: hidden;
     }
-
-    .case-card:active {
-      transform: scale(0.97);
-      border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
+    .case-card:active { transform: scale(0.97); border-color: var(--accent); }
 
     .case-tag {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: rgba(15, 15, 22, 0.82);
-      border: 1px solid rgba(124, 92, 255, 0.45);
-      color: #e9d5ff;
-      z-index: 2;
+      position: absolute; top: 8px; right: 8px; font-size: 10px; font-weight: 800;
+      padding: 2px 7px; border-radius: 999px;
+      background: rgba(15, 15, 22, 0.85); border: 1px solid rgba(124, 92, 255, 0.45);
+      color: #e9d5ff; z-index: 2;
     }
 
     .case-art-wrap {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #111119;
-      border: 1px solid var(--border);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 42px;
+      width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden;
+      background: #101018; border: 1px solid var(--border); margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 40px;
     }
-
-    .case-art-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .case-art-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .case-title { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
     .case-desc { font-size: 11px; color: var(--muted); margin-bottom: 8px; min-height: 26px; }
 
     .price-pill {
-      display: inline-block;
-      background: linear-gradient(135deg, var(--accent), #5d3df7);
-      color: #fff;
-      font-weight: 700;
-      font-size: 12px;
-      padding: 6px 14px;
-      border-radius: 10px;
+      display: inline-block; background: linear-gradient(135deg, var(--accent), #5b3df5);
+      color: #fff; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 10px;
     }
 
     .card-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 14px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px; margin-bottom: 14px;
     }
 
     .roulette-window {
-      position: relative;
-      height: 102px;
-      overflow: hidden;
-      background: #0e0e16;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      margin: 12px 0 14px;
+      position: relative; height: 102px; overflow: hidden; background: #0d0d15;
+      border: 1px solid var(--border); border-radius: 14px; margin: 12px 0 14px;
     }
-
     .roulette-pointer {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 3px;
-      transform: translateX(-50%);
-      background: var(--gold);
-      box-shadow: 0 0 12px var(--gold);
-      z-index: 5;
+      position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; transform: translateX(-50%);
+      background: var(--gold); box-shadow: 0 0 12px var(--gold); z-index: 5;
     }
-
-    .roulette-track {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      gap: 8px;
-      padding: 0 10px;
-    }
+    .roulette-track { display: flex; align-items: center; height: 100%; gap: 8px; padding: 0 10px; }
 
     .slot-item {
-      min-width: 82px;
-      height: 82px;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      flex-shrink: 0;
+      min-width: 82px; height: 82px; background: var(--card-2); border: 1px solid var(--border);
+      border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
     }
-
     .slot-item span {
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 3px;
-      max-width: 74px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 10px; color: var(--muted); margin-top: 3px; max-width: 74px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    .drop-preview-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 10px;
-    }
-
+    .drop-preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
     .drop-mini {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 8px 6px;
-      text-align: center;
+      background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 8px 6px; text-align: center;
     }
-
+    .drop-mini.nft-item { border-color: rgba(255, 184, 0, 0.45); }
     .drop-mini .em { font-size: 22px; }
     .drop-mini .nm { font-size: 11px; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .drop-mini .pr { font-size: 11px; color: var(--gold); margin-top: 2px; }
-    .drop-mini .ch { font-size: 10px; color: var(--muted); }
+    .drop-mini .tp { font-size: 9px; font-weight: 700; color: #c4b5fd; margin-top: 1px; }
+    .drop-mini.nft-item .tp { color: var(--gold); }
+    .drop-mini .pr { font-size: 11px; color: var(--success); margin-top: 2px; }
 
-    .upgrade-slots {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
+    .upgrade-slots { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 12px 0; }
     .upg-slot {
-      background: var(--card-2);
-      border: 1px dashed #3d3d58;
-      border-radius: 14px;
-      padding: 12px 8px;
-      text-align: center;
-      min-height: 112px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      background: var(--card-2); border: 1px dashed #3d3d58; border-radius: 14px;
+      padding: 12px 8px; text-align: center; min-height: 112px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
+    .upg-slot.filled { border-style: solid; border-color: var(--accent); }
 
-    .upg-slot.filled {
-      border-style: solid;
-      border-color: var(--accent);
-    }
+    .upg-bar-wrap { background: #0d0d14; border: 1px solid var(--border); border-radius: 999px; height: 16px; overflow: hidden; margin: 10px 0 12px; }
+    .upg-bar-fill { height: 100%; width: 50%; background: linear-gradient(90deg, var(--accent), var(--success)); transition: width 0.25s ease; }
 
-    .upg-bar-wrap {
-      background: #0d0d14;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      height: 16px;
-      overflow: hidden;
-      margin: 10px 0 12px;
-    }
-
-    .upg-bar-fill {
-      height: 100%;
-      width: 50%;
-      background: linear-gradient(90deg, var(--accent), var(--success));
-      transition: width 0.25s ease;
-    }
-
-    .target-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
+    .target-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
     .target-btn {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 9px;
-      color: var(--text);
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 9px; color: var(--text); text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px;
     }
+    .target-btn.active { border-color: var(--gold); box-shadow: 0 0 14px rgba(255, 184, 0, 0.22); }
 
-    .target-btn.active {
-      border-color: var(--gold);
-      box-shadow: 0 0 14px rgba(255, 184, 0, 0.22);
-    }
-
-    .inv-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 10px;
-    }
-
-    .inv-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
+    .inv-item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+    .inv-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
     .inv-left { display: flex; align-items: center; gap: 10px; }
-
-    .inv-actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-    }
+    .inv-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 
     .btn-primary {
-      width: 100%;
-      background: linear-gradient(135deg, var(--accent), #5d3df7);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 13px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 20px var(--accent-glow);
+      width: 100%; background: linear-gradient(135deg, var(--accent), #5b3df5);
+      color: #fff; border: none; border-radius: 12px; padding: 13px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
     }
-
     .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .btn-small {
-      background: var(--card-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 7px 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+      background: var(--card-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 9px; padding: 7px 8px; font-size: 12px; font-weight: 600; cursor: pointer;
     }
-
     .btn-sell { border-color: rgba(46, 213, 115, 0.4); color: #7bed9f; }
     .btn-withdraw { border-color: rgba(56, 189, 248, 0.4); color: #7dd3fc; }
     .btn-upg { border-color: rgba(255, 184, 0, 0.45); color: #fcd34d; }
 
     .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 5, 10, 0.78);
-      backdrop-filter: blur(6px);
-      z-index: 60;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
+      position: fixed; inset: 0; background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(6px);
+      z-index: 60; display: none; align-items: flex-end; justify-content: center;
     }
-
     .modal-backdrop.open { display: flex; }
 
     .modal-sheet {
-      width: 100%;
-      max-width: 520px;
-      max-height: 88vh;
-      overflow-y: auto;
-      background: #151520;
-      border-top-left-radius: 22px;
-      border-top-right-radius: 22px;
-      border: 1px solid var(--border);
-      padding: 18px 16px 26px;
-      animation: slideUp 0.22s ease-out;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0.4; }
-      to { transform: translateY(0); opacity: 1; }
+      width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+      background: #151520; border-top-left-radius: 22px; border-top-right-radius: 22px;
+      border: 1px solid var(--border); padding: 18px 16px 26px;
     }
 
     .tabs-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      background: #0d0d14;
-      padding: 4px;
-      border-radius: 12px;
-      margin: 12px 0;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+      background: #0d0d14; padding: 4px; border-radius: 12px; margin: 12px 0;
     }
-
     .tabs-3 button {
-      background: none;
-      border: none;
-      color: var(--muted);
-      padding: 8px 6px;
-      border-radius: 9px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
+      background: none; border: none; color: var(--muted); padding: 8px 6px;
+      border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer;
     }
-
     .tabs-3 button.active { background: var(--accent); color: #fff; }
 
     .input-box {
-      width: 100%;
-      background: #0d0d14;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 11px 12px;
-      color: var(--text);
-      font-size: 14px;
-      margin-bottom: 10px;
+      width: 100%; background: #0d0d14; border: 1px solid var(--border);
+      border-radius: 11px; padding: 11px 12px; color: var(--text); font-size: 14px; margin-bottom: 10px;
     }
 
     .chips-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-
     .chip {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 9px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+      background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 9px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
     }
 
-    .wallet-connect-box {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-      margin-bottom: 10px;
+    .wallet-box {
+      background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 12px; margin-bottom: 12px;
     }
-
-    .wallet-connect-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .wallet-picker {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      display: none;
-    }
-    .wallet-picker.open { display: block; }
 
     .drop-choice-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
 
     nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 66px;
-      background: #12121a;
-      border-top: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      z-index: 40;
+      position: fixed; bottom: 0; left: 0; right: 0; height: 66px;
+      background: #12121a; border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr); z-index: 40;
       padding: 0 18px 0 46px;
     }
-
     nav button {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 11px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      cursor: pointer;
-      min-width: 0;
+      background: none; border: none; color: var(--muted); font-size: 11px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer;
     }
-
     nav button.active { color: #fff; font-weight: 700; }
     nav button .ico { font-size: 18px; line-height: 1.1; }
 
     .toast {
-      position: fixed;
-      top: 66px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #232336;
-      border: 1px solid var(--accent);
-      color: #fff;
-      padding: 8px 14px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-      z-index: 90;
-      display: none;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      position: fixed; top: 66px; left: 50%; transform: translateX(-50%);
+      background: #232336; border: 1px solid var(--accent); color: #fff;
+      padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600;
+      z-index: 90; display: none;
     }
     .toast.show { display: block; }
   </style>
@@ -600,21 +278,21 @@
       <div class="balance-pill" onclick="openWalletModal('stars')">
         <span>⭐ <span id="stars-val">150</span></span>
         <span style="color:var(--muted);">|</span>
-        <span>💎 <span id="gram-val">2.5</span></span>
+        <span>💎 <span id="ton-val">0</span></span>
       </div>
-      <button class="topup-btn" onclick="openWalletModal('gram')">+ Кошелек</button>
+      <button class="topup-btn" onclick="openWalletModal('ton')">+ Кошелек</button>
     </div>
   </header>
 
   <div class="live-strip" id="live-strip">
     <div class="live-badge">● LIVE</div>
-    <div class="live-item">👑 @alex · Gold Crown</div>
-    <div class="live-item">🚀 @dima · Rocket NFT</div>
-    <div class="live-item">🐸 @kira · Rare Pepe</div>
+    <div class="live-item">👑 @alex · Gold Crown [NFT]</div>
+    <div class="live-item">🧸 @dima · Plush Bear</div>
+    <div class="live-item">🐸 @kira · Rare Pepe [NFT]</div>
   </div>
 
   <section id="screen-home" class="screen active">
-    <h2>Кейсы с NFT-подарками</h2>
+    <h2>Кейсы: Обычные + NFT подарки</h2>
     <div class="grid-2" id="cases-grid"></div>
   </section>
 
@@ -625,17 +303,15 @@
         <button class="btn-small" onclick="switchTab('screen-home')">← Кейсы</button>
       </div>
       <p id="active-case-desc" style="color:var(--muted); font-size:12px; margin:6px 0 0;"></p>
-
       <div class="roulette-window">
         <div class="roulette-pointer"></div>
         <div class="roulette-track" id="roulette-track"></div>
       </div>
-
       <button class="btn-primary" id="spin-btn">Открыть за 25 ⭐</button>
     </div>
 
     <div class="card-box">
-      <div style="font-size:13px; font-weight:700;">Содержимое и шансы</div>
+      <div style="font-size:13px; font-weight:700;">Внутри кейса (Обычные и NFT)</div>
       <div class="drop-preview-grid" id="case-drops-preview"></div>
     </div>
   </section>
@@ -647,7 +323,7 @@
         <span style="font-size:12px; color:var(--gold); font-weight:700;">Защита: <span id="pity-val">0</span>/100</span>
       </div>
       <p style="color:var(--muted); font-size:12px; margin:6px 0 0;">
-        Выбери подарок из инвентаря и цель. При промахе копится защита — следующий апгрейд выше по шансу.
+        Выбери подарок из инвентаря и цель. При промахе копится шкала защиты.
       </p>
 
       <div class="upgrade-slots">
@@ -679,126 +355,107 @@
   <section id="screen-inventory" class="screen">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
       <h2 style="margin:0;">Инвентарь</h2>
-      <button class="btn-small" onclick="openWalletModal('gifts')">+ Внести NFT</button>
+      <button class="btn-small" onclick="openWalletModal('gifts')">+ Внести подарок</button>
     </div>
     <div id="inventory-list"></div>
   </section>
 
   <nav>
-    <button data-target="screen-home" class="active">
-      <span class="ico">🎁</span>
-      <span>Кейсы</span>
-    </button>
-    <button data-target="screen-case">
-      <span class="ico">🎰</span>
-      <span>Рулетка</span>
-    </button>
-    <button data-target="screen-upgrade">
-      <span class="ico">⚡</span>
-      <span>Апгрейд</span>
-    </button>
-    <button data-target="screen-inventory">
-      <span class="ico">🎒</span>
-      <span>Инвентарь</span>
-    </button>
+    <button data-target="screen-home" class="active"><span class="ico">🎁</span><span>Кейсы</span></button>
+    <button data-target="screen-case"><span class="ico">🎰</span><span>Рулетка</span></button>
+    <button data-target="screen-upgrade"><span class="ico">⚡</span><span>Апгрейд</span></button>
+    <button data-target="screen-inventory"><span class="ico">🎒</span><span>Инвентарь</span></button>
   </nav>
 
+  <!-- Модалка выпавшего подарка -->
   <div class="modal-backdrop" id="drop-modal">
     <div class="modal-sheet">
       <div style="text-align:center;">
-        <div style="font-size:11px; color:var(--gold); font-weight:800; letter-spacing:0.6px;">НОВЫЙ ДРОП</div>
+        <div id="drop-modal-badge" style="font-size:11px; color:var(--gold); font-weight:800;">НОВЫЙ ДРОП</div>
         <div id="drop-modal-emoji" style="font-size:56px; margin:8px 0;">🎁</div>
-        <div id="drop-modal-name" style="font-size:20px; font-weight:800;">Gift Name</div>
-        <div id="drop-modal-meta" style="font-size:13px; color:var(--muted); margin-top:4px;">Редкость · Цена: 0 ⭐</div>
+        <div id="drop-modal-name" style="font-size:20px; font-weight:800;">Gift</div>
+        <div id="drop-modal-meta" style="font-size:13px; color:var(--muted); margin-top:4px;"></div>
       </div>
-
       <div class="drop-choice-grid">
-        <button class="btn-primary" id="drop-btn-sell" style="background:linear-gradient(135deg,#10b981,#059669);">
-          💰 Продать за ... ⭐
-        </button>
-        <button class="btn-primary" id="drop-btn-withdraw" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);">
-          📤 Вывести подарок в Telegram
-        </button>
-        <button class="btn-primary" id="drop-btn-upgrade" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
-          ⚡ Отправить в Апгрейд
-        </button>
-        <button class="btn-small" style="padding:10px; margin-top:2px;" onclick="closeDropModal()">
-          Оставить в инвентаре
-        </button>
+        <button class="btn-primary" id="drop-btn-sell" style="background:linear-gradient(135deg,#10b981,#059669);">💰 Продать</button>
+        <button class="btn-primary" id="drop-btn-withdraw" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);">📤 Вывести подарок в Telegram</button>
+        <button class="btn-primary" id="drop-btn-upgrade" style="background:linear-gradient(135deg,#f59e0b,#d97706);">⚡ Отправить в Апгрейд</button>
+        <button class="btn-small" style="padding:10px;" onclick="closeDropModal()">Оставить в инвентаре</button>
       </div>
     </div>
   </div>
 
+  <!-- Модалка Кошелька (TON Connect / Stars / Подарки) -->
   <div class="modal-backdrop" id="wallet-modal">
     <div class="modal-sheet">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">Кошелек и пополнение</h2>
+        <h2 style="margin:0;">Пополнение баланса</h2>
         <button class="btn-small" onclick="closeWalletModal()">✕</button>
       </div>
 
-      <!-- Подключение криптокошелька -->
-      <div class="wallet-connect-box">
-        <div class="wallet-connect-head">
+      <div class="wallet-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
           <div>
-            <div style="font-size:12px; font-weight:700;" id="wallet-conn-status">Кошелек не подключен</div>
-            <div style="font-size:11px; color:var(--muted);" id="wallet-conn-addr">Tonkeeper / Telegram Wallet / TON-адрес</div>
+            <div style="font-size:12px; font-weight:700;" id="tc-status">TON Connect не подключен</div>
+            <div style="font-size:11px; color:var(--muted);" id="tc-address">Telegram Wallet / Tonkeeper / MyTonWallet</div>
           </div>
-          <button class="btn-small" id="connect-wallet-btn" onclick="handleWalletAction()">Подключить</button>
-        </div>
-
-        <div class="wallet-picker" id="wallet-picker">
-          <div style="font-size:11px; color:var(--muted); margin-bottom:6px;">Выбери способ подключения:</div>
-          <div class="chips-row" style="margin-bottom:8px;">
-            <button class="chip" onclick="quickConnectWallet('Tonkeeper', 'UQDk...9mP1')">Tonkeeper</button>
-            <button class="chip" onclick="quickConnectWallet('Telegram Wallet', 'UQC9...4vL8')">Telegram Wallet</button>
-            <button class="chip" onclick="quickConnectWallet('MyTonWallet', 'UQB2...7xR3')">MyTonWallet</button>
-          </div>
-          <input type="text" class="input-box" id="custom-wallet-input" placeholder="Или вставь свой TON-адрес (UQ... / EQ...)" style="margin-bottom:6px;" />
-          <button class="btn-small" style="width:100%;" onclick="connectCustomAddress()">Сохранить адрес кошелька</button>
+          <button class="btn-small" id="tc-connect-btn" onclick="toggleTonConnect()">Подключить</button>
         </div>
       </div>
 
       <div class="tabs-3">
-        <button id="tab-gram" class="active" onclick="switchWalletTab('gram')">💎 GRAM</button>
-        <button id="tab-stars" onclick="switchWalletTab('stars')">⭐ Stars</button>
-        <button id="tab-gifts" onclick="switchWalletTab('gifts')">🎁 NFT-подарки</button>
+        <button id="tab-ton" class="active" onclick="switchWalletTab('ton')">💎 TON / GRAM</button>
+        <button id="tab-stars" onclick="switchWalletTab('stars')">⭐ Звездами</button>
+        <button id="tab-gifts" onclick="switchWalletTab('gifts')">🎁 Подарками</button>
       </div>
 
-      <div id="panel-gram">
-        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Сумма пополнения в GRAM (1 GRAM = 40 ⭐):</div>
-        <input type="number" step="0.1" min="0.1" class="input-box" id="gram-amount-input" value="1" />
-        <div class="chips-row">
-          <button class="chip" onclick="setGramAmount(0.5)">+0.5 GRAM</button>
-          <button class="chip" onclick="setGramAmount(1)">+1 GRAM</button>
-          <button class="chip" onclick="setGramAmount(5)">+5 GRAM</button>
-          <button class="chip" onclick="setGramAmount(10)">+10 GRAM</button>
+      <!-- Реальный перевод через TON Connect -->
+      <div id="panel-ton">
+        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
+          Сумма депозита в TON (отправится транзакция в кошелек-получатель):
         </div>
-        <button class="btn-primary" onclick="depositGram()">Пополнить через GRAM</button>
+        <input type="number" step="0.05" min="0.05" class="input-box" id="ton-deposit-amount" value="0.2" />
+        <div class="chips-row">
+          <button class="chip" onclick="setTonAmount(0.1)">0.1 TON</button>
+          <button class="chip" onclick="setTonAmount(0.2)">0.2 TON</button>
+          <button class="chip" onclick="setTonAmount(0.5)">0.5 TON</button>
+          <button class="chip" onclick="setTonAmount(1)">1 TON</button>
+        </div>
+        <button class="btn-primary" onclick="sendRealTonDeposit()">Отправить депозит через TON Connect</button>
       </div>
 
+      <!-- Пополнение через Telegram Stars -->
       <div id="panel-stars" style="display:none;">
-        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Количество Telegram Stars:</div>
-        <input type="number" min="10" step="10" class="input-box" id="stars-amount-input" value="100" />
+        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
+          Количество Telegram Stars (оплата через бота):
+        </div>
+        <input type="number" min="10" step="10" class="input-box" id="stars-deposit-amount" value="100" />
         <div class="chips-row">
           <button class="chip" onclick="setStarsAmount(50)">50 ⭐</button>
           <button class="chip" onclick="setStarsAmount(100)">100 ⭐</button>
           <button class="chip" onclick="setStarsAmount(250)">250 ⭐</button>
           <button class="chip" onclick="setStarsAmount(500)">500 ⭐</button>
         </div>
-        <button class="btn-primary" onclick="depositStars()">Пополнить через Stars</button>
+        <button class="btn-primary" onclick="requestStarsInvoice()">Оплатить Stars через бота</button>
       </div>
 
+      <!-- Пополнение подарками -->
       <div id="panel-gifts" style="display:none;">
         <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">
-          Выбери NFT-подарок для внесения в инвентарь:
+          Выберите подарок и отправьте его боту/аккаунту проекта, затем нажмите «Подтвердить отправку»:
         </div>
         <select class="input-box" id="deposit-gift-select"></select>
-        <button class="btn-primary" onclick="depositNftGift()">Внести NFT-подарок</button>
+        <button class="btn-primary" onclick="requestGiftDeposit()">Отправить заявку на внесение подарка</button>
       </div>
     </div>
   </div>
 
   <script>
+    // УКАЖИ СВОЙ АДРЕС КОШЕЛЬКА-ПОЛУЧАТЕЛЯ (в формате EQ... или UQ...)
+    const RECEIVER_TON_ADDRESS = "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO";
+    // УКАЖИ USERNAME ТВОЕГО БОТА (без @) для приема Stars и подарков
+    const BOT_USERNAME = "your_mellstroy_bot";
+
     const tg = window.Telegram?.WebApp;
     let userHandle = "@player";
 
@@ -816,101 +473,160 @@
       }
     }
 
+    // Настоящий TON Connect UI
+    let tonConnectUI = null;
+    try {
+      tonConnectUI = new TONCONNECT_UI.TonConnectUI({
+        manifestUrl: "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json"
+      });
+      tonConnectUI.onStatusChange((wallet) => {
+        updateTonWalletStatus(wallet);
+      });
+    } catch (e) {
+      console.warn("TON Connect init error:", e);
+    }
+
+    function updateTonWalletStatus(wallet) {
+      const statusEl = document.getElementById("tc-status");
+      const addrEl = document.getElementById("tc-address");
+      const btnEl = document.getElementById("tc-connect-btn");
+
+      if (wallet?.account?.address) {
+        const addr = wallet.account.address;
+        const shortAddr = `${addr.slice(0, 5)}...${addr.slice(-4)}`;
+        statusEl.textContent = "Кошелек подключен";
+        addrEl.textContent = `${wallet.device?.appName || "TON Wallet"} · ${shortAddr}`;
+        btnEl.textContent = "Отключить";
+      } else {
+        statusEl.textContent = "TON Connect не подключен";
+        addrEl.textContent = "Telegram Wallet / Tonkeeper / MyTonWallet";
+        btnEl.textContent = "Подключить";
+      }
+    }
+
+    async function toggleTonConnect() {
+      if (!tonConnectUI) return showToast("TON Connect не загрузился");
+      if (tonConnectUI.account) {
+        await tonConnectUI.disconnect();
+        showToast("Кошелек отключен");
+      } else {
+        await tonConnectUI.openModal();
+      }
+    }
+
+    function setTonAmount(v) { document.getElementById("ton-deposit-amount").value = v; }
+    function setStarsAmount(v) { document.getElementById("stars-deposit-amount").value = v; }
+
+    async function sendRealTonDeposit() {
+      if (!tonConnectUI?.account) {
+        showToast("Сначала подключи кошелек через TON Connect");
+        await tonConnectUI?.openModal();
+        return;
+      }
+      const tonVal = parseFloat(document.getElementById("ton-deposit-amount").value);
+      if (!tonVal || tonVal < 0.05) return showToast("Минимум 0.05 TON");
+
+      const nanoAmount = Math.round(tonVal * 1e9).toString();
+      try {
+        const res = await tonConnectUI.sendTransaction({
+          validUntil: Math.floor(Date.now() / 1000) + 300,
+          messages: [
+            {
+              address: RECEIVER_TON_ADDRESS,
+              amount: nanoAmount
+            }
+          ]
+        });
+        // В продакшене отправь res.boc на бэкенд для проверки транзакции в блокчейне TON перед начислением!
+        showToast("Транзакция отправлена в кошелек!");
+        tonDeposited += tonVal;
+        starsBalance += Math.round(tonVal * 120);
+        updateBalances();
+        closeWalletModal();
+      } catch (err) {
+        showToast("Транзакция отклонена или отменена");
+      }
+    }
+
+    function requestStarsInvoice() {
+      const amt = parseInt(document.getElementById("stars-deposit-amount").value, 10);
+      if (!amt || amt < 10) return showToast("Минимум 10 ⭐");
+      const payload = JSON.stringify({ type: "deposit_stars", amount: amt });
+      if (tg?.sendData) {
+        tg.sendData(payload);
+        showToast(`Запрос на счет ${amt} ⭐ отправлен боту`);
+      } else {
+        window.open(`https://t.me/${BOT_USERNAME}?start=stars_${amt}`, "_blank");
+      }
+    }
+
+    function requestGiftDeposit() {
+      const giftId = document.getElementById("deposit-gift-select").value;
+      const g = getGiftById(giftId);
+      const payload = JSON.stringify({ type: "deposit_gift", giftId: g.id });
+      if (tg?.sendData) {
+        tg.sendData(payload);
+        showToast(`Заявка на внесение ${g.name} отправлена боту`);
+      } else {
+        window.open(`https://t.me/${BOT_USERNAME}?start=gift_${g.id}`, "_blank");
+      }
+    }
+
+    // Обычные подарки (isNft: false) и NFT-подарки (isNft: true)
     const GIFTS = [
-      { id: "bear", emoji: "🧸", name: "Plush Bear", rarity: "Common", price: 15, sellStars: 12 },
-      { id: "rose", emoji: "🌹", name: "Neon Rose", rarity: "Common", price: 20, sellStars: 16 },
-      { id: "ring", emoji: "💍", name: "Silver Ring", rarity: "Rare", price: 35, sellStars: 28 },
-      { id: "visor", emoji: "🕶️", name: "Cyber Visor", rarity: "Rare", price: 50, sellStars: 40 },
-      { id: "rocket", emoji: "🚀", name: "Rocket NFT", rarity: "Epic", price: 70, sellStars: 56 },
-      { id: "helmet", emoji: "🧑‍🚀", name: "Astro Helmet", rarity: "Epic", price: 105, sellStars: 84 },
-      { id: "crown", emoji: "👑", name: "Gold Crown", rarity: "Mythic", price: 150, sellStars: 120 },
-      { id: "pepe", emoji: "🐸", name: "Rare Pepe", rarity: "Legendary", price: 240, sellStars: 190 }
+      { id: "bear", emoji: "🧸", name: "Plush Bear", isNft: false, price: 15, sellStars: 12 },
+      { id: "rose", emoji: "🌹", name: "Neon Rose", isNft: false, price: 20, sellStars: 16 },
+      { id: "cake", emoji: "🎂", name: "Party Cake", isNft: false, price: 30, sellStars: 24 },
+      { id: "ring", emoji: "💍", name: "Silver Ring", isNft: true, price: 45, sellStars: 36 },
+      { id: "rocket", emoji: "🚀", name: "Rocket NFT", isNft: true, price: 85, sellStars: 68 },
+      { id: "crown", emoji: "👑", name: "Gold Crown", isNft: true, price: 160, sellStars: 128 },
+      { id: "pepe", emoji: "🐸", name: "Rare Pepe", isNft: true, price: 260, sellStars: 205 }
     ];
 
-    // Мультяшные мемные кейсы с картинками (если файл еще не залит, сработает fallback на эмодзи)
     const CASES = [
       {
         id: "mell-king",
         title: "Mell King",
         tag: "MEME",
-        desc: "Мемный король дропов: подарки, алмазы и редкие NFT",
+        desc: "Обычные подарки + шанс на NFT-подарки",
         price: 25,
         img: "https://kyyovrstack.github.io/MellstroyGift/case-king.png",
         fallbackEmoji: "👑",
         pool: [
-          { giftId: "bear", weight: 52 },
-          { giftId: "rose", weight: 28 },
-          { giftId: "ring", weight: 13 },
-          { giftId: "rocket", weight: 5 },
-          { giftId: "crown", weight: 2 }
+          { giftId: "bear", weight: 46 },
+          { giftId: "rose", weight: 26 },
+          { giftId: "cake", weight: 14 },
+          { giftId: "ring", weight: 9 },
+          { giftId: "rocket", weight: 4 },
+          { giftId: "crown", weight: 1 }
         ]
       },
       {
         id: "mell-cash",
         title: "Mell Cash",
-        tag: "HOT",
-        desc: "Кэш-вайб и редкие подарки с повышенным тиром",
-        price: 60,
+        tag: "NFT + DROP",
+        desc: "Больше NFT-подарков и редких трофеев",
+        price: 75,
         img: "https://kyyovrstack.github.io/MellstroyGift/case-cash.png",
         fallbackEmoji: "💸",
         pool: [
-          { giftId: "rose", weight: 40 },
-          { giftId: "ring", weight: 28 },
-          { giftId: "visor", weight: 18 },
-          { giftId: "rocket", weight: 9 },
-          { giftId: "helmet", weight: 4 },
-          { giftId: "crown", weight: 1 }
-        ]
-      },
-      {
-        id: "vip",
-        title: "VIP Legend",
-        tag: "RARE",
-        desc: "Охота за короной, шлемом и редким Пепе",
-        price: 150,
-        img: "https://kyyovrstack.github.io/MellstroyGift/case-king.png",
-        fallbackEmoji: "💎",
-        pool: [
-          { giftId: "ring", weight: 36 },
-          { giftId: "visor", weight: 28 },
-          { giftId: "rocket", weight: 20 },
-          { giftId: "helmet", weight: 10 },
-          { giftId: "crown", weight: 4.5 },
-          { giftId: "pepe", weight: 1.5 }
-        ]
-      },
-      {
-        id: "whale",
-        title: "Whale Vault",
-        tag: "MAX",
-        desc: "Крупные NFT-подарки с контролем банка",
-        price: 300,
-        img: "https://kyyovrstack.github.io/MellstroyGift/case-cash.png",
-        fallbackEmoji: "🚀",
-        pool: [
-          { giftId: "rocket", weight: 44 },
-          { giftId: "helmet", weight: 30 },
-          { giftId: "crown", weight: 18 },
-          { giftId: "pepe", weight: 8 }
+          { giftId: "rose", weight: 28 },
+          { giftId: "cake", weight: 26 },
+          { giftId: "ring", weight: 22 },
+          { giftId: "rocket", weight: 15 },
+          { giftId: "crown", weight: 7 },
+          { giftId: "pepe", weight: 2 }
         ]
       }
     ];
 
     let starsBalance = 150;
-    let gramBalance = 2.5;
-    let walletConnected = false;
-    let walletProvider = "";
-    let walletAddress = "";
+    let tonDeposited = 0;
     let currentCase = CASES[0];
     let isSpinning = false;
     let lastDroppedGift = null;
     let pityPoints = 0;
-
-    let inventory = [
-      { ...GIFTS[0], uid: 101 },
-      { ...GIFTS[2], uid: 102 }
-    ];
-
+    let inventory = [{ ...GIFTS[0], uid: 101 }];
     let selectedUpgradeInvIndex = 0;
     let selectedTargetGiftId = GIFTS[4].id;
 
@@ -918,50 +634,37 @@
       const el = document.getElementById("toast");
       el.textContent = msg;
       el.classList.add("show");
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
-    }
-
-    function haptic(style = "light") {
-      try { tg?.HapticFeedback?.impactOccurred(style); } catch (e) {}
+      clearTimeout(window._t);
+      window._t = setTimeout(() => el.classList.remove("show"), 2300);
     }
 
     function updateBalances() {
       document.getElementById("stars-val").textContent = starsBalance;
-      document.getElementById("gram-val").textContent = Number(gramBalance).toFixed(2).replace(/\.00$/, "");
+      document.getElementById("ton-val").textContent = Number(tonDeposited).toFixed(2).replace(/\.00$/, "");
     }
 
     function addLiveFeed(text) {
       const strip = document.getElementById("live-strip");
       const badge = strip.querySelector(".live-badge");
-      const item = document.createElement("div");
-      item.className = "live-item";
-      item.textContent = text;
-      badge.insertAdjacentElement("afterend", item);
-      if (strip.children.length > 10) strip.removeChild(strip.lastElementChild);
+      const el = document.createElement("div");
+      el.className = "live-item";
+      el.textContent = text;
+      badge.insertAdjacentElement("afterend", el);
     }
 
-    function switchTab(screenId) {
-      document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === screenId));
-      document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.target === screenId));
-      if (screenId === "screen-inventory") renderInventory();
-      if (screenId === "screen-upgrade") renderUpgradeScreen();
+    function switchTab(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+      document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.target === id));
+      if (id === "screen-inventory") renderInventory();
+      if (id === "screen-upgrade") renderUpgradeScreen();
     }
 
-    document.querySelectorAll("nav button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        haptic("light");
-        switchTab(btn.dataset.target);
-      });
-    });
+    document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.target)));
 
-    function getGiftById(id) {
-      return GIFTS.find(g => g.id === id) || GIFTS[0];
-    }
+    function getGiftById(id) { return GIFTS.find(g => g.id === id) || GIFTS[0]; }
 
     function renderCases() {
-      const grid = document.getElementById("cases-grid");
-      grid.innerHTML = CASES.map(c => `
+      document.getElementById("cases-grid").innerHTML = CASES.map(c => `
         <div class="case-card" onclick="selectCase('${c.id}')">
           <div class="case-tag">${c.tag}</div>
           <div class="case-art-wrap">
@@ -974,31 +677,30 @@
       `).join("");
     }
 
-    function selectCase(caseId) {
-      currentCase = CASES.find(c => c.id === caseId) || CASES[0];
+    function selectCase(id) {
+      currentCase = CASES.find(c => c.id === id) || CASES[0];
       document.getElementById("active-case-title").textContent = currentCase.title;
       document.getElementById("active-case-desc").textContent = currentCase.desc;
       document.getElementById("spin-btn").textContent = `Открыть за ${currentCase.price} ⭐`;
 
-      const dropsHtml = currentCase.pool.map(entry => {
-        const g = getGiftById(entry.giftId);
+      document.getElementById("case-drops-preview").innerHTML = currentCase.pool.map(p => {
+        const g = getGiftById(p.giftId);
         return `
-          <div class="drop-mini">
+          <div class="drop-mini ${g.isNft ? "nft-item" : ""}">
             <div class="em">${g.emoji}</div>
             <div class="nm">${g.name}</div>
+            <div class="tp">${g.isNft ? "NFT GIFT" : "Обычный"}</div>
             <div class="pr">${g.price} ⭐</div>
-            <div class="ch">${entry.weight}%</div>
           </div>
         `;
       }).join("");
-      document.getElementById("case-drops-preview").innerHTML = dropsHtml;
 
       buildRoulette(currentCase.pool);
       switchTab("screen-case");
     }
 
-    function rollFromCasePool(pool) {
-      const total = pool.reduce((sum, item) => sum + item.weight, 0);
+    function rollFromPool(pool) {
+      const total = pool.reduce((a, b) => a + b.weight, 0);
       let r = Math.random() * total;
       for (const item of pool) {
         r -= item.weight;
@@ -1007,110 +709,93 @@
       return getGiftById(pool[0].giftId);
     }
 
-    function buildRoulette(pool, winnerGift = null) {
+    function buildRoulette(pool, winner = null) {
       const track = document.getElementById("roulette-track");
       track.style.transition = "none";
       track.style.transform = "translateX(0px)";
       track.innerHTML = "";
 
-      const items = [];
-      for (let i = 0; i < 34; i++) {
-        items.push(rollFromCasePool(pool));
-      }
-      if (winnerGift) items[27] = winnerGift;
+      const list = Array.from({ length: 34 }, () => rollFromPool(pool));
+      if (winner) list[27] = winner;
 
-      items.forEach(g => {
-        const div = document.createElement("div");
-        div.className = "slot-item";
-        div.innerHTML = `${g.emoji}<span>${g.name}</span>`;
-        track.appendChild(div);
+      list.forEach(g => {
+        const d = document.createElement("div");
+        d.className = "slot-item";
+        d.innerHTML = `${g.emoji}<span>${g.name}</span>`;
+        track.appendChild(d);
       });
     }
 
     document.getElementById("spin-btn").addEventListener("click", () => {
       if (isSpinning) return;
-      if (starsBalance < currentCase.price) {
-        showToast("Недостаточно ⭐ — открой Кошелек для пополнения");
-        haptic("heavy");
-        return;
-      }
+      if (starsBalance < currentCase.price) return showToast("Недостаточно ⭐");
 
       isSpinning = true;
       starsBalance -= currentCase.price;
       updateBalances();
       document.getElementById("spin-btn").disabled = true;
-      haptic("medium");
 
-      const winner = rollFromCasePool(currentCase.pool);
+      const winner = rollFromPool(currentCase.pool);
       buildRoulette(currentCase.pool, winner);
 
       const track = document.getElementById("roulette-track");
       const winWidth = document.querySelector(".roulette-window").offsetWidth;
-      const step = 90;
-      const offset = (27 * step) - (winWidth / 2) + 41;
+      const offset = (27 * 90) - (winWidth / 2) + 41;
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          track.style.transition = "transform 3.3s cubic-bezier(0.12, 0.86, 0.2, 1)";
-          track.style.transform = `translateX(-${offset}px)`;
-        });
-      });
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        track.style.transition = "transform 3.3s cubic-bezier(0.12, 0.86, 0.2, 1)";
+        track.style.transform = `translateX(-${offset}px)`;
+      }));
 
       setTimeout(() => {
         isSpinning = false;
         document.getElementById("spin-btn").disabled = false;
-        const droppedObj = { ...winner, uid: Date.now() + Math.random() };
-        inventory.unshift(droppedObj);
-        lastDroppedGift = droppedObj;
-        addLiveFeed(`${winner.emoji} ${userHandle} · ${winner.name}`);
-        haptic("heavy");
-        openDropModal(droppedObj);
+        const dropped = { ...winner, uid: Date.now() + Math.random() };
+        inventory.unshift(dropped);
+        lastDroppedGift = dropped;
+        addLiveFeed(`${winner.emoji} ${userHandle} · ${winner.name}${winner.isNft ? " [NFT]" : ""}`);
+        openDropModal(dropped);
       }, 3400);
     });
 
-    function openDropModal(giftObj) {
-      lastDroppedGift = giftObj;
-      document.getElementById("drop-modal-emoji").textContent = giftObj.emoji;
-      document.getElementById("drop-modal-name").textContent = giftObj.name;
-      document.getElementById("drop-modal-meta").textContent = `${giftObj.rarity} · Ценность: ${giftObj.price} ⭐`;
-
-      document.getElementById("drop-btn-sell").textContent = `💰 Продать за +${giftObj.sellStars} ⭐`;
-      document.getElementById("drop-btn-withdraw").textContent = `📤 Вывести ${giftObj.name} в Telegram`;
-      document.getElementById("drop-btn-upgrade").textContent = `⚡ Отправить ${giftObj.name} в Апгрейд`;
-
+    function openDropModal(g) {
+      lastDroppedGift = g;
+      document.getElementById("drop-modal-badge").textContent = g.isNft ? "NFT ПОДАРОК" : "ОБЫЧНЫЙ ПОДАРОК";
+      document.getElementById("drop-modal-emoji").textContent = g.emoji;
+      document.getElementById("drop-modal-name").textContent = g.name;
+      document.getElementById("drop-modal-meta").textContent = `${g.isNft ? "NFT" : "Обычный"} · Ценность: ${g.price} ⭐`;
+      document.getElementById("drop-btn-sell").textContent = `💰 Продать за +${g.sellStars} ⭐`;
+      document.getElementById("drop-btn-withdraw").textContent = `📤 Вывести ${g.name} в Telegram`;
+      document.getElementById("drop-btn-upgrade").textContent = `⚡ Отправить ${g.name} в Апгрейд`;
       document.getElementById("drop-modal").classList.add("open");
     }
 
-    function closeDropModal() {
-      document.getElementById("drop-modal").classList.remove("open");
-    }
+    function closeDropModal() { document.getElementById("drop-modal").classList.remove("open"); }
 
     document.getElementById("drop-btn-sell").addEventListener("click", () => {
       if (!lastDroppedGift) return;
-      const idx = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
-      if (idx !== -1) inventory.splice(idx, 1);
+      const i = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
+      if (i !== -1) inventory.splice(i, 1);
       starsBalance += lastDroppedGift.sellStars;
       updateBalances();
       closeDropModal();
       showToast(`Продано за +${lastDroppedGift.sellStars} ⭐`);
-      haptic("light");
     });
 
     document.getElementById("drop-btn-withdraw").addEventListener("click", () => {
       if (!lastDroppedGift) return;
-      const idx = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
-      if (idx !== -1) inventory.splice(idx, 1);
+      const i = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
+      if (i !== -1) inventory.splice(i, 1);
       closeDropModal();
-      showToast(`Заявка на вывод ${lastDroppedGift.name} отправлена в бота!`);
-      haptic("medium");
+      showToast(`Заявка на вывод ${lastDroppedGift.name} отправлена`);
     });
 
     document.getElementById("drop-btn-upgrade").addEventListener("click", () => {
       if (!lastDroppedGift) return;
-      const idx = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
-      selectedUpgradeInvIndex = idx !== -1 ? idx : 0;
-      const nextTarget = GIFTS.find(g => g.price > lastDroppedGift.price) || GIFTS[GIFTS.length - 1];
-      selectedTargetGiftId = nextTarget.id;
+      const i = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
+      selectedUpgradeInvIndex = i !== -1 ? i : 0;
+      const next = GIFTS.find(g => g.price > lastDroppedGift.price) || GIFTS[GIFTS.length - 1];
+      selectedTargetGiftId = next.id;
       closeDropModal();
       switchTab("screen-upgrade");
     });
@@ -1122,20 +807,19 @@
 
       if (!inventory.length) {
         srcSlot.className = "upg-slot";
-        srcSlot.innerHTML = `<div style="font-size:12px; color:var(--muted);">Нет подарков</div><div style="font-size:11px; color:var(--gold); margin-top:4px;">Открой кейс</div>`;
+        srcSlot.innerHTML = `<div style="font-size:12px; color:var(--muted);">Нет подарков</div>`;
       } else {
         if (selectedUpgradeInvIndex >= inventory.length) selectedUpgradeInvIndex = 0;
         const src = inventory[selectedUpgradeInvIndex];
         srcSlot.className = "upg-slot filled";
-        srcSlot.innerHTML = `<div style="font-size:32px;">${src.emoji}</div><div style="font-size:12px; font-weight:700; margin-top:4px;">${src.name}</div><div style="font-size:11px; color:var(--muted);">${src.price} ⭐</div>`;
+        srcSlot.innerHTML = `<div style="font-size:32px;">${src.emoji}</div><div style="font-size:12px; font-weight:700;">${src.name}</div><div style="font-size:11px; color:var(--muted);">${src.price} ⭐</div>`;
       }
 
-      const target = getGiftById(selectedTargetGiftId);
+      const tgt = getGiftById(selectedTargetGiftId);
       tgtSlot.className = "upg-slot filled";
-      tgtSlot.innerHTML = `<div style="font-size:32px;">${target.emoji}</div><div style="font-size:12px; font-weight:700; margin-top:4px;">${target.name}</div><div style="font-size:11px; color:var(--gold);">${target.price} ⭐</div>`;
+      tgtSlot.innerHTML = `<div style="font-size:32px;">${tgt.emoji}</div><div style="font-size:12px; font-weight:700;">${tgt.name}</div><div style="font-size:11px; color:var(--gold);">${tgt.price} ⭐</div>`;
 
-      const listEl = document.getElementById("upgrade-targets-list");
-      listEl.innerHTML = GIFTS.slice(2).map(g => `
+      document.getElementById("upgrade-targets-list").innerHTML = GIFTS.slice(2).map(g => `
         <button class="target-btn ${g.id === selectedTargetGiftId ? "active" : ""}" onclick="chooseUpgradeTarget('${g.id}')">
           <span style="font-size:22px;">${g.emoji}</span>
           <div>
@@ -1145,19 +829,19 @@
         </button>
       `).join("");
 
-      updateUpgradeChance();
+      const ch = calcChance();
+      document.getElementById("upg-chance-text").textContent = `${ch}%`;
+      document.getElementById("upg-bar-fill").style.width = `${ch}%`;
     }
 
     function cycleSourceGift() {
       if (!inventory.length) return;
       selectedUpgradeInvIndex = (selectedUpgradeInvIndex + 1) % inventory.length;
-      haptic("light");
       renderUpgradeScreen();
     }
 
     function chooseUpgradeTarget(id) {
       selectedTargetGiftId = id;
-      haptic("light");
       renderUpgradeScreen();
     }
 
@@ -1165,44 +849,24 @@
       if (!inventory.length) return 0;
       const src = inventory[selectedUpgradeInvIndex];
       const tgt = getGiftById(selectedTargetGiftId);
-      const base = (src.price / Math.max(src.price + 1, tgt.price)) * 75;
-      const pityBonus = pityPoints * 0.25;
-      return Math.max(8, Math.min(80, Math.round(base + pityBonus)));
-    }
-
-    function updateUpgradeChance() {
-      const chance = calcChance();
-      document.getElementById("upg-chance-text").textContent = `${chance}%`;
-      document.getElementById("upg-bar-fill").style.width = `${chance}%`;
+      return Math.max(8, Math.min(80, Math.round((src.price / Math.max(src.price + 1, tgt.price)) * 75 + pityPoints * 0.25)));
     }
 
     document.getElementById("do-upgrade-btn").addEventListener("click", () => {
-      if (!inventory.length) {
-        showToast("Сначала получи подарок в кейсе или внеси NFT");
-        return;
-      }
-      const src = inventory[selectedUpgradeInvIndex];
+      if (!inventory.length) return showToast("Нет подарка для апгрейда");
       const tgt = getGiftById(selectedTargetGiftId);
-      const chance = calcChance();
-      const win = (Math.random() * 100) < chance;
-
+      const win = (Math.random() * 100) < calcChance();
       inventory.splice(selectedUpgradeInvIndex, 1);
-      if (selectedUpgradeInvIndex >= inventory.length) selectedUpgradeInvIndex = 0;
 
       if (win) {
         pityPoints = 0;
-        const upgraded = { ...tgt, uid: Date.now() + Math.random() };
-        inventory.unshift(upgraded);
-        document.getElementById("upgrade-status").style.color = "var(--success)";
-        document.getElementById("upgrade-status").textContent = `Успех! Получен ${tgt.emoji} ${tgt.name}`;
-        addLiveFeed(`⚡ ${userHandle} апгрейднул в ${tgt.name}`);
-        haptic("heavy");
-        openDropModal(upgraded);
+        const upg = { ...tgt, uid: Date.now() + Math.random() };
+        inventory.unshift(upg);
+        document.getElementById("upgrade-status").textContent = `Успех! Получен ${tgt.name}`;
+        openDropModal(upg);
       } else {
         pityPoints = Math.min(100, pityPoints + 25);
-        document.getElementById("upgrade-status").style.color = "#fda4af";
-        document.getElementById("upgrade-status").textContent = `Неудача (${src.name}). Начислено +25 защиты`;
-        haptic("medium");
+        document.getElementById("upgrade-status").textContent = `Неудача. +25 к защите`;
       }
       renderUpgradeScreen();
     });
@@ -1210,18 +874,17 @@
     function renderInventory() {
       const box = document.getElementById("inventory-list");
       if (!inventory.length) {
-        box.innerHTML = `<div class="card-box" style="text-align:center; color:var(--muted);">Инвентарь пуст. Открой кейс или внеси NFT-подарок.</div>`;
+        box.innerHTML = `<div class="card-box" style="text-align:center; color:var(--muted);">Инвентарь пуст</div>`;
         return;
       }
-
       box.innerHTML = inventory.map((item, idx) => `
         <div class="inv-item">
           <div class="inv-top">
             <div class="inv-left">
               <div style="font-size:30px;">${item.emoji}</div>
               <div>
-                <div style="font-weight:700; font-size:14px;">${item.name}</div>
-                <div style="font-size:11px; color:var(--muted);">${item.rarity} · ${item.price} ⭐</div>
+                <div style="font-weight:700; font-size:14px;">${item.name} ${item.isNft ? "· NFT" : ""}</div>
+                <div style="font-size:11px; color:var(--muted);">Ценность: ${item.price} ⭐</div>
               </div>
             </div>
           </div>
@@ -1234,132 +897,46 @@
       `).join("");
     }
 
-    function invSell(idx) {
-      const item = inventory[idx];
+    function invSell(i) {
+      const item = inventory[i];
       if (!item) return;
       starsBalance += item.sellStars;
-      inventory.splice(idx, 1);
+      inventory.splice(i, 1);
       updateBalances();
       renderInventory();
-      showToast(`Продано за +${item.sellStars} ⭐`);
-      haptic("light");
     }
 
-    function invWithdraw(idx) {
-      const item = inventory[idx];
+    function invWithdraw(i) {
+      const item = inventory[i];
       if (!item) return;
-      inventory.splice(idx, 1);
+      inventory.splice(i, 1);
       renderInventory();
-      showToast(`Подарок ${item.name} поставлен на вывод`);
-      haptic("medium");
+      showToast(`Заявка на вывод ${item.name} создана`);
     }
 
-    function invToUpgrade(idx) {
-      selectedUpgradeInvIndex = idx;
-      const src = inventory[idx];
+    function invToUpgrade(i) {
+      selectedUpgradeInvIndex = i;
+      const src = inventory[i];
       const next = GIFTS.find(g => g.price > src.price) || GIFTS[GIFTS.length - 1];
       selectedTargetGiftId = next.id;
       switchTab("screen-upgrade");
     }
 
-    function openWalletModal(tab = "gram") {
-      const sel = document.getElementById("deposit-gift-select");
-      sel.innerHTML = GIFTS.map(g => `<option value="${g.id}">${g.emoji} ${g.name} (ценность ${g.price} ⭐)</option>`).join("");
+    function openWalletModal(tab = "ton") {
+      document.getElementById("deposit-gift-select").innerHTML = GIFTS.map(g =>
+        `<option value="${g.id}">${g.emoji} ${g.name} (${g.isNft ? "NFT" : "Обычный"} · ${g.price} ⭐)</option>`
+      ).join("");
       switchWalletTab(tab);
-      updateWalletUI();
       document.getElementById("wallet-modal").classList.add("open");
     }
 
-    function closeWalletModal() {
-      document.getElementById("wallet-modal").classList.remove("open");
-    }
+    function closeWalletModal() { document.getElementById("wallet-modal").classList.remove("open"); }
 
     function switchWalletTab(tab) {
-      ["gram", "stars", "gifts"].forEach(t => {
+      ["ton", "stars", "gifts"].forEach(t => {
         document.getElementById(`tab-${t}`).classList.toggle("active", t === tab);
         document.getElementById(`panel-${t}`).style.display = t === tab ? "block" : "none";
       });
-    }
-
-    function updateWalletUI() {
-      const statusEl = document.getElementById("wallet-conn-status");
-      const addrEl = document.getElementById("wallet-conn-addr");
-      const btnEl = document.getElementById("connect-wallet-btn");
-      const pickerEl = document.getElementById("wallet-picker");
-
-      if (walletConnected) {
-        statusEl.textContent = `Подключен: ${walletProvider}`;
-        addrEl.textContent = walletAddress;
-        btnEl.textContent = "Отключить";
-        pickerEl.classList.remove("open");
-      } else {
-        statusEl.textContent = "Кошелек не подключен";
-        addrEl.textContent = "Tonkeeper / Telegram Wallet / TON-адрес";
-        btnEl.textContent = "Подключить";
-      }
-    }
-
-    function handleWalletAction() {
-      haptic("light");
-      if (walletConnected) {
-        walletConnected = false;
-        walletProvider = "";
-        walletAddress = "";
-        updateWalletUI();
-        showToast("Кошелек отключен");
-      } else {
-        document.getElementById("wallet-picker").classList.toggle("open");
-      }
-    }
-
-    function quickConnectWallet(provider, shortAddr) {
-      walletConnected = true;
-      walletProvider = provider;
-      walletAddress = shortAddr;
-      updateWalletUI();
-      showToast(`${provider} подключен`);
-      haptic("medium");
-    }
-
-    function connectCustomAddress() {
-      const raw = document.getElementById("custom-wallet-input").value.trim();
-      if (raw.length < 6) return showToast("Введите корректный TON-адрес");
-      const shortAddr = raw.length > 10 ? `${raw.slice(0, 4)}...${raw.slice(-4)}` : raw;
-      quickConnectWallet("TON Wallet", shortAddr);
-    }
-
-    function setGramAmount(val) { document.getElementById("gram-amount-input").value = val; }
-    function setStarsAmount(val) { document.getElementById("stars-amount-input").value = val; }
-
-    function depositGram() {
-      const amt = parseFloat(document.getElementById("gram-amount-input").value);
-      if (!amt || amt <= 0) return showToast("Введите корректную сумму GRAM");
-      gramBalance += amt;
-      starsBalance += Math.round(amt * 40);
-      updateBalances();
-      closeWalletModal();
-      showToast(`Пополнено на +${amt} GRAM (+${Math.round(amt * 40)} ⭐)`);
-      haptic("medium");
-    }
-
-    function depositStars() {
-      const amt = parseInt(document.getElementById("stars-amount-input").value, 10);
-      if (!amt || amt <= 0) return showToast("Введите корректное число Stars");
-      starsBalance += amt;
-      updateBalances();
-      closeWalletModal();
-      showToast(`Баланс пополнен на +${amt} ⭐`);
-      haptic("medium");
-    }
-
-    function depositNftGift() {
-      const giftId = document.getElementById("deposit-gift-select").value;
-      const g = getGiftById(giftId);
-      inventory.unshift({ ...g, uid: Date.now() + Math.random() });
-      closeWalletModal();
-      renderInventory();
-      showToast(`NFT-подарок ${g.name} добавлен в инвентарь`);
-      haptic("medium");
     }
 
     updateBalances();
