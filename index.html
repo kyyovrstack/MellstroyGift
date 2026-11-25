@@ -377,7 +377,6 @@
     <button data-target="screen-inventory"><span class="ico">🎒</span><span>Инвентарь</span></button>
   </nav>
 
-  <!-- Модалка выпавшего подарка -->
   <div class="modal-backdrop" id="drop-modal">
     <div class="modal-sheet">
       <div style="text-align:center;">
@@ -395,7 +394,6 @@
     </div>
   </div>
 
-  <!-- Модалка Кошелька (TON Connect / Stars / Подарки) -->
   <div class="modal-backdrop" id="wallet-modal">
     <div class="modal-sheet">
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -426,7 +424,6 @@
         <button id="tab-gifts" onclick="switchWalletTab('gifts')">🎁 Подарками</button>
       </div>
 
-      <!-- Депозит через привязанный кошелек -->
       <div id="panel-ton">
         <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
           Сумма депозита в TON (откроет подтверждение в подключенном кошельке):
@@ -441,7 +438,6 @@
         <button class="btn-primary" onclick="sendRealTonDeposit()">Отправить депозит через кошелек</button>
       </div>
 
-      <!-- Пополнение через Telegram Stars -->
       <div id="panel-stars" style="display:none;">
         <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
           Количество Telegram Stars (оплата через бота):
@@ -456,7 +452,6 @@
         <button class="btn-primary" onclick="requestStarsInvoice()">Оплатить Stars через бота</button>
       </div>
 
-      <!-- Пополнение подарками -->
       <div id="panel-gifts" style="display:none;">
         <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">
           Выберите подарок и отправьте заявку боту на зачисление:
