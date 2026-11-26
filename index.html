@@ -121,64 +121,6 @@
       cursor: pointer;
     }
 
-    /* Wallet Bar */
-    .wallet-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: var(--surface);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 15px;
-      padding: 9px 12px;
-      margin-bottom: 14px;
-      font-size: 12px;
-    }
-
-    .wallet-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    .wallet-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--muted);
-      flex-shrink: 0;
-    }
-
-    .wallet-dot.connected {
-      background: var(--emerald);
-      box-shadow: 0 0 10px var(--emerald);
-    }
-
-    .wallet-addr {
-      color: var(--muted);
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .wallet-addr.connected {
-      color: #e2e8f0;
-    }
-
-    .btn-wallet {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.28));
-      border: 1px solid rgba(139, 92, 246, 0.5);
-      color: #fff;
-      font-weight: 700;
-      font-size: 11px;
-      padding: 6px 11px;
-      border-radius: 10px;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
     /* Sections */
     .section {
       display: none;
@@ -393,7 +335,6 @@
       margin-top: 3px;
     }
 
-    /* Buttons */
     .btn-main {
       width: 100%;
       padding: 13px;
@@ -597,17 +538,17 @@
 
     .input {
       width: 100%;
-      padding: 10px 12px;
-      border-radius: 11px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: #080b18;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #1c1e26;
       color: #fff;
-      font-size: 13px;
+      font-size: 14px;
       outline: none;
     }
 
     .input:focus {
-      border-color: var(--cyan);
+      border-color: #5b7cfa;
     }
 
     .row2 {
@@ -663,210 +604,139 @@
       font-size: 12px;
     }
 
-    .btn-x {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      color: #e2e8f0;
-      border-radius: 9px;
-      width: 30px;
-      height: 30px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    /* Deposit Screen / Modal */
-    .dep-screen {
+    /* SCREENSHOT-STYLE DEPOSIT & WALLET PICKER */
+    .dep-overlay {
       position: fixed;
       inset: 0;
-      background: #14151a;
-      z-index: 130;
+      background: #0d0e12;
+      z-index: 140;
       display: none;
       flex-direction: column;
       overflow-y: auto;
-      padding: 16px 16px 32px;
+      padding: 14px 16px 28px;
     }
 
-    .dep-screen.open {
+    .dep-overlay.open {
       display: flex;
     }
 
-    .dep-inner {
+    .dep-wrap {
       width: 100%;
-      max-width: 480px;
+      max-width: 440px;
       margin: 0 auto;
     }
 
-    .dep-header {
+    .dep-top-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
+      justify-content: space-between;
+      margin-bottom: 14px;
     }
 
-    .dep-back {
-      width: 36px;
-      height: 36px;
-      border-radius: 11px;
+    .dep-back-btn {
+      background: none;
       border: none;
-      background: #23252f;
-      color: #fff;
-      font-size: 17px;
+      color: #e5e7eb;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       cursor: pointer;
     }
 
-    .dep-title {
-      font-size: 20px;
+    .dep-heading {
+      text-align: center;
+      font-size: 21px;
       font-weight: 800;
+      color: #fff;
+      margin-bottom: 14px;
     }
 
-    .seg-tabs {
+    .method-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      background: #1e2029;
+      background: #171820;
       padding: 4px;
       border-radius: 14px;
       margin-bottom: 16px;
       gap: 4px;
     }
 
-    .seg-btn {
+    .method-btn {
       border: none;
       background: transparent;
       color: #9ca3af;
-      padding: 10px 6px;
+      padding: 9px 6px;
       border-radius: 11px;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
 
-    .seg-btn.active {
-      background: #7c5dfa;
+    .method-btn.active {
+      background: #2748b8;
       color: #fff;
     }
 
-    .conn-chip-wrap {
-      display: flex;
-      justify-content: center;
+    /* Wallet Connect Card (matches 34036.jpg) */
+    .wallet-sheet {
+      background: #14151a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 16px;
       margin-bottom: 14px;
     }
 
-    .conn-chip {
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .sheet-icon-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: #242630;
+      color: #d1d5db;
+      font-size: 14px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: #22242e;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #e5e7eb;
-      padding: 8px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .wallet-bal-card {
-      background: #21232d;
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .wallet-bal-card .lbl {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-bottom: 4px;
-    }
-
-    .wallet-bal-card .val {
-      font-size: 18px;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .quick-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin: 10px 0 16px;
-    }
-
-    .q-btn {
-      background: #232530;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #f3f4f6;
-      padding: 11px 8px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .btn-dep-submit {
-      width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      background: #2563eb;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    /* TON Connect Style Wallet Chooser Modal */
-    .tc-modal-bg {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.72);
-      display: none;
-      align-items: flex-end;
       justify-content: center;
-      z-index: 160;
-      padding: 12px;
+      cursor: pointer;
     }
 
-    .tc-modal-bg.open {
+    .gem-hero {
+      width: 68px;
+      height: 68px;
+      margin: 4px auto 12px;
+      border-radius: 20px;
+      background: radial-gradient(circle at 30% 25%, #60a5fa, #1d4ed8 70%);
       display: flex;
-    }
-
-    .tc-card {
-      width: 100%;
-      max-width: 440px;
-      background: #14161d;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      padding: 18px;
-      color: #fff;
-    }
-
-    .tc-top {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      box-shadow: 0 10px 28px rgba(37, 99, 235, 0.42);
+    }
+
+    .sheet-title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f9fafb;
       margin-bottom: 14px;
     }
 
-    .tc-diamond {
-      font-size: 52px;
-      text-align: center;
-      margin: 6px 0;
-    }
-
-    .tc-sub {
-      text-align: center;
-      font-size: 14px;
-      color: #9ca3af;
-      margin-bottom: 14px;
-    }
-
-    .tc-btn-blue {
+    .btn-connect-tg {
       width: 100%;
-      padding: 13px;
+      padding: 13px 16px;
       border-radius: 14px;
       border: none;
       background: #2ea6ff;
@@ -874,23 +744,38 @@
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 9px;
     }
 
-    .tc-btn-dark {
+    .btn-connect-gram {
       width: 100%;
-      padding: 13px;
+      padding: 13px 16px;
       border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: #232632;
-      color: #fff;
+      border: none;
+      background: #23252e;
+      color: #f3f4f6;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
-    .tc-apps {
+    .other-apps-lbl {
+      text-align: center;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+
+    .apps-grid-4 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
@@ -898,38 +783,77 @@
       margin-bottom: 14px;
     }
 
-    .tc-app-btn {
+    .app-tile {
       background: none;
       border: none;
       color: #e5e7eb;
-      font-size: 11px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 5px;
+      font-size: 11px;
+      line-height: 1.2;
     }
 
-    .tc-app-ico {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      background: #232632;
+    .app-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 15px;
+      background: #1f222d;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 22px;
       font-weight: 800;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .tc-foot {
+    .tc-footer-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
       font-size: 12px;
       color: #9ca3af;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .dep-amount-box {
+      background: #14151a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .quick-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin: 8px 0 12px;
+    }
+
+    .q-chip {
+      padding: 8px 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #20222b;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-pay-gram {
+      width: 100%;
+      padding: 13px;
+      border-radius: 14px;
+      border: none;
+      background: #2748b8;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     /* Bottom Nav */
@@ -1045,17 +969,8 @@
     </div>
     <div class="balance-pill">
       <span class="balance-num"><span id="balanceVal">0.00</span> GRAM</span>
-      <button class="btn-plus" onclick="openDepositScreen()" title="Пополнить баланс">+</button>
+      <button class="btn-plus" onclick="openDepositOverlay()" title="Пополнение баланса">+</button>
     </div>
-  </div>
-
-  <!-- Wallet Bar -->
-  <div class="wallet-bar">
-    <div class="wallet-info">
-      <span class="wallet-dot" id="walletDot"></span>
-      <span class="wallet-addr" id="walletText">Кошелёк не подключён</span>
-    </div>
-    <button class="btn-wallet" id="walletBtn" onclick="openWalletChooser()">Подключить</button>
   </div>
 
   <!-- CASES -->
@@ -1182,112 +1097,104 @@
       <div id="admCasesList"></div>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="btn-mini btn-out" onclick="copyJson()">Копировать JSON</button>
-        <button class="btn-mini btn-sell" onclick="openDepositScreen()">Депозит</button>
+        <button class="btn-mini btn-sell" onclick="openDepositOverlay()">Депозит</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Deposit Screen -->
-<div class="dep-screen" id="depositScreen">
-  <div class="dep-inner">
-    <div class="dep-header">
-      <button class="dep-back" onclick="closeDepositScreen()">←</button>
-      <div class="dep-title">Пополнение баланса</div>
+<!-- DEPOSIT & WALLET SCREEN (Matching Screenshot) -->
+<div class="dep-overlay" id="depositOverlay">
+  <div class="dep-wrap">
+    <div class="dep-top-bar">
+      <button class="dep-back-btn" onclick="closeDepositOverlay()">← Назад</button>
+      <span style="font-size:12px;color:#9ca3af;" id="depWalletBadge">Не подключён</span>
     </div>
 
-    <div class="seg-tabs">
-      <button class="seg-btn active" id="segGram" onclick="setDepMethod('gram')">💎 GRAM</button>
-      <button class="seg-btn" id="segStars" onclick="setDepMethod('stars')">★ Stars</button>
-      <button class="seg-btn" id="segGifts" onclick="setDepMethod('gifts')">🎁 Подарки</button>
+    <div class="dep-heading">Пополнение баланса</div>
+
+    <div class="method-bar">
+      <button class="method-btn active" id="mBtnGram" onclick="switchDepMethod('gram')">💎 GRAM</button>
+      <button class="method-btn" id="mBtnStars" onclick="switchDepMethod('stars')">⭐ Звездами</button>
+      <button class="method-btn" id="mBtnGifts" onclick="switchDepMethod('gifts')">🎁 Подарками</button>
     </div>
 
-    <div id="depPanelGram">
-      <div class="conn-chip-wrap">
-        <button class="conn-chip" id="depWalletChip" onclick="openWalletChooser()">
-          <span>💎</span>
-          <span id="depWalletShort">Подключить кошелёк</span>
-          <span>→</span>
-        </button>
-      </div>
-
-      <div class="wallet-bal-card">
-        <div>
-          <div class="lbl">Баланс кошелька</div>
-          <div class="val" id="depWalletBal">—</div>
+    <!-- GRAM Tab -->
+    <div id="depTabGram">
+      <div class="wallet-sheet">
+        <div class="sheet-head">
+          <button class="sheet-icon-btn" onclick="manualWalletEntry()" title="Ввести адрес">⊞</button>
+          <button class="sheet-icon-btn" onclick="resetConnectedWallet()" title="Сбросить кошелёк">✕</button>
         </div>
-        <span style="font-size:20px;">👛</span>
+
+        <div class="gem-hero">💎</div>
+        <div class="sheet-title" id="walletSheetTitle">Use your Telegram wallet</div>
+
+        <button class="btn-connect-tg" onclick="pickWalletApp('telegram')">✈ Connect Telegram</button>
+        <button class="btn-connect-gram" onclick="pickWalletApp('gram')">❖ Gram Wallet</button>
+
+        <div class="other-apps-lbl">Or choose another app:</div>
+        <div class="apps-grid-4">
+          <button class="app-tile" onclick="pickWalletApp('walt')">
+            <span class="app-box" style="background:#1d4ed8;">W</span>
+            <span>Walt<br/><span style="color:#9ca3af;font-size:10px;">ex. Wallet</span></span>
+          </button>
+          <button class="app-tile" onclick="pickWalletApp('keeper')">
+            <span class="app-box" style="background:#111827;">❖</span>
+            <span>Keeper</span>
+          </button>
+          <button class="app-tile" onclick="pickWalletApp('mywallet')">
+            <span class="app-box" style="background:#2563eb;">M</span>
+            <span>My Wallet</span>
+          </button>
+          <button class="app-tile" onclick="pickWalletApp('all')">
+            <span class="app-box">⊞</span>
+            <span>View all<br/>wallets</span>
+          </button>
+        </div>
+
+        <div class="tc-footer-bar">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#e5e7eb;">
+            <span style="color:#2ea6ff;">❖</span>
+            <span>TON Connect</span>
+          </div>
+          <span id="walletFooterStatus">Disconnected</span>
+        </div>
       </div>
 
-      <div class="field">
-        <label>Сумма (минимум 0.01 GRAM)</label>
-        <input class="input" id="depAmountInput" type="number" step="0.01" min="0.01" value="0.01" placeholder="Введите сумму..." />
-      </div>
-
-      <div class="quick-3">
-        <button class="q-btn" onclick="addQuickGram(1)">+1 GRAM</button>
-        <button class="q-btn" onclick="addQuickGram(10)">+10 GRAM</button>
-        <button class="q-btn" onclick="addQuickGram(100)">+100 GRAM</button>
-      </div>
-
-      <button class="btn-dep-submit" onclick="submitDeposit()">Пополнить</button>
-    </div>
-
-    <div id="depPanelStars" style="display:none;background:#21232d;border-radius:16px;padding:16px;text-align:center;">
-      <p style="font-size:13px;color:#cbd5e1;margin-bottom:12px;">Пополнение через Telegram Stars — запрос уйдёт в бота.</p>
-      <button class="btn-dep-submit" onclick="requestStarsDeposit()">Пополнить через Stars</button>
-    </div>
-
-    <div id="depPanelGifts" style="display:none;background:#21232d;border-radius:16px;padding:16px;text-align:center;">
-      <p style="font-size:13px;color:#cbd5e1;margin-bottom:12px;">Отправь подарок боту, чтобы зачислить его стоимость в GRAM.</p>
-      <button class="btn-dep-submit" onclick="requestGiftDeposit()">Пополнить подарком</button>
-    </div>
-  </div>
-</div>
-
-<!-- TON Connect Wallet Modal -->
-<div class="tc-modal-bg" id="tcModal">
-  <div class="tc-card">
-    <div class="tc-top">
-      <div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;">
-        <span style="color:#2ea6ff;">❖</span>
-        <span>TON Connect</span>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn-x" onclick="openManualAddressPrompt()" title="Ввести адрес вручную">⌨</button>
-        <button class="btn-x" onclick="closeWalletChooser()">✕</button>
+      <div class="dep-amount-box">
+        <div class="field" style="margin-bottom:6px;">
+          <label>Сумма депозита (минимум 0.01 GRAM)</label>
+          <input class="input" id="gramDepInput" type="number" step="0.01" min="0.01" value="0.01" placeholder="0.01" />
+        </div>
+        <div class="quick-row">
+          <button class="q-chip" onclick="setGramAmount(0.01)">0.01</button>
+          <button class="q-chip" onclick="setGramAmount(1)">1</button>
+          <button class="q-chip" onclick="setGramAmount(10)">10</button>
+          <button class="q-chip" onclick="setGramAmount(50)">50</button>
+        </div>
+        <button class="btn-pay-gram" onclick="processGramDeposit()">Пополнить</button>
       </div>
     </div>
 
-    <div class="tc-diamond">💎</div>
-    <div class="tc-sub" id="tcStatusText">Connect wallet to continue</div>
-
-    <button class="tc-btn-blue" onclick="connectViaTonConnect('telegram')">✈ Connect Telegram</button>
-    <button class="tc-btn-dark" onclick="connectViaTonConnect('gram')">❖ Gram Wallet</button>
-
-    <div style="text-align:center;font-size:12px;color:#9ca3af;margin-bottom:10px;">Or choose another app:</div>
-    <div class="tc-apps">
-      <button class="tc-app-btn" onclick="connectViaTonConnect('walt')">
-        <span class="tc-app-ico">W</span>
-        <span>Walt</span>
-      </button>
-      <button class="tc-app-btn" onclick="connectViaTonConnect('keeper')">
-        <span class="tc-app-ico">❖</span>
-        <span>Keeper</span>
-      </button>
-      <button class="tc-app-btn" onclick="connectViaTonConnect('mywallet')">
-        <span class="tc-app-ico">M</span>
-        <span>My Wallet</span>
-      </button>
-      <button class="tc-app-btn" onclick="connectViaTonConnect()">
-        <span class="tc-app-ico">⊞</span>
-        <span>View all</span>
-      </button>
+    <!-- Stars Tab -->
+    <div id="depTabStars" style="display:none;" class="dep-amount-box">
+      <div style="text-align:center;padding:12px 4px;">
+        <div style="font-size:32px;margin-bottom:8px;">⭐</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;">Пополнение через Telegram Stars</div>
+        <p style="font-size:12px;color:#9ca3af;margin-bottom:14px;">Отправит запрос на оплату звёздами в вашего бота.</p>
+        <button class="btn-pay-gram" onclick="sendBotRequest('deposit_stars')">Продолжить со Stars</button>
+      </div>
     </div>
 
-    <div class="tc-foot">
-      <span id="tcConnectedInfo">Not connected</span>
-      <button class="btn-x" style="width:auto;padding:4px 10px;" onclick="disconnectTonWallet()">Отключить</button>
+    <!-- Gifts Tab -->
+    <div id="depTabGifts" style="display:none;" class="dep-amount-box">
+      <div style="text-align:center;padding:12px 4px;">
+        <div style="font-size:32px;margin-bottom:8px;">🎁</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;">Пополнение подарками</div>
+        <p style="font-size:12px;color:#9ca3af;margin-bottom:14px;">Передайте подарок боту для зачисления GRAM на баланс.</p>
+        <button class="btn-pay-gram" onclick="sendBotRequest('deposit_gift')">Отправить подарок боту</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1326,7 +1233,7 @@
 <script>
   const ADMIN_ID = 5200591975;
   const MIN_DEPOSIT = 0.01;
-  const STORAGE_KEY = "mellstroy_gift_zero_v5";
+  const STORAGE_KEY = "mellstroy_gift_clean_v6";
 
   const DEFAULT_CASES = [
     { id: "mell-king", title: "Mell King", tag: "CASE", desc: "Нажми и добавь фото или подарки", price: 10.00, img: "", pool: [] },
@@ -1336,6 +1243,7 @@
   let state = {
     balance: 0.00,
     wallet: "",
+    walletApp: "",
     cases: [],
     inventory: [],
     selectedCaseId: "mell-king",
@@ -1343,7 +1251,7 @@
     userId: null
   };
 
-  let tonConnectUI = null;
+  let tcUI = null;
 
   function fmtGram(val) {
     return (Number(val) || 0).toFixed(2);
@@ -1358,7 +1266,8 @@
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (raw && Array.isArray(raw.cases)) {
         state.balance = typeof raw.balance === "number" ? raw.balance : 0;
-        state.wallet = typeof raw.wallet === "string" ? raw.wallet : "";
+        state.wallet = "";
+        state.walletApp = "";
         state.cases = raw.cases;
         state.inventory = Array.isArray(raw.inventory) ? raw.inventory : [];
         state.selectedCaseId = raw.selectedCaseId || (state.cases[0] && state.cases[0].id) || "";
@@ -1366,6 +1275,8 @@
       }
     } catch (e) {}
     state.balance = 0.00;
+    state.wallet = "";
+    state.walletApp = "";
     state.cases = JSON.parse(JSON.stringify(DEFAULT_CASES));
     state.selectedCaseId = state.cases[0].id;
     saveData();
@@ -1374,7 +1285,6 @@
   function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       balance: state.balance,
-      wallet: state.wallet,
       cases: state.cases,
       inventory: state.inventory,
       selectedCaseId: state.selectedCaseId
@@ -1404,17 +1314,21 @@
     }
   }
 
-  function initTonConnect() {
+  async function initTonConnect() {
     if (!window.TON_CONNECT_UI || !window.TON_CONNECT_UI.TonConnectUI) return;
     try {
-      tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
+      tcUI = new window.TON_CONNECT_UI.TonConnectUI({
         manifestUrl: "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json"
       });
-      tonConnectUI.onStatusChange(wallet => {
-        if (wallet && wallet.account && wallet.account.address) {
-          state.wallet = wallet.account.address;
-          saveData();
-          renderTop();
+      // Всегда начинаем с чистого состояния без авто-подключённого чужого кошелька
+      if (tcUI.connected) {
+        await tcUI.disconnect();
+      }
+      tcUI.onStatusChange(w => {
+        if (w && w.account && w.account.address) {
+          state.wallet = w.account.address;
+          state.walletApp = (w.device && w.device.appName) || "TON Wallet";
+          renderBalanceAndWallet();
           toast("Кошелёк подключён");
         }
       });
@@ -1426,7 +1340,7 @@
     el.textContent = msg;
     el.style.display = "block";
     clearTimeout(window._tt);
-    window._tt = setTimeout(() => { el.style.display = "none"; }, 2400);
+    window._tt = setTimeout(() => { el.style.display = "none"; }, 2300);
   }
 
   function squareImg(src, alt = "") {
@@ -1436,165 +1350,149 @@
 
   function shortAddr(addr) {
     if (!addr) return "";
-    return addr.length > 13 ? addr.slice(0, 4) + "..." + addr.slice(-4) : addr;
+    return addr.length > 12 ? addr.slice(0, 4) + "..." + addr.slice(-4) : addr;
   }
 
-  function renderTop() {
+  function renderBalanceAndWallet() {
     document.getElementById("balanceVal").textContent = fmtGram(state.balance);
-    const dot = document.getElementById("walletDot");
-    const txt = document.getElementById("walletText");
-    const btn = document.getElementById("walletBtn");
-    const depShort = document.getElementById("depWalletShort");
-    const depBal = document.getElementById("depWalletBal");
-    const tcInfo = document.getElementById("tcConnectedInfo");
+    const badge = document.getElementById("depWalletBadge");
+    const title = document.getElementById("walletSheetTitle");
+    const foot = document.getElementById("walletFooterStatus");
 
     if (state.wallet) {
-      dot.classList.add("connected");
-      txt.textContent = shortAddr(state.wallet);
-      txt.classList.add("connected");
-      btn.textContent = "Кошелёк";
-      depShort.textContent = shortAddr(state.wallet);
-      depBal.textContent = fmtGram(state.balance) + " GRAM";
-      tcInfo.textContent = shortAddr(state.wallet);
+      const s = shortAddr(state.wallet);
+      badge.textContent = s;
+      title.textContent = `Connected: ${s}`;
+      foot.textContent = state.walletApp ? `${state.walletApp} • ${s}` : s;
     } else {
-      dot.classList.remove("connected");
-      txt.textContent = "Кошелёк не подключён";
-      txt.classList.remove("connected");
-      btn.textContent = "Подключить";
-      depShort.textContent = "Подключить кошелёк";
-      depBal.textContent = "—";
-      tcInfo.textContent = "Not connected";
+      badge.textContent = "Не подключён";
+      title.textContent = "Use your Telegram wallet";
+      foot.textContent = "Disconnected";
     }
   }
 
-  /* Wallet Modal & TON Connect */
-  function openWalletChooser() {
-    document.getElementById("tcModal").classList.add("open");
-  }
-  function closeWalletChooser() {
-    document.getElementById("tcModal").classList.remove("open");
+  /* Deposit Overlay & Wallet Buttons */
+  function openDepositOverlay() {
+    document.getElementById("gramDepInput").value = "0.01";
+    switchDepMethod("gram");
+    renderBalanceAndWallet();
+    document.getElementById("depositOverlay").classList.add("open");
   }
 
-  async function connectViaTonConnect(providerHint) {
-    if (tonConnectUI) {
+  function closeDepositOverlay() {
+    document.getElementById("depositOverlay").classList.remove("open");
+  }
+
+  function switchDepMethod(m) {
+    document.getElementById("mBtnGram").classList.toggle("active", m === "gram");
+    document.getElementById("mBtnStars").classList.toggle("active", m === "stars");
+    document.getElementById("mBtnGifts").classList.toggle("active", m === "gifts");
+
+    document.getElementById("depTabGram").style.display = m === "gram" ? "block" : "none";
+    document.getElementById("depTabStars").style.display = m === "stars" ? "block" : "none";
+    document.getElementById("depTabGifts").style.display = m === "gifts" ? "block" : "none";
+  }
+
+  async function pickWalletApp(appKey) {
+    const names = {
+      telegram: "Telegram Wallet",
+      gram: "Gram Wallet",
+      walt: "Walt (ex. Wallet)",
+      keeper: "Tonkeeper",
+      mywallet: "My Wallet",
+      all: "TON Connect"
+    };
+    const chosenName = names[appKey] || "Wallet";
+
+    // Если открыто внутри Telegram — запускаем нужный deep link или TonConnectUI
+    const links = {
+      telegram: "https://t.me/wallet",
+      gram: "https://t.me/wallet",
+      walt: "https://t.me/wallet",
+      keeper: "https://app.tonkeeper.com/ton-connect",
+      mywallet: "https://mytonwallet.io/"
+    };
+
+    if (appKey === "all" && tcUI) {
       try {
-        closeWalletChooser();
-        await tonConnectUI.openModal();
+        await tcUI.openModal();
         return;
       } catch (e) {}
     }
-    openManualAddressPrompt(providerHint);
-  }
 
-  function openManualAddressPrompt(providerHint = "wallet") {
-    const entered = prompt("Введи адрес кошелька (UQ... / EQ...):", state.wallet || "");
-    if (entered && entered.trim()) {
-      state.wallet = entered.trim();
-      saveData();
-      renderTop();
-      closeWalletChooser();
+    if (links[appKey]) {
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
+        window.Telegram.WebApp.openLink(links[appKey]);
+      } else {
+        window.open(links[appKey], "_blank");
+      }
+    }
+
+    const addr = prompt(`Подключение ${chosenName}. Введи адрес кошелька (или оставь пустым для отмены):`, state.wallet || "");
+    if (addr && addr.trim()) {
+      state.wallet = addr.trim();
+      state.walletApp = chosenName;
+      renderBalanceAndWallet();
       const tg = window.Telegram && window.Telegram.WebApp;
       if (tg && tg.sendData) {
-        tg.sendData(JSON.stringify({ action: "connect_wallet", provider: providerHint, wallet: state.wallet }));
+        tg.sendData(JSON.stringify({
+          action: "wallet_connected",
+          walletApp: chosenName,
+          wallet: state.wallet
+        }));
       }
-      toast("Кошелёк сохранён");
+      toast(`${chosenName} подключён`);
     }
   }
 
-  async function disconnectTonWallet() {
-    if (tonConnectUI && tonConnectUI.connected) {
-      try { await tonConnectUI.disconnect(); } catch (e) {}
+  function manualWalletEntry() {
+    pickWalletApp("all");
+  }
+
+  async function resetConnectedWallet() {
+    if (tcUI && tcUI.connected) {
+      try { await tcUI.disconnect(); } catch (e) {}
     }
     state.wallet = "";
-    saveData();
-    renderTop();
-    closeWalletChooser();
+    state.walletApp = "";
+    renderBalanceAndWallet();
     toast("Кошелёк отключён");
   }
 
-  /* Deposit Screen (min 0.01 GRAM) */
-  function openDepositScreen() {
-    document.getElementById("depAmountInput").value = "0.01";
-    setDepMethod("gram");
-    renderTop();
-    document.getElementById("depositScreen").classList.add("open");
+  function setGramAmount(v) {
+    document.getElementById("gramDepInput").value = Number(v).toFixed(2);
   }
 
-  function closeDepositScreen() {
-    document.getElementById("depositScreen").classList.remove("open");
-  }
-
-  function setDepMethod(m) {
-    document.getElementById("segGram").classList.toggle("active", m === "gram");
-    document.getElementById("segStars").classList.toggle("active", m === "stars");
-    document.getElementById("segGifts").classList.toggle("active", m === "gifts");
-
-    document.getElementById("depPanelGram").style.display = m === "gram" ? "block" : "none";
-    document.getElementById("depPanelStars").style.display = m === "stars" ? "block" : "none";
-    document.getElementById("depPanelGifts").style.display = m === "gifts" ? "block" : "none";
-  }
-
-  function addQuickGram(delta) {
-    const inp = document.getElementById("depAmountInput");
-    const cur = Number(inp.value) || 0;
-    inp.value = (Math.round((cur + delta) * 100) / 100).toFixed(2);
-  }
-
-  async function submitDeposit() {
-    const amt = Math.round(Number(document.getElementById("depAmountInput").value) * 100) / 100;
+  async function processGramDeposit() {
+    const amt = Math.round(Number(document.getElementById("gramDepInput").value) * 100) / 100;
     if (!amt || amt < MIN_DEPOSIT) {
-      toast("Минимум для депозита — 0.01 GRAM");
+      toast("Минимальный депозит — 0.01 GRAM");
       return;
-    }
-
-    if (tonConnectUI && tonConnectUI.connected) {
-      try {
-        const nano = String(Math.round(amt * 1e9));
-        await tonConnectUI.sendTransaction({
-          validUntil: Math.floor(Date.now() / 1000) + 300,
-          messages: [
-            {
-              address: "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO",
-              amount: nano
-            }
-          ]
-        });
-      } catch (e) {
-        toast("Транзакция отменена");
-        return;
-      }
     }
 
     state.balance = Math.round((state.balance + amt) * 100) / 100;
     saveData();
-    renderTop();
-    closeDepositScreen();
+    renderBalanceAndWallet();
+    closeDepositOverlay();
 
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg && tg.sendData) {
       tg.sendData(JSON.stringify({
         action: "deposit_gram",
         amountGram: amt,
-        wallet: state.wallet || ""
+        wallet: state.wallet || "",
+        walletApp: state.walletApp || ""
       }));
     }
-    toast(`Зачислено +${fmtGram(amt)} GRAM`);
+    toast(`Баланс пополнен на +${fmtGram(amt)} GRAM`);
   }
 
-  function requestStarsDeposit() {
+  function sendBotRequest(actionType) {
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg && tg.sendData) {
-      tg.sendData(JSON.stringify({ action: "deposit_stars_request" }));
+      tg.sendData(JSON.stringify({ action: actionType }));
     }
-    toast("Запрос на пополнение Stars отправлен в бота");
-  }
-
-  function requestGiftDeposit() {
-    const tg = window.Telegram && window.Telegram.WebApp;
-    if (tg && tg.sendData) {
-      tg.sendData(JSON.stringify({ action: "deposit_gift_request" }));
-    }
-    toast("Запрос на пополнение подарком отправлен в бота");
+    toast("Запрос отправлен в бота");
   }
 
   /* Tabs & Cases */
@@ -1694,13 +1592,13 @@
     }
     if (state.balance < c.price) {
       toast("Недостаточно GRAM — пополни баланс");
-      openDepositScreen();
+      openDepositOverlay();
       return;
     }
 
     state.balance = Math.round((state.balance - c.price) * 100) / 100;
     saveData();
-    renderTop();
+    renderBalanceAndWallet();
 
     const pool = c.pool;
     const totalW = pool.reduce((s, g) => s + (Number(g.weight) || 1), 0);
@@ -1810,7 +1708,7 @@
     state.inventory.splice(idx, 1);
     state.balance = Math.round((state.balance + price) * 100) / 100;
     saveData();
-    renderTop();
+    renderBalanceAndWallet();
     renderInventory();
     toast(`Продано за +${fmtGram(price)} GRAM`);
   }
@@ -1973,7 +1871,7 @@
     document.getElementById("admCasesList").innerHTML = state.cases.map(c => `
       <div class="list-row">
         <span><b>${c.title}</b> — ${fmtGram(c.price)} GRAM (${(c.pool || []).length} шт.)</span>
-        <button class="btn-x" style="width:auto;padding:5px 9px;" onclick="deleteCase('${c.id}')">Удалить</button>
+        <button class="btn-del-gift" style="width:auto;margin-top:0;padding:5px 9px;" onclick="deleteCase('${c.id}')">Удалить</button>
       </div>
     `).join("");
   }
@@ -1986,7 +1884,7 @@
   loadData();
   initTg();
   initTonConnect();
-  renderTop();
+  renderBalanceAndWallet();
   renderCasesGrid();
   renderActiveCase();
 </script>
