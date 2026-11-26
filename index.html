@@ -487,6 +487,11 @@
       box-shadow: 0 8px 22px rgba(249, 115, 22, 0.28);
     }
 
+    .btn-orange:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .btn-blue-big {
       width: 100%;
       padding: 13px 16px;
@@ -2007,6 +2012,7 @@
 
   let tonConnectUI = null;
   let autoSpinTimer = null;
+  let caseSpinTimer = null;
 
   function fmt(v) {
     return (Number(v) || 0).toFixed(2);
@@ -2037,11 +2043,13 @@
   }
 
   function saveApp() {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({
-      balance: appState.balance,
-      cases: appState.cases,
-      inventory: appState.inventory
-    }));
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        balance: appState.balance,
+        cases: appState.cases,
+        inventory: appState.inventory
+      }));
+    } catch (e) {}
   }
 
   function loadApp() {
@@ -2148,7 +2156,7 @@
       <div class="live-label"><span class="live-dot"></span>NFT Live</div>
       ${cards.map(g => `
         <div class="live-card" title="${g.name} · ${fmt(g.price)} GRAM">
-          ${g.img ? `<img src="${g.img}" alt="" />` : `<span>${g.icon || "💎"}</span><span class="live-nft-tag">NFT</span>`}
+          ${g.img ? `<img src="${g.img}" alt="" loading="lazy" />` : `<span>${g.icon || "💎"}</span><span class="live-nft-tag">NFT</span>`}
         </div>
       `).join("")}
     `;
@@ -2171,7 +2179,7 @@
     appState.balance = Math.round((appState.balance + v) * 100) / 100;
     saveApp();
     renderBalance();
-    renderOpenCase();
+    updateCaseButtonText();
     closeModal("visModal");
     showToast(`Добавлено +${fmt(v)} GRAM`);
   }
@@ -2207,7 +2215,7 @@
       appState.balance = Math.round((appState.balance + amt) * 100) / 100;
       saveApp();
       renderBalance();
-      renderOpenCase();
+      updateCaseButtonText();
       closeModal("depModal");
       sendBotData({
         action: "real_deposit",
@@ -2288,7 +2296,7 @@
   }
 
   function mediaHtml(img, fb = "💎") {
-    return img ? `<img src="${img}" alt="" />` : `<span>${fb}</span>`;
+    return img ? `<img src="${img}" alt="" loading="lazy" />` : `<span>${fb}</span>`;
   }
 
   function readImgFile(inp) {
@@ -2343,15 +2351,25 @@
 
   function openCaseById(caseId) {
     appState.openedCaseId = caseId;
+    appState.spinningCase = false;
+    clearTimeout(caseSpinTimer);
+
+    const c = appState.cases.find(x => x.id === caseId) || appState.cases[0];
     document.getElementById("topBarMain").style.display = "none";
     document.getElementById("topBarBack").style.display = "flex";
     document.getElementById("casesListView").style.display = "none";
     document.getElementById("caseOpenView").style.display = "block";
-    renderOpenCase();
+    if (c) document.getElementById("openCaseTitle").textContent = c.title;
+    updateCaseButtonText();
+
+    requestAnimationFrame(() => {
+      renderOpenCase();
+    });
   }
 
   function goBackToCases() {
-    if (appState.spinningCase) return;
+    appState.spinningCase = false;
+    clearTimeout(caseSpinTimer);
     appState.openedCaseId = null;
     document.getElementById("topBarMain").style.display = "flex";
     document.getElementById("topBarBack").style.display = "none";
@@ -2360,12 +2378,10 @@
     renderCasesGrid();
   }
 
-  function renderOpenCase() {
+  function updateCaseButtonText() {
     const c = appState.cases.find(x => x.id === appState.openedCaseId) || appState.cases[0];
-    if (!c) return;
-    document.getElementById("openCaseTitle").textContent = c.title;
-
     const btn = document.getElementById("caseActionBtn");
+    if (!c || !btn) return;
     if (appState.spinningCase) {
       btn.disabled = true;
       btn.textContent = "Крутим NFT...";
@@ -2376,18 +2392,25 @@
       btn.disabled = false;
       btn.textContent = `Открыть NFT-кейс (${fmt(c.price)} GRAM)`;
     }
+  }
+
+  function renderOpenCase() {
+    const c = appState.cases.find(x => x.id === appState.openedCaseId) || appState.cases[0];
+    if (!c) return;
+    document.getElementById("openCaseTitle").textContent = c.title;
+    updateCaseButtonText();
 
     const pool = Array.isArray(c.pool) ? c.pool : [];
     document.getElementById("openCasePoolCount").textContent = `${pool.length} NFT`;
 
     const track = document.getElementById("rouletteTrack");
     track.style.transition = "none";
-    track.style.transform = "translateX(0px)";
+    track.style.transform = "translate3d(0px, 0, 0)";
     if (!pool.length) {
       track.innerHTML = `<div style="padding-left:14px;color:var(--muted);font-size:12px;">NFT-подарков пока нет</div>`;
     } else {
       const strip = [];
-      for (let i = 0; i < 16; i++) strip.push(pool[i % pool.length]);
+      for (let i = 0; i < 12; i++) strip.push(pool[i % pool.length]);
       track.innerHTML = strip.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
     }
 
@@ -2426,6 +2449,7 @@
   }
 
   function spinOpenedCase(c) {
+    clearTimeout(caseSpinTimer);
     const pool = Array.isArray(c.pool) ? c.pool : [];
     const totalW = pool.reduce((s, g) => s + (Number(g.weight) || 1), 0);
     let won;
@@ -2444,32 +2468,39 @@
     saveApp();
 
     appState.spinningCase = true;
-    renderOpenCase();
+    updateCaseButtonText();
 
-    const winIdx = 28;
+    const winIdx = 22;
     const basePool = pool.length ? pool : [won];
     const tape = [];
-    for (let i = 0; i < 36; i++) tape.push(i === winIdx ? won : basePool[Math.floor(Math.random() * basePool.length)]);
+    for (let i = 0; i < 30; i++) {
+      tape.push(i === winIdx ? won : basePool[Math.floor(Math.random() * basePool.length)]);
+    }
 
     const track = document.getElementById("rouletteTrack");
     track.style.transition = "none";
-    track.style.transform = "translateX(0px)";
+    track.style.transform = "translate3d(0px, 0, 0)";
     track.innerHTML = tape.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
 
+    void track.offsetWidth;
+
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        track.style.transition = "transform 3.2s cubic-bezier(0.12, 0.85, 0.22, 1)";
-        track.style.transform = `translateX(-${winIdx * 96 + 44}px)`;
-      });
+      const firstCard = track.querySelector(".r-card");
+      const cardW = firstCard ? firstCard.getBoundingClientRect().width : 88;
+      const step = cardW + 8;
+      const shift = Math.round(winIdx * step + cardW / 2);
+
+      track.style.transition = "transform 2.4s cubic-bezier(0.14, 0.86, 0.22, 1)";
+      track.style.transform = `translate3d(-${shift}px, 0, 0)`;
     });
 
-    setTimeout(() => {
+    caseSpinTimer = setTimeout(() => {
       appState.spinningCase = false;
       addNftToInventory(won);
-      renderOpenCase();
+      updateCaseButtonText();
       renderLiveNftStrip();
       showToast(`NFT в инвентаре: ${won.name} (${fmt(won.price)} GRAM)`);
-    }, 3300);
+    }, 2500);
   }
 
   /* Admin Case & Gift Actions */
