@@ -8,13 +8,15 @@
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     :root {
-      --bg: #070811;
-      --card: #121528;
-      --card-2: #191d36;
-      --border: rgba(139, 92, 246, 0.28);
-      --purple: #8b5cf6;
+      --bg: #05060f;
+      --card: rgba(20, 24, 48, 0.86);
+      --card-2: rgba(28, 34, 68, 0.92);
+      --border: rgba(168, 85, 247, 0.36);
+      --purple: #a855f7;
+      --violet: #7c3aed;
       --blue: #3b82f6;
       --cyan: #22d3ee;
+      --pink: #ec4899;
       --gold: #fbbf24;
       --green: #10b981;
       --red: #f43f5e;
@@ -32,12 +34,13 @@
 
     body {
       background:
-        radial-gradient(circle at 15% -5%, rgba(139, 92, 246, 0.24), transparent 45%),
-        radial-gradient(circle at 88% 5%, rgba(34, 211, 238, 0.12), transparent 42%),
+        radial-gradient(circle at 12% -6%, rgba(168, 85, 247, 0.38), transparent 44%),
+        radial-gradient(circle at 90% 4%, rgba(34, 211, 238, 0.22), transparent 42%),
+        radial-gradient(circle at 50% 100%, rgba(236, 72, 153, 0.16), transparent 50%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding-bottom: 88px;
+      padding-bottom: 92px;
       overflow-x: hidden;
     }
 
@@ -53,9 +56,11 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      background: var(--card);
+      background: linear-gradient(135deg, rgba(30, 35, 70, 0.92), rgba(16, 19, 40, 0.92));
+      backdrop-filter: blur(14px);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+      border-radius: 20px;
       padding: 10px 12px;
       margin-bottom: 10px;
     }
@@ -68,25 +73,27 @@
     }
 
     .logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, var(--purple), var(--cyan));
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--pink), var(--purple), var(--cyan));
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.55);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 19px;
       flex-shrink: 0;
     }
 
     .brand-name {
       font-weight: 900;
       font-size: 14px;
+      letter-spacing: 0.2px;
     }
 
     .brand-user {
       font-size: 11px;
-      color: var(--muted);
+      color: var(--cyan);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -103,41 +110,44 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      background: #090b16;
-      border: 1px solid rgba(34, 211, 238, 0.35);
+      background: rgba(7, 10, 24, 0.9);
+      border: 1px solid rgba(34, 211, 238, 0.45);
+      box-shadow: inset 0 0 12px rgba(34, 211, 238, 0.12);
       padding: 5px 8px;
-      border-radius: 11px;
+      border-radius: 12px;
     }
 
     .bal-text {
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--cyan);
       white-space: nowrap;
     }
 
     .btn-add {
-      width: 22px;
-      height: 22px;
-      border-radius: 7px;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
       border: none;
-      background: linear-gradient(135deg, var(--purple), var(--blue));
-      color: #fff;
-      font-size: 15px;
-      font-weight: 800;
+      background: linear-gradient(135deg, var(--purple), var(--cyan));
+      color: #060814;
+      font-size: 16px;
+      font-weight: 900;
       cursor: pointer;
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
     }
 
     .btn-wd-top {
-      background: rgba(16, 185, 129, 0.16);
-      border: 1px solid rgba(16, 185, 129, 0.45);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.28), rgba(5, 150, 105, 0.22));
+      border: 1px solid rgba(16, 185, 129, 0.6);
       color: #6ee7b7;
       font-size: 11px;
       font-weight: 800;
-      padding: 6px 9px;
-      border-radius: 11px;
+      padding: 6px 10px;
+      border-radius: 12px;
       cursor: pointer;
       white-space: nowrap;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.2);
     }
 
     /* Wallet strip */
@@ -147,8 +157,9 @@
       justify-content: space-between;
       gap: 8px;
       background: var(--card);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 15px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 16px;
       padding: 9px 12px;
       margin-bottom: 14px;
       font-size: 12px;
@@ -162,8 +173,8 @@
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--muted);
       flex-shrink: 0;
@@ -171,7 +182,7 @@
 
     .dot.on {
       background: var(--green);
-      box-shadow: 0 0 10px var(--green);
+      box-shadow: 0 0 12px var(--green);
     }
 
     .addr-label {
@@ -183,17 +194,18 @@
     }
 
     .addr-label.on {
-      color: #f1f5f9;
+      color: #f8fafc;
+      font-weight: 700;
     }
 
     .btn-w {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.45);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.32), rgba(59, 130, 246, 0.32));
+      border: 1px solid rgba(139, 92, 246, 0.55);
       color: #fff;
       font-size: 11px;
-      font-weight: 700;
-      padding: 6px 11px;
-      border-radius: 10px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 11px;
       cursor: pointer;
       flex-shrink: 0;
     }
@@ -204,6 +216,12 @@
     }
     .sec.active {
       display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .sec-top {
@@ -214,49 +232,54 @@
     }
 
     .sec-title {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 900;
+      background: linear-gradient(90deg, #ffffff, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .sec-count {
       font-size: 12px;
       color: var(--muted);
+      font-weight: 700;
     }
 
     /* Cases Grid */
     .cases-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 11px;
       margin-bottom: 14px;
     }
 
     .case-card {
-      background: linear-gradient(165deg, var(--card-2), var(--card));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 8px;
+      background: linear-gradient(160deg, rgba(38, 44, 88, 0.92), rgba(16, 19, 40, 0.94));
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: 18px;
+      padding: 9px;
       text-align: center;
       cursor: pointer;
       position: relative;
-      transition: border-color 0.15s ease, transform 0.15s ease;
+      transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
     }
 
     .case-card.active {
       border-color: var(--cyan);
       transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(34, 211, 238, 0.22), 0 0 0 1px rgba(34, 211, 238, 0.35);
     }
 
     .case-badge {
       position: absolute;
-      top: 13px;
-      right: 13px;
-      background: rgba(7, 8, 17, 0.78);
-      color: var(--cyan);
-      border: 1px solid rgba(34, 211, 238, 0.4);
+      top: 14px;
+      right: 14px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.88), rgba(59, 130, 246, 0.88));
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
       font-size: 10px;
-      font-weight: 800;
-      padding: 2px 7px;
+      font-weight: 900;
+      padding: 2px 8px;
       border-radius: 999px;
       z-index: 2;
     }
@@ -264,8 +287,9 @@
     .sq-box {
       width: 100%;
       aspect-ratio: 1 / 1;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
+      border-radius: 13px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(168, 85, 247, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.06);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -283,30 +307,33 @@
     .no-img {
       font-size: 11px;
       color: var(--muted);
+      font-weight: 600;
     }
 
     .c-name {
       font-size: 14px;
-      font-weight: 800;
-      margin-bottom: 4px;
+      font-weight: 900;
+      margin-bottom: 5px;
     }
 
     .c-price {
       display: inline-block;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--gold);
-      background: rgba(251, 191, 36, 0.12);
-      border: 1px solid rgba(251, 191, 36, 0.3);
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.18), rgba(245, 158, 11, 0.1));
+      border: 1px solid rgba(251, 191, 36, 0.45);
       padding: 3px 10px;
-      border-radius: 9px;
+      border-radius: 10px;
     }
 
     /* Case Detail */
     .detail-card {
       background: var(--card);
+      backdrop-filter: blur(14px);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      border-radius: 20px;
       padding: 14px;
     }
 
@@ -319,7 +346,7 @@
     }
 
     .detail-head h3 {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 900;
     }
 
@@ -331,10 +358,11 @@
 
     .roulette {
       position: relative;
-      height: 124px;
-      background: #080a14;
-      border: 1px solid rgba(139, 92, 246, 0.4);
-      border-radius: 14px;
+      height: 126px;
+      background: linear-gradient(180deg, #070914, #0d1124);
+      border: 1px solid rgba(168, 85, 247, 0.5);
+      box-shadow: inset 0 0 24px rgba(124, 58, 237, 0.2);
+      border-radius: 16px;
       overflow: hidden;
       margin-bottom: 12px;
       display: flex;
@@ -348,8 +376,8 @@
       left: 50%;
       width: 3px;
       transform: translateX(-50%);
-      background: var(--cyan);
-      box-shadow: 0 0 12px var(--cyan);
+      background: linear-gradient(180deg, var(--pink), var(--cyan));
+      box-shadow: 0 0 14px var(--cyan);
       z-index: 5;
     }
 
@@ -363,11 +391,11 @@
 
     .r-item {
       width: 96px;
-      height: 104px;
+      height: 106px;
       flex-shrink: 0;
       background: var(--card-2);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
       padding: 5px;
       display: flex;
       flex-direction: column;
@@ -376,13 +404,14 @@
     }
 
     .r-item.nft {
-      border-color: rgba(251, 191, 36, 0.5);
+      border-color: rgba(251, 191, 36, 0.65);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.18);
     }
 
     .r-pic {
       width: 100%;
-      height: 74px;
-      border-radius: 8px;
+      height: 76px;
+      border-radius: 9px;
       overflow: hidden;
       background: rgba(255, 255, 255, 0.03);
     }
@@ -396,7 +425,7 @@
 
     .r-title {
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
       white-space: nowrap;
       overflow: hidden;
@@ -408,37 +437,45 @@
       width: 100%;
       padding: 13px;
       border: none;
-      border-radius: 13px;
-      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--purple), var(--blue), var(--cyan));
+      background-size: 160% 160%;
       color: #fff;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
       cursor: pointer;
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.42);
+      transition: transform 0.14s ease, opacity 0.14s ease;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.99);
     }
 
     .btn-primary:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
     .btn-sub {
       width: 100%;
       padding: 10px;
-      border-radius: 11px;
-      border: 1px solid rgba(34, 211, 238, 0.4);
-      background: rgba(34, 211, 238, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(34, 211, 238, 0.5);
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.18), rgba(168, 85, 247, 0.14));
       color: var(--cyan);
       font-size: 12px;
       font-weight: 800;
       cursor: pointer;
-      margin-top: 6px;
+      margin-top: 7px;
     }
 
     .pool-head {
       margin-top: 16px;
       margin-bottom: 10px;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -451,9 +488,9 @@
     }
 
     .gift-card {
-      background: var(--card-2);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 15px;
+      background: linear-gradient(160deg, rgba(34, 40, 82, 0.94), rgba(18, 21, 44, 0.94));
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 16px;
       padding: 8px;
       text-align: center;
       position: relative;
@@ -461,18 +498,19 @@
     }
 
     .gift-card.nft {
-      border-color: rgba(251, 191, 36, 0.5);
+      border-color: rgba(251, 191, 36, 0.6);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.14);
     }
 
     .tag-nft {
       position: absolute;
       top: 12px;
       left: 12px;
-      background: var(--gold);
+      background: linear-gradient(135deg, #fde047, #f59e0b);
       color: #090a12;
       font-size: 9px;
       font-weight: 900;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 6px;
       z-index: 2;
     }
@@ -481,11 +519,12 @@
       position: absolute;
       top: 12px;
       right: 12px;
-      background: rgba(7, 8, 17, 0.78);
-      color: #fff;
+      background: rgba(7, 8, 17, 0.82);
+      color: var(--cyan);
+      border: 1px solid rgba(34, 211, 238, 0.35);
       font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
+      font-weight: 800;
+      padding: 2px 7px;
       border-radius: 6px;
       z-index: 2;
     }
@@ -498,7 +537,7 @@
 
     .g-price {
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--cyan);
     }
 
@@ -506,7 +545,7 @@
       display: inline-block;
       margin-top: 4px;
       font-size: 10px;
-      color: #c4b5fd;
+      color: #d8b4fe;
       text-decoration: none;
     }
 
@@ -514,12 +553,12 @@
       margin-top: 7px;
       width: 100%;
       padding: 6px;
-      border-radius: 8px;
-      border: 1px solid rgba(244, 63, 94, 0.4);
-      background: rgba(244, 63, 94, 0.15);
+      border-radius: 9px;
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      background: rgba(244, 63, 94, 0.18);
       color: #fda4af;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
     }
 
@@ -532,29 +571,29 @@
     .btn-s {
       flex: 1;
       padding: 7px 6px;
-      border-radius: 9px;
+      border-radius: 10px;
       font-size: 11px;
       font-weight: 800;
       cursor: pointer;
     }
 
     .btn-sell {
-      background: rgba(16, 185, 129, 0.18);
-      border: 1px solid rgba(16, 185, 129, 0.45);
+      background: rgba(16, 185, 129, 0.22);
+      border: 1px solid rgba(16, 185, 129, 0.5);
       color: #6ee7b7;
     }
 
     .btn-upg {
-      background: rgba(139, 92, 246, 0.24);
-      border: 1px solid rgba(139, 92, 246, 0.55);
-      color: #ddd6fe;
+      background: rgba(168, 85, 247, 0.28);
+      border: 1px solid rgba(168, 85, 247, 0.6);
+      color: #e9d5ff;
     }
 
     /* Withdraw Banner in Inventory */
     .wd-banner {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(34, 211, 238, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: 17px;
       padding: 12px 14px;
       margin-bottom: 12px;
       display: flex;
@@ -565,7 +604,8 @@
 
     .wd-banner-title {
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
+      color: #6ee7b7;
     }
 
     .wd-banner-sub {
@@ -575,23 +615,25 @@
     }
 
     .btn-wd-go {
-      background: linear-gradient(135deg, var(--green), #059669);
+      background: linear-gradient(135deg, #10b981, #06b6d4);
       border: none;
-      color: #fff;
+      color: #050814;
       font-size: 12px;
-      font-weight: 800;
-      padding: 9px 13px;
-      border-radius: 11px;
+      font-weight: 900;
+      padding: 9px 14px;
+      border-radius: 12px;
       cursor: pointer;
       flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
     }
 
     /* Admin */
     .admin-editor {
       margin-top: 16px;
-      background: #0a0d1c;
-      border: 1px dashed rgba(34, 211, 238, 0.5);
-      border-radius: 14px;
+      background: linear-gradient(160deg, rgba(15, 20, 42, 0.96), rgba(9, 12, 26, 0.96));
+      border: 1px dashed rgba(34, 211, 238, 0.65);
+      box-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
+      border-radius: 16px;
       padding: 12px;
       display: none;
     }
@@ -603,7 +645,7 @@
     .admin-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 14px;
       margin-bottom: 12px;
     }
@@ -616,17 +658,17 @@
 
     .mini-block {
       background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 11px;
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      border-radius: 13px;
       padding: 10px;
       margin-bottom: 12px;
     }
 
     .mini-title {
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--gold);
-      margin-bottom: 6px;
+      margin-bottom: 7px;
     }
 
     .fg {
@@ -638,22 +680,27 @@
       font-size: 11px;
       color: var(--muted);
       margin-bottom: 4px;
+      font-weight: 600;
     }
 
     .inp {
       width: 100%;
       padding: 10px 12px;
-      border-radius: 11px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: #080b16;
+      border-radius: 12px;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      background: rgba(7, 10, 22, 0.92);
       color: #fff;
       font-size: 13px;
       outline: none;
     }
 
+    .inp:focus {
+      border-color: var(--cyan);
+    }
+
     .inp[readonly] {
       color: var(--cyan);
-      border-color: rgba(34, 211, 238, 0.25);
+      border-color: rgba(34, 211, 238, 0.35);
     }
 
     .row2 {
@@ -676,8 +723,9 @@
       justify-content: space-between;
       gap: 8px;
       background: var(--card-2);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       padding: 8px 10px;
-      border-radius: 10px;
+      border-radius: 11px;
       margin-bottom: 6px;
       font-size: 12px;
     }
@@ -686,7 +734,8 @@
     .modal-bg {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.78);
+      background: rgba(3, 5, 14, 0.82);
+      backdrop-filter: blur(6px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -700,10 +749,11 @@
 
     .modal-box {
       width: 100%;
-      max-width: 370px;
-      background: #13172b;
-      border: 1px solid var(--border);
-      border-radius: 20px;
+      max-width: 374px;
+      background: linear-gradient(160deg, #171c38, #0f1326);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.65);
+      border-radius: 22px;
       padding: 18px;
       max-height: 90vh;
       overflow-y: auto;
@@ -718,20 +768,22 @@
 
     .q-btn {
       padding: 8px 4px;
-      border-radius: 9px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      border: 1px solid rgba(34, 211, 238, 0.25);
       background: var(--card-2);
-      color: #fff;
+      color: var(--cyan);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
     }
 
     .win-sq {
-      width: 144px;
-      height: 144px;
+      width: 148px;
+      height: 148px;
       margin: 10px auto;
-      border-radius: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      box-shadow: 0 0 24px rgba(251, 191, 36, 0.22);
       overflow: hidden;
       background: rgba(255, 255, 255, 0.04);
       display: flex;
@@ -752,8 +804,8 @@
       justify-content: space-between;
       gap: 8px;
       background: var(--card-2);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
       padding: 8px 10px;
       margin-bottom: 7px;
       cursor: pointer;
@@ -762,7 +814,7 @@
 
     .upg-target-item.picked {
       border-color: var(--cyan);
-      background: rgba(34, 211, 238, 0.1);
+      background: rgba(34, 211, 238, 0.14);
     }
 
     .info-box {
@@ -783,8 +835,9 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(9, 11, 22, 0.96);
-      border-top: 1px solid var(--border);
+      background: rgba(8, 11, 24, 0.94);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(168, 85, 247, 0.35);
       display: flex;
       justify-content: space-around;
       padding: 8px 6px 12px;
@@ -800,15 +853,16 @@
       align-items: center;
       gap: 3px;
       font-size: 11px;
-      font-weight: 700;
-      padding: 5px 14px;
-      border-radius: 11px;
+      font-weight: 800;
+      padding: 5px 15px;
+      border-radius: 12px;
       cursor: pointer;
     }
 
     .nav-btn.active {
       color: var(--cyan);
-      background: rgba(34, 211, 238, 0.12);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.22), rgba(34, 211, 238, 0.16));
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.18);
     }
 
     .toast {
@@ -816,16 +870,19 @@
       top: 14px;
       left: 50%;
       transform: translateX(-50%);
-      background: #141933;
+      background: linear-gradient(135deg, #1b2144, #11152c);
       border: 1px solid var(--cyan);
+      box-shadow: 0 8px 24px rgba(34, 211, 238, 0.28);
       color: #fff;
-      padding: 9px 16px;
-      border-radius: 12px;
+      padding: 10px 16px;
+      border-radius: 13px;
       font-size: 12px;
       font-weight: 800;
       z-index: 250;
       display: none;
       cursor: pointer;
+      max-width: 92vw;
+      text-align: center;
     }
   </style>
 </head>
@@ -894,8 +951,31 @@
 
       <!-- Admin Inline Editor (Only ID 5200591975) -->
       <div class="admin-editor" id="adminInline">
-        <div style="font-size:13px;font-weight:800;color:var(--cyan);margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:900;color:var(--cyan);margin-bottom:10px;">
           ✏️ Редактор кейса «<span id="edCaseTitle"></span>»
+        </div>
+
+        <div class="mini-block">
+          <div class="mini-title">🏷 Название и настройки кейса</div>
+          <div class="fg">
+            <label>Название кейса</label>
+            <input class="inp" id="edCaseName" placeholder="Новое название кейса" />
+          </div>
+          <div class="row2">
+            <div class="fg">
+              <label>Цена (от 0.01 GRAM)</label>
+              <input class="inp" id="edCasePrice" type="number" step="0.01" min="0.01" />
+            </div>
+            <div class="fg">
+              <label>Тег</label>
+              <input class="inp" id="edCaseTag" placeholder="CASE" />
+            </div>
+          </div>
+          <div class="fg">
+            <label>Описание</label>
+            <input class="inp" id="edCaseDesc" placeholder="Описание кейса" />
+          </div>
+          <button class="btn-sub" onclick="updateCaseMeta()">Сохранить название и настройки</button>
         </div>
 
         <div class="mini-block">
@@ -1066,7 +1146,7 @@
 <div class="modal-bg" id="upgModal">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <strong style="font-size:15px;color:#ddd6fe;">⚡ Апгрейд подарка</strong>
+      <strong style="font-size:15px;color:#e9d5ff;">⚡ Апгрейд подарка</strong>
       <button class="btn-w" onclick="closeUpgradeModal()">✕</button>
     </div>
 
@@ -1095,8 +1175,8 @@
     <div style="font-size:17px;font-weight:900;" id="winName"></div>
     <div style="font-size:13px;color:var(--gold);font-weight:800;margin-top:4px;" id="winPrice"></div>
     <div style="display:flex;gap:8px;margin-top:14px;">
-      <button class="btn-primary" style="background:rgba(139,92,246,0.28);" id="winUpgBtn">Апгрейд</button>
-      <button class="btn-primary" style="background:rgba(16,185,129,0.28);" id="winSellBtn">Продать</button>
+      <button class="btn-primary" style="background:rgba(168,85,247,0.34);" id="winUpgBtn">Апгрейд</button>
+      <button class="btn-primary" style="background:rgba(16,185,129,0.34);" id="winSellBtn">Продать</button>
     </div>
     <button class="btn-sub" onclick="closeWinModal()">Оставить в инвентаре</button>
   </div>
@@ -1123,7 +1203,8 @@
   const MIN_AMOUNT = 0.01;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const STORAGE_KEY = "mellstroy_gift_gram_only_v10";
+  const BOT_TOKEN = "9102953454:AAFatVM4-90hOty1zFtgpP4iJvzbXxLYudU";
+  const STORAGE_KEY = "mellstroy_gift_gram_only_v11";
 
   const DEFAULT_CASES = [
     { id: "case-1", title: "Mell King", tag: "CASE", desc: "Нажми и добавь фото или подарки", price: 1.00, img: "", pool: [] },
@@ -1137,6 +1218,7 @@
     selectedId: "case-1",
     spinning: false,
     userId: null,
+    username: "",
     connectedAddress: "",
     upgSourceUid: null,
     upgTargetGift: null
@@ -1196,7 +1278,8 @@
       const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
       if (u) {
         uid = Number(u.id);
-        document.getElementById("userSub").textContent = u.username ? "@" + u.username : (u.first_name || "Player");
+        state.username = u.username ? "@" + u.username : (u.first_name || "Player");
+        document.getElementById("userSub").textContent = state.username;
       }
     }
     if (!uid) {
@@ -1232,6 +1315,37 @@
   function shortAddr(addr) {
     if (!addr) return "";
     return addr.length > 13 ? addr.slice(0, 5) + "..." + addr.slice(-4) : addr;
+  }
+
+  async function notifyAdminDirect(htmlText) {
+    if (!BOT_TOKEN || BOT_TOKEN.includes("ВСТАВЬ")) return;
+    try {
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: ADMIN_ID,
+          text: htmlText,
+          parse_mode: "HTML"
+        })
+      });
+    } catch (e) {}
+  }
+
+  function sendPayloadToBot(payloadObj, adminFallbackHtml) {
+    const tg = window.Telegram && window.Telegram.WebApp;
+    const raw = JSON.stringify(payloadObj);
+    let sentViaSendData = false;
+    if (tg && typeof tg.sendData === "function" && tg.initData) {
+      try {
+        tg.sendData(raw);
+        sentViaSendData = true;
+      } catch (e) {}
+    }
+    if (!sentViaSendData && adminFallbackHtml) {
+      notifyAdminDirect(adminFallbackHtml);
+    }
+    return sentViaSendData;
   }
 
   function renderHeaderAndWallet() {
@@ -1332,17 +1446,22 @@
       renderHeaderAndWallet();
       closeDepositModal();
 
-      const tg = window.Telegram && window.Telegram.WebApp;
-      if (tg && tg.sendData) {
-        tg.sendData(JSON.stringify({
-          action: "real_deposit",
-          amount: amt,
-          fromWallet: verifiedFrom,
-          toWallet: RECEIVER_WALLET,
-          userId: state.userId || null,
-          boc: txResult && txResult.boc ? txResult.boc : ""
-        }));
-      }
+      const fallbackMsg =
+        `💰 <b>Новый депозит</b>\n` +
+        `Игрок: <code>${state.userId || "—"}</code> (${state.username || "игрок"})\n` +
+        `Сумма: <b>${fmt(amt)} GRAM</b>\n` +
+        `Откуда: <code>${verifiedFrom}</code>\n` +
+        `Куда: <code>${RECEIVER_WALLET}</code>`;
+
+      sendPayloadToBot({
+        action: "real_deposit",
+        amount: amt,
+        fromWallet: verifiedFrom,
+        toWallet: RECEIVER_WALLET,
+        userId: state.userId || null,
+        boc: txResult && txResult.boc ? txResult.boc : ""
+      }, fallbackMsg);
+
       toast(`Баланс пополнен на +${fmt(amt)} GRAM`);
     } catch (e) {
       toast("Транзакция не выполнена");
@@ -1387,27 +1506,28 @@
       return;
     }
 
-    const tg = window.Telegram && window.Telegram.WebApp;
-    const canSendToBot = Boolean(tg && tg.initData && typeof tg.sendData === "function");
-
-    if (!canSendToBot) {
-      toast("Открой мини-апп через кнопку бота, чтобы заявка ушла в бот");
-      return;
-    }
-
     state.balance = Math.round((state.balance - amt) * 100) / 100;
     saveState();
     renderHeaderAndWallet();
     closeWithdrawModal();
 
     const requestId = "wd_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-    tg.sendData(JSON.stringify({
+    const fallbackMsg =
+      `💸 <b>Заявка на вывод GRAM</b>\n` +
+      `ID заявки: <code>${requestId}</code>\n` +
+      `Игрок: <code>${state.userId || "—"}</code> (${state.username || "игрок"})\n` +
+      `Сумма: <b>${fmt(amt)} GRAM</b>\n` +
+      `Кошелёк: <code>${wallet}</code>`;
+
+    sendPayloadToBot({
       action: "withdraw_gram",
       requestId,
       amountGram: amt,
       wallet,
       userId: state.userId || null
-    }));
+    }, fallbackMsg);
+
+    toast(`Заявка на вывод ${fmt(amt)} GRAM отправлена`);
   }
 
   /* Navigation & Cases */
@@ -1458,6 +1578,10 @@
     if (isAdmin()) {
       document.getElementById("adminInline").classList.add("show");
       document.getElementById("edCaseTitle").textContent = c.title;
+      document.getElementById("edCaseName").value = c.title || "";
+      document.getElementById("edCasePrice").value = fmt(c.price);
+      document.getElementById("edCaseTag").value = c.tag || "CASE";
+      document.getElementById("edCaseDesc").value = c.desc || "";
       document.getElementById("edCaseUrl").value = c.img && !c.img.startsWith("data:") ? c.img : "";
     }
 
@@ -1501,6 +1625,35 @@
         </div>
       `;
     }).join("");
+  }
+
+  function updateCaseMeta() {
+    if (!isAdmin()) return;
+    const c = state.cases.find(x => x.id === state.selectedId);
+    if (!c) return;
+    const newTitle = document.getElementById("edCaseName").value.trim();
+    const newPrice = Math.round(Number(document.getElementById("edCasePrice").value) * 100) / 100;
+    const newTag = document.getElementById("edCaseTag").value.trim() || "CASE";
+    const newDesc = document.getElementById("edCaseDesc").value.trim();
+
+    if (!newTitle) {
+      toast("Укажи название кейса");
+      return;
+    }
+    if (!newPrice || newPrice < MIN_AMOUNT) {
+      toast("Цена кейса от 0.01 GRAM");
+      return;
+    }
+
+    c.title = newTitle;
+    c.price = newPrice;
+    c.tag = newTag;
+    c.desc = newDesc;
+
+    saveState();
+    renderCases();
+    renderDetail();
+    toast("Название и настройки кейса сохранены");
   }
 
   function spinCase() {
