@@ -1797,7 +1797,7 @@
     <div class="card">
       <div class="card-title">🗄️ Общая база данных (Supabase)</div>
       <div class="info-line">
-        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Синхронизация...</b></span>
+        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Готово</b></span>
         <button class="btn-edit-sm" onclick="fetchRemoteState(true)">Обновить</button>
       </div>
       <button class="btn-purple" onclick="pushRemoteState(true)">Сохранить базу сейчас</button>
@@ -2108,8 +2108,8 @@
     editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
-    dbStatus: "Локальный кэш",
-    dbMode: "warn",
+    dbStatus: "Кэш загружен",
+    dbMode: "ok",
     /* Rocket */
     rocketPhase: "countdown",
     rocketCountdownSec: 3,
@@ -2235,10 +2235,9 @@
   }
 
   async function fetchRemoteState(notify = false) {
-    setDbBadge("warn", "Загрузка базы...");
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data`;
       const res = await fetch(url, {
         signal: controller.signal,
@@ -2251,37 +2250,37 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rows = await res.json();
       if (Array.isArray(rows) && rows.length && rows[0].data && Array.isArray(rows[0].data.cases) && rows[0].data.cases.length) {
-        appState.cases = normalizeCases(rows[0].data.cases);
+        const remoteCases = normalizeCases(rows[0].data.cases);
+        const changed = JSON.stringify(remoteCases) !== JSON.stringify(appState.cases);
+        appState.cases = remoteCases;
         if (isAdminUser() && typeof rows[0].data.balance === "number") {
           appState.balance = rows[0].data.balance;
         }
         saveApp();
-        renderCasesGrid();
-        renderLiveNftStrip();
-        if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
-        if (isAdminUser()) {
-          renderBalance();
-          renderAdminUI();
+        if (changed || notify) {
+          renderCasesGrid();
+          renderLiveNftStrip();
+          if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
+          if (isAdminUser()) {
+            renderBalance();
+            renderAdminUI();
+          }
         }
-        setDbBadge("ok", "Общая база подключена");
-        if (notify) showToast("База обновлена из Supabase");
-      } else {
-        await pushRemoteState(false);
-        setDbBadge("ok", "База инициализирована");
+        setDbBadge("ok", "Синхронизировано с базой");
+        if (notify) showToast("База обновлена");
       }
     } catch (err) {
-      setDbBadge("err", "Офлайн / локальный кэш");
-      if (notify) showToast("Не удалось загрузить базу");
+      setDbBadge("warn", "Локальный кэш");
+      if (notify) showToast("Используется локальный кэш");
     }
   }
 
   async function pushRemoteState(notify = false) {
     saveApp();
     if (!isAdminUser()) return;
-    setDbBadge("warn", "Сохранение в базу...");
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
       const url = `${SUPABASE_URL}/rest/v1/app_state?on_conflict=id`;
       const res = await fetch(url, {
         method: "POST",
@@ -2303,11 +2302,11 @@
       });
       clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDbBadge("ok", "Синхронизировано");
+      setDbBadge("ok", "Сохранено в базе");
       if (notify) showToast("Сохранено в общую базу");
     } catch (err) {
-      setDbBadge("err", "Ошибка записи в базу");
-      if (notify) showToast("Ошибка сохранения в базу");
+      setDbBadge("warn", "Сохранено локально");
+      if (notify) showToast("Сохранено локально");
     }
   }
 
@@ -2806,11 +2805,8 @@
     if (isAdminUser()) {
       appState.balance = Math.max(0, Math.round((appState.balance - Number(c.price)) * 100) / 100);
       renderBalance();
-      saveApp();
-      pushRemoteState(false);
-    } else {
-      saveApp();
     }
+    saveApp();
 
     const winIdx = 36;
     const basePool = pool.length ? pool : [won];
@@ -3738,7 +3734,7 @@
   renderMinesUI();
   renderPlinkoUI();
   renderSlotsUI();
-  fetchRemoteState(false);
+  setTimeout(() => { fetchRemoteState(false); }, 50);
 </script>
 </body>
 </html>
