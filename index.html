@@ -52,36 +52,36 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 11px 13px;
+      padding: 10px 12px;
       margin-bottom: 10px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       min-width: 0;
     }
 
     .logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
       background: linear-gradient(135deg, var(--purple), var(--cyan));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 19px;
+      font-size: 18px;
       flex-shrink: 0;
     }
 
     .brand-name {
       font-weight: 900;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .brand-user {
@@ -92,33 +92,52 @@
       text-overflow: ellipsis;
     }
 
-    .bal-box {
+    .top-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: #090b16;
-      border: 1px solid rgba(34, 211, 238, 0.35);
-      padding: 6px 10px;
-      border-radius: 12px;
+      gap: 6px;
       flex-shrink: 0;
     }
 
+    .bal-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #090b16;
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      padding: 5px 8px;
+      border-radius: 11px;
+    }
+
     .bal-text {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
       color: var(--cyan);
+      white-space: nowrap;
     }
 
     .btn-add {
-      width: 24px;
-      height: 24px;
-      border-radius: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
       border: none;
       background: linear-gradient(135deg, var(--purple), var(--blue));
       color: #fff;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       cursor: pointer;
+    }
+
+    .btn-wd-top {
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 9px;
+      border-radius: 11px;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
     /* Wallet strip */
@@ -504,6 +523,69 @@
       cursor: pointer;
     }
 
+    .inv-btns {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .btn-s {
+      flex: 1;
+      padding: 7px 6px;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-sell {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+    }
+
+    .btn-upg {
+      background: rgba(139, 92, 246, 0.24);
+      border: 1px solid rgba(139, 92, 246, 0.55);
+      color: #ddd6fe;
+    }
+
+    /* Withdraw Banner in Inventory */
+    .wd-banner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .wd-banner-title {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .wd-banner-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .btn-wd-go {
+      background: linear-gradient(135deg, var(--green), #059669);
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 9px 13px;
+      border-radius: 11px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
     /* Admin */
     .admin-editor {
       margin-top: 16px;
@@ -583,33 +665,6 @@
       margin: 8px 0;
     }
 
-    .inv-btns {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .btn-s {
-      flex: 1;
-      padding: 7px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .btn-sell {
-      background: rgba(16, 185, 129, 0.18);
-      border: 1px solid rgba(16, 185, 129, 0.45);
-      color: #6ee7b7;
-    }
-
-    .btn-out {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.45);
-      color: #93c5fd;
-    }
-
     .adm-row {
       display: flex;
       align-items: center;
@@ -622,7 +677,7 @@
       font-size: 12px;
     }
 
-    /* Deposit Modal */
+    /* Modals */
     .modal-bg {
       position: fixed;
       inset: 0;
@@ -640,11 +695,13 @@
 
     .modal-box {
       width: 100%;
-      max-width: 360px;
+      max-width: 370px;
       background: #13172b;
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 18px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .q-grid {
@@ -666,9 +723,9 @@
     }
 
     .win-sq {
-      width: 148px;
-      height: 148px;
-      margin: 12px auto;
+      width: 144px;
+      height: 144px;
+      margin: 10px auto;
       border-radius: 16px;
       overflow: hidden;
       background: rgba(255, 255, 255, 0.04);
@@ -682,6 +739,37 @@
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    .upg-target-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--card-2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 11px;
+      padding: 8px 10px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .upg-target-item.picked {
+      border-color: var(--cyan);
+      background: rgba(34, 211, 238, 0.1);
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     /* Nav */
@@ -749,13 +837,16 @@
         <div class="brand-user" id="userSub">NFT &amp; GRAM</div>
       </div>
     </div>
-    <div class="bal-box">
-      <span class="bal-text"><span id="balVal">0.00</span> GRAM</span>
-      <button class="btn-add" onclick="openDepositModal()" title="Депозит от 0.01">+</button>
+    <div class="top-actions">
+      <div class="bal-box">
+        <span class="bal-text"><span id="balVal">0.00</span> GRAM</span>
+        <button class="btn-add" onclick="openDepositModal()" title="Депозит от 0.01">+</button>
+      </div>
+      <button class="btn-wd-top" onclick="openWithdrawModal()">Вывести</button>
     </div>
   </div>
 
-  <!-- Wallet Strip (Real TON Connect) -->
+  <!-- Wallet strip -->
   <div class="wallet-strip">
     <div class="wallet-state">
       <span class="dot" id="wDot"></span>
@@ -847,6 +938,15 @@
       <span class="sec-title">Инвентарь</span>
       <span class="sec-count" id="invCount">0 шт.</span>
     </div>
+
+    <div class="wd-banner">
+      <div>
+        <div class="wd-banner-title">Вывод только в GRAM</div>
+        <div class="wd-banner-sub">Подарки можно продать в GRAM или сделать апгрейд</div>
+      </div>
+      <button class="btn-wd-go" onclick="openWithdrawModal()">Вывести</button>
+    </div>
+
     <div class="gifts-grid" id="invGrid"></div>
   </div>
 
@@ -892,7 +992,7 @@
   </div>
 </div>
 
-<!-- Real Wallet Deposit Modal -->
+<!-- Real Deposit Modal -->
 <div class="modal-bg" id="depModal">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -900,7 +1000,7 @@
       <button class="btn-w" onclick="closeDepositModal()">✕</button>
     </div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-      Минимум: <b>0.01</b>. Оплата отправляется через подключённый кошелёк на адрес получателя.
+      Минимум: <b>0.01</b>. Оплата отправляется с подключённого кошелька на адрес получателя.
     </p>
     <div class="fg">
       <label>Сумма (минимум 0.01)</label>
@@ -916,18 +1016,79 @@
   </div>
 </div>
 
-<!-- Win Modal -->
+<!-- Real GRAM Withdraw Modal -->
+<div class="modal-bg" id="wdModal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <strong style="font-size:15px;color:#6ee7b7;">💸 Вывод GRAM</strong>
+      <button class="btn-w" onclick="closeWithdrawModal()">✕</button>
+    </div>
+
+    <div class="info-box">
+      <span style="color:var(--muted);">Доступный баланс:</span>
+      <strong style="color:var(--cyan);" id="wdAvailBal">0.00 GRAM</strong>
+    </div>
+
+    <div class="fg">
+      <label>Адрес кошелька для вывода</label>
+      <input class="inp" id="wdWalletInp" placeholder="UQ... или EQ..." />
+    </div>
+
+    <div class="fg">
+      <label>Сумма вывода (минимум 0.01 GRAM)</label>
+      <input class="inp" id="wdAmtInp" type="number" step="0.01" min="0.01" value="0.01" />
+    </div>
+
+    <div class="q-grid">
+      <button class="q-btn" onclick="setWdPct(0.25)">25%</button>
+      <button class="q-btn" onclick="setWdPct(0.5)">50%</button>
+      <button class="q-btn" onclick="setWdPct(0.75)">75%</button>
+      <button class="q-btn" onclick="setWdPct(1)">Макс</button>
+    </div>
+
+    <button class="btn-primary" style="background:linear-gradient(135deg,#10b981,#059669);" id="wdSubmitBtn" onclick="submitRealWithdraw()">
+      Подтвердить вывод GRAM
+    </button>
+  </div>
+</div>
+
+<!-- Upgrade Modal -->
+<div class="modal-bg" id="upgModal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <strong style="font-size:15px;color:#ddd6fe;">⚡ Апгрейд подарка</strong>
+      <button class="btn-w" onclick="closeUpgradeModal()">✕</button>
+    </div>
+
+    <div class="info-box">
+      <span id="upgFromName">Подарок</span>
+      <strong style="color:var(--cyan);" id="upgFromPrice">0.00 GRAM</strong>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Выбери цель дороже текущего подарка:</div>
+    <div id="upgTargetsList"></div>
+
+    <div class="info-box" style="margin-top:8px;">
+      <span style="color:var(--muted);">Шанс успеха:</span>
+      <strong style="color:var(--gold);" id="upgChanceText">0%</strong>
+    </div>
+
+    <button class="btn-primary" id="upgRunBtn" onclick="runUpgrade()">Запустить апгрейд</button>
+  </div>
+</div>
+
+<!-- Win Modal (Only Sell or Upgrade) -->
 <div class="modal-bg" id="winModal">
   <div class="modal-box" style="text-align:center;">
     <div style="font-size:12px;color:var(--cyan);font-weight:900;">🎉 ВЫИГРЫШ</div>
     <div class="win-sq" id="winSq"></div>
     <div style="font-size:17px;font-weight:900;" id="winName"></div>
     <div style="font-size:13px;color:var(--gold);font-weight:800;margin-top:4px;" id="winPrice"></div>
-    <a id="winUrl" href="#" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#c4b5fd;">Открыть ↗</a>
     <div style="display:flex;gap:8px;margin-top:14px;">
-      <button class="btn-primary" style="background:rgba(255,255,255,0.12);" onclick="closeWinModal()">В инвентарь</button>
-      <button class="btn-primary" id="winSellBtn">Продать</button>
+      <button class="btn-primary" style="background:rgba(139,92,246,0.28);" id="winUpgBtn">Апгрейд</button>
+      <button class="btn-primary" style="background:rgba(16,185,129,0.28);" id="winSellBtn">Продать</button>
     </div>
+    <button class="btn-sub" onclick="closeWinModal()">Оставить в инвентаре</button>
   </div>
 </div>
 
@@ -949,11 +1110,11 @@
 
 <script>
   const ADMIN_ID = 5200591975;
-  const MIN_DEPOSIT = 0.01;
+  const MIN_AMOUNT = 0.01;
   // ЗАМЕНИ НА СВОЙ РЕАЛЬНЫЙ АДРЕС КОШЕЛЬКА ПРИЁМА ОПЛАТ (UQ... или EQ...)
   const RECEIVER_WALLET = "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const STORAGE_KEY = "mellstroy_gift_real_v7";
+  const STORAGE_KEY = "mellstroy_gift_gram_only_v8";
 
   const DEFAULT_CASES = [
     { id: "case-1", title: "Mell King", tag: "CASE", desc: "Нажми и добавь фото или подарки", price: 1.00, img: "", pool: [] },
@@ -967,7 +1128,9 @@
     selectedId: "case-1",
     spinning: false,
     userId: null,
-    connectedAddress: ""
+    connectedAddress: "",
+    upgSourceUid: null,
+    upgTargetGift: null
   };
 
   let tonUI = null;
@@ -1030,20 +1193,12 @@
   }
 
   function initTonConnect() {
-    if (!window.TON_CONNECT_UI || !window.TON_CONNECT_UI.TonConnectUI) {
-      toast("TON Connect UI не загрузился");
-      return;
-    }
+    if (!window.TON_CONNECT_UI || !window.TON_CONNECT_UI.TonConnectUI) return;
     tonUI = new window.TON_CONNECT_UI.TonConnectUI({
       manifestUrl: MANIFEST_URL
     });
-
     tonUI.onStatusChange(wallet => {
-      if (wallet && wallet.account && wallet.account.address) {
-        state.connectedAddress = wallet.account.address;
-      } else {
-        state.connectedAddress = "";
-      }
+      state.connectedAddress = (wallet && wallet.account && wallet.account.address) ? wallet.account.address : "";
       renderHeaderAndWallet();
     });
   }
@@ -1082,7 +1237,7 @@
 
   async function toggleWalletConnection() {
     if (!tonUI) {
-      toast("TON Connect недоступен в этом окружении");
+      toast("TON Connect недоступен");
       return;
     }
     try {
@@ -1099,7 +1254,7 @@
     }
   }
 
-  /* Real Deposit via Connected Wallet */
+  /* Deposit */
   function openDepositModal() {
     if (!state.connectedAddress) {
       toast("Сначала подключи кошелёк");
@@ -1125,13 +1280,11 @@
       toggleWalletConnection();
       return;
     }
-
     const amt = Math.round(Number(document.getElementById("depAmt").value) * 100) / 100;
-    if (!amt || amt < MIN_DEPOSIT) {
-      toast("Минимальная сумма депозита — 0.01");
+    if (!amt || amt < MIN_AMOUNT) {
+      toast("Минимум — 0.01");
       return;
     }
-
     if (!RECEIVER_WALLET || RECEIVER_WALLET.includes("AAAA")) {
       toast("Укажи свой адрес получателя в RECEIVER_WALLET");
       return;
@@ -1142,15 +1295,9 @@
     btn.textContent = "Подтверди в кошельке...";
 
     try {
-      const nanoAmount = String(Math.round(amt * 1e9));
       const txResult = await tonUI.sendTransaction({
         validUntil: Math.floor(Date.now() / 1000) + 300,
-        messages: [
-          {
-            address: RECEIVER_WALLET,
-            amount: nanoAmount
-          }
-        ]
+        messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
       });
 
       state.balance = Math.round((state.balance + amt) * 100) / 100;
@@ -1168,13 +1315,67 @@
           boc: txResult && txResult.boc ? txResult.boc : ""
         }));
       }
-      toast(`Депозит +${fmt(amt)} подтверждён`);
+      toast(`Баланс пополнен на +${fmt(amt)} GRAM`);
     } catch (e) {
-      toast("Транзакция отклонена или не выполнена");
+      toast("Транзакция не выполнена");
     } finally {
       btn.disabled = false;
       btn.textContent = "Оплатить с кошелька";
     }
+  }
+
+  /* Real GRAM Withdraw */
+  function openWithdrawModal() {
+    document.getElementById("wdAvailBal").textContent = `${fmt(state.balance)} GRAM`;
+    document.getElementById("wdWalletInp").value = state.connectedAddress || "";
+    const defAmt = state.balance >= MIN_AMOUNT ? Math.min(state.balance, 0.01).toFixed(2) : "0.01";
+    document.getElementById("wdAmtInp").value = defAmt;
+    document.getElementById("wdModal").classList.add("open");
+  }
+
+  function closeWithdrawModal() {
+    document.getElementById("wdModal").classList.remove("open");
+  }
+
+  function setWdPct(pct) {
+    const val = Math.floor(state.balance * pct * 100) / 100;
+    document.getElementById("wdAmtInp").value = Math.max(0, val).toFixed(2);
+  }
+
+  function submitRealWithdraw() {
+    const wallet = document.getElementById("wdWalletInp").value.trim();
+    const amt = Math.round(Number(document.getElementById("wdAmtInp").value) * 100) / 100;
+
+    if (!wallet || wallet.length < 10) {
+      toast("Укажи корректный адрес кошелька");
+      return;
+    }
+    if (!amt || amt < MIN_AMOUNT) {
+      toast("Минимальный вывод — 0.01 GRAM");
+      return;
+    }
+    if (amt > state.balance) {
+      toast("Недостаточно GRAM на балансе");
+      return;
+    }
+
+    state.balance = Math.round((state.balance - amt) * 100) / 100;
+    saveState();
+    renderHeaderAndWallet();
+    closeWithdrawModal();
+
+    const requestId = "wd_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg && tg.sendData) {
+      tg.sendData(JSON.stringify({
+        action: "withdraw_gram",
+        requestId,
+        amountGram: amt,
+        wallet,
+        userId: state.userId || null
+      }));
+    }
+    toast(`Заявка на вывод ${fmt(amt)} GRAM отправлена`);
   }
 
   /* Navigation & Cases */
@@ -1278,7 +1479,7 @@
       return;
     }
     if (state.balance < c.price) {
-      toast("Недостаточно средств на балансе");
+      toast("Недостаточно GRAM");
       return;
     }
 
@@ -1343,19 +1544,20 @@
     document.getElementById("winSq").innerHTML = sqPhoto(gift.img, gift.name);
     document.getElementById("winName").textContent = gift.name;
     document.getElementById("winPrice").textContent = `${fmt(gift.price)} GRAM`;
-    const link = document.getElementById("winUrl");
-    if (gift.externalUrl) {
-      link.href = gift.externalUrl;
-      link.style.display = "inline-block";
-    } else {
-      link.style.display = "none";
-    }
+
     const sellBtn = document.getElementById("winSellBtn");
     sellBtn.textContent = `Продать (${fmt(gift.price)})`;
     sellBtn.onclick = () => {
       sellInv(uid);
       closeWinModal();
     };
+
+    const upgBtn = document.getElementById("winUpgBtn");
+    upgBtn.onclick = () => {
+      closeWinModal();
+      openUpgradeModal(uid);
+    };
+
     document.getElementById("winModal").classList.add("open");
   }
 
@@ -1380,7 +1582,7 @@
           <div class="g-price">${fmt(g.price)} GRAM</div>
           <div class="inv-btns">
             <button class="btn-s btn-sell" onclick="sellInv('${row.uid}')">Продать</button>
-            <button class="btn-s btn-out" onclick="withdrawInv('${row.uid}')">Вывод</button>
+            <button class="btn-s btn-upg" onclick="openUpgradeModal('${row.uid}')">Апгрейд</button>
           </div>
         </div>
       `;
@@ -1395,24 +1597,98 @@
     state.balance = Math.round((state.balance + price) * 100) / 100;
     saveState();
     renderHeaderAndWallet();
-    renderInventory();
+    if (document.getElementById("sec-inventory").classList.contains("active")) {
+      renderInventory();
+    }
     toast(`Продано за +${fmt(price)} GRAM`);
   }
 
-  function withdrawInv(uid) {
+  /* Upgrade */
+  function getAllPoolGifts() {
+    const map = new Map();
+    for (const c of state.cases) {
+      for (const g of (c.pool || [])) {
+        if (!map.has(g.id)) map.set(g.id, { ...g });
+      }
+    }
+    return Array.from(map.values());
+  }
+
+  function openUpgradeModal(uid) {
     const row = state.inventory.find(x => x.uid === uid);
     if (!row) return;
-    const tg = window.Telegram && window.Telegram.WebApp;
-    if (tg && tg.sendData) {
-      tg.sendData(JSON.stringify({
-        action: "withdraw_gift",
-        giftName: row.gift.name,
-        price: row.gift.price,
-        wallet: state.connectedAddress || "",
-        externalUrl: row.gift.externalUrl || ""
-      }));
+    const srcPrice = Number(row.gift.price) || 0;
+    const targets = getAllPoolGifts().filter(g => (Number(g.price) || 0) > srcPrice);
+
+    if (!targets.length) {
+      toast("Нет подарков дороже для апгрейда");
+      return;
     }
-    toast(`Заявка на вывод «${row.gift.name}» отправлена`);
+
+    state.upgSourceUid = uid;
+    state.upgTargetGift = targets[0];
+
+    document.getElementById("upgFromName").textContent = row.gift.name;
+    document.getElementById("upgFromPrice").textContent = `${fmt(srcPrice)} GRAM`;
+
+    const listEl = document.getElementById("upgTargetsList");
+    listEl.innerHTML = targets.map((t, idx) => `
+      <div class="upg-target-item ${idx === 0 ? "picked" : ""}" id="upgT_${idx}" onclick="pickUpgradeTarget(${idx}, ${srcPrice})">
+        <span><b>${t.name}</b></span>
+        <span style="color:var(--cyan);font-weight:800;">${fmt(t.price)} GRAM</span>
+      </div>
+    `).join("");
+
+    window._upgTargets = targets;
+    updateUpgradeChance(srcPrice, targets[0].price);
+    document.getElementById("upgModal").classList.add("open");
+  }
+
+  function pickUpgradeTarget(idx, srcPrice) {
+    const targets = window._upgTargets || [];
+    const t = targets[idx];
+    if (!t) return;
+    state.upgTargetGift = t;
+    document.querySelectorAll(".upg-target-item").forEach((el, i) => {
+      el.classList.toggle("picked", i === idx);
+    });
+    updateUpgradeChance(srcPrice, t.price);
+  }
+
+  function updateUpgradeChance(srcPrice, targetPrice) {
+    const raw = (srcPrice / Math.max(0.01, targetPrice)) * 90;
+    const chance = Math.max(5, Math.min(85, Math.round(raw * 10) / 10));
+    state.upgChance = chance;
+    document.getElementById("upgChanceText").textContent = `${chance}%`;
+  }
+
+  function closeUpgradeModal() {
+    document.getElementById("upgModal").classList.remove("open");
+  }
+
+  function runUpgrade() {
+    const idx = state.inventory.findIndex(x => x.uid === state.upgSourceUid);
+    const target = state.upgTargetGift;
+    if (idx === -1 || !target) return;
+
+    state.inventory.splice(idx, 1);
+    const roll = Math.random() * 100;
+    const won = roll < (state.upgChance || 0);
+
+    if (won) {
+      const newUid = Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+      state.inventory.unshift({ uid: newUid, gift: { ...target } });
+      saveState();
+      closeUpgradeModal();
+      if (document.getElementById("sec-inventory").classList.contains("active")) renderInventory();
+      openWin({ ...target }, newUid);
+      toast("Апгрейд успешен!");
+    } else {
+      saveState();
+      closeUpgradeModal();
+      if (document.getElementById("sec-inventory").classList.contains("active")) renderInventory();
+      toast("Апгрейд не прошёл — подарок сгорел");
+    }
   }
 
   /* Admin */
@@ -1457,7 +1733,7 @@
     const url = document.getElementById("edGImgUrl").value.trim();
     const isNft = document.getElementById("edGNft").checked;
 
-    if (!name || !price || price < MIN_DEPOSIT) {
+    if (!name || !price || price < MIN_AMOUNT) {
       toast("Укажи название и цену от 0.01");
       return;
     }
@@ -1504,7 +1780,7 @@
     const desc = document.getElementById("cDesc").value.trim() || "";
     const url = document.getElementById("cImgUrl").value.trim();
 
-    if (!title || !price || price < MIN_DEPOSIT) {
+    if (!title || !price || price < MIN_AMOUNT) {
       toast("Укажи название и цену от 0.01");
       return;
     }
