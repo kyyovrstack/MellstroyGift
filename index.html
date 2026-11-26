@@ -552,7 +552,7 @@
       border-radius: 10px;
     }
 
-    /* Rocket Reference Screen adapted to Neon/Purple/Cyan theme */
+    /* Rocket Screen */
     .rocket-arena {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -604,7 +604,6 @@
       width: 72%;
       height: 55%;
       border-bottom: 4px solid rgba(168, 85, 247, 0.55);
-      border-left: none;
       border-radius: 0 0 0 80px;
       transform: rotate(-18deg);
       pointer-events: none;
@@ -736,7 +735,7 @@
       flex-shrink: 0;
     }
 
-    /* Upgrader Reference Wheel adapted to Neon/Purple/Cyan theme */
+    /* Upgrader Wheel */
     .upg-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1014,11 +1013,6 @@
       height: 6px;
       border-radius: 50%;
       background: #64748b;
-    }
-
-    .peg-dot.on {
-      background: var(--cyan);
-      box-shadow: 0 0 8px var(--cyan);
     }
 
     .plinko-slots {
@@ -1310,7 +1304,7 @@
     </div>
   </div>
 
-  <!-- 2. GAMES (Rocket Reference + Mines, Plinko, Slots) -->
+  <!-- 2. GAMES (Rocket Continuous Loop + Mines, Plinko, Slots) -->
   <div id="sec-games" class="sec">
     <div class="row4" style="grid-template-columns:repeat(4,1fr);">
       <button class="wallet-mini" onclick="selectSubGame('rocket')">🚀 Ракета</button>
@@ -1319,26 +1313,27 @@
       <button class="wallet-mini" onclick="selectSubGame('slots')">🎰 Слоты</button>
     </div>
 
-    <!-- ROCKET (Reference layout) -->
+    <!-- ROCKET -->
     <div id="sub-rocket" class="rocket-arena">
       <div class="rocket-hud-top">
-        <span class="ping-pill"><span class="live-dot"></span>📶 24ms</span>
-        <span class="ping-pill" style="color:var(--cyan);">🚀 Ракетка · GRAM</span>
+        <span class="ping-pill"><span class="live-dot"></span>📶 24ms · LIVE</span>
+        <span class="ping-pill" style="color:var(--cyan);" id="rocketStatusBadge">🚀 В полёте</span>
       </div>
 
       <div class="rocket-screen" id="rocketScreen">
         <div class="rocket-curve" id="rocketCurve"></div>
-        <div class="countdown-ring" id="rocketCountdown" style="display:none;">2</div>
+        <div class="countdown-ring" id="rocketCountdown" style="display:none;">3</div>
         <div class="rocket-flight-obj" id="rocketFlightBox">
           <div class="rocket-emoji-big" id="rocketShip">🚀</div>
           <div class="rocket-live-mult" id="rocketMult">1.00x</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="rocketSubInfo"></div>
         </div>
       </div>
 
       <div class="history-chips" id="rocketHistory"></div>
 
       <div class="fg">
-        <label>Ставка в раунд (от 0.01 GRAM)</label>
+        <label>Ставка (от 0.01 GRAM)</label>
         <input class="inp" id="rocketBet" type="number" step="0.01" min="0.01" value="0.50" />
       </div>
 
@@ -1406,7 +1401,7 @@
     </div>
   </div>
 
-  <!-- 3. UPGRADER (Reference Wheel + NFT Gift or GRAM) -->
+  <!-- 3. UPGRADER -->
   <div id="sec-upgrader" class="sec">
     <div class="upg-card">
       <div class="rocket-hud-top">
@@ -1425,7 +1420,6 @@
         </div>
       </div>
 
-      <!-- Two Input Slots (NFT Gift / GRAM on left, Target on right) -->
       <div class="upg-pair">
         <div class="upg-box active-border" onclick="openUpgSourcePicker()">
           <div class="upg-plus-circle">+</div>
@@ -1442,7 +1436,6 @@
         </div>
       </div>
 
-      <!-- Presets -->
       <div class="preset-row">
         <button class="preset-btn" onclick="applyChancePreset('x2')">X2</button>
         <button class="preset-btn" onclick="applyChancePreset('x4')">X4</button>
@@ -1531,7 +1524,7 @@
   </div>
 </div>
 
-<!-- Upgrader Source Picker (NFT Gift or GRAM) -->
+<!-- Upgrader Source Picker -->
 <div class="modal-bg" id="upgSrcModal">
   <div class="modal-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -1654,7 +1647,7 @@
   const MIN_GRAM = 0.01;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_ref_v2";
+  const SAVE_KEY = "mellstroy_gift_full_v3";
 
   const INITIAL_CASES = [
     {
@@ -1694,6 +1687,15 @@
     }
   ];
 
+  const ROCKET_BOT_POOL = [
+    { name: "Amir", bet: 1.00, target: 2.35 },
+    { name: "kUfUH", bet: 0.20, target: 1.65 },
+    { name: "Saeed", bet: 0.50, target: 3.10 },
+    { name: "Вовчік", bet: 0.30, target: 1.85 },
+    { name: "Nika", bet: 1.50, target: 4.20 },
+    { name: "MaxPayne", bet: 0.40, target: 1.40 }
+  ];
+
   const appState = {
     userId: null,
     username: "Игрок",
@@ -1704,20 +1706,20 @@
     walletAddr: "",
     spinningCase: false,
     /* Rocket */
-    rocketPhase: "idle", // idle | flying | cashed
+    rocketPhase: "countdown",
+    rocketCountdownSec: 3,
     rocketBet: 0,
+    rocketInRound: false,
+    rocketCashedOut: false,
+    rocketQueuedBet: 0,
     rocketMult: 1.00,
-    rocketCrashAt: 2.00,
-    rocketTimer: null,
+    rocketCrashAt: 2.40,
+    rocketLoopTimer: null,
     rocketHistory: [6.91, 3.98, 2.20, 1.17, 33.7, 2.17],
-    rocketLiveFeed: [
-      { name: "Amir", bet: 1.00, mult: 6.90, out: 6.90 },
-      { name: "kUfUH", bet: 0.10, mult: 6.90, out: 0.69 },
-      { name: "Saeed", bet: 0.10, mult: 6.90, out: 0.69 }
-    ],
+    rocketLiveFeed: [],
     /* Upgrader */
-    upgSource: null, // { type: 'gram', amount } or { type: 'nft', uid, gift }
-    upgTarget: null, // gift object
+    upgSource: null,
+    upgTarget: null,
     upgChance: 35.0,
     upgSpinning: false,
     upgAngle: 0,
@@ -2267,102 +2269,255 @@
     switchNav("upgrader");
   }
 
-  /* ROCKET (Reference style) */
-  function renderRocketUI() {
-    document.getElementById("rocketHistory").innerHTML = appState.rocketHistory.slice(0, 8).map(x => {
-      const val = Number(x).toFixed(2);
-      const cls = Number(x) >= 3 ? "hi" : (Number(x) < 1.5 ? "lo" : "");
-      return `<span class="h-chip ${cls}">${val}x</span>`;
-    }).join("");
+  /* ROCKET (Continuous Online Loop + Live Players) */
+  function buildRocketRoundFeed() {
+    const picked = [...ROCKET_BOT_POOL]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 4)
+      .map(p => {
+        const mult = Number((p.target + (Math.random() * 0.6 - 0.3)).toFixed(2));
+        return {
+          name: p.name,
+          bet: p.bet,
+          targetMult: Math.max(1.15, mult),
+          cashedOut: false,
+          out: 0,
+          isPlayer: false
+        };
+      });
 
-    const multEl = document.getElementById("rocketMult");
-    const shipEl = document.getElementById("rocketShip");
-    const actBtn = document.getElementById("rocketActionBtn");
-
-    multEl.textContent = `${appState.rocketMult.toFixed(2)}x`;
-    if (appState.rocketPhase === "flying") {
-      actBtn.textContent = `Забрать (${fmt(appState.rocketBet * appState.rocketMult)} GRAM)`;
-      actBtn.style.background = "linear-gradient(135deg,#10b981,#059669)";
-    } else {
-      actBtn.textContent = "Сделать ставку";
-      actBtn.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
+    if (appState.rocketQueuedBet >= MIN_GRAM) {
+      appState.rocketBet = appState.rocketQueuedBet;
+      appState.rocketQueuedBet = 0;
+      appState.rocketInRound = true;
+      appState.rocketCashedOut = false;
+      picked.unshift({
+        name: appState.username,
+        bet: appState.rocketBet,
+        targetMult: 999,
+        cashedOut: false,
+        out: 0,
+        isPlayer: true
+      });
     }
 
-    document.getElementById("rocketBetsList").innerHTML = appState.rocketLiveFeed.map(b => {
-      const ini = String(b.name || "U").slice(0, 1).toUpperCase();
-      return `
-        <div class="r-bet-row">
-          <div style="display:flex;align-items:center;gap:9px;min-width:0;">
-            <div class="r-bet-ava">${ini}</div>
-            <div>
-              <div style="font-size:13px;font-weight:800;">${b.name}</div>
-              <span class="r-bet-sub">◆ ${fmt(b.bet)} · ×${Number(b.mult).toFixed(2)}</span>
+    appState.rocketLiveFeed = picked;
+  }
+
+  function startRocketCountdown() {
+    appState.rocketPhase = "countdown";
+    appState.rocketCountdownSec = 3;
+    appState.rocketMult = 1.00;
+    appState.rocketInRound = false;
+    appState.rocketCashedOut = false;
+    appState.rocketBet = 0;
+    buildRocketRoundFeed();
+    renderRocketUI();
+
+    clearInterval(appState.rocketLoopTimer);
+    appState.rocketLoopTimer = setInterval(() => {
+      appState.rocketCountdownSec -= 1;
+      if (appState.rocketCountdownSec > 0) {
+        renderRocketUI();
+      } else {
+        clearInterval(appState.rocketLoopTimer);
+        beginRocketFlight();
+      }
+    }, 900);
+  }
+
+  function beginRocketFlight() {
+    appState.rocketPhase = "flying";
+    appState.rocketMult = 1.00;
+    appState.rocketCrashAt = Number((1.2 + Math.pow(Math.random(), 2.0) * 6.5).toFixed(2));
+    const multEl = document.getElementById("rocketMult");
+    if (multEl) multEl.classList.remove("boom");
+    renderRocketUI();
+
+    clearInterval(appState.rocketLoopTimer);
+    appState.rocketLoopTimer = setInterval(() => {
+      appState.rocketMult = Number((appState.rocketMult + 0.05).toFixed(2));
+
+      for (const row of appState.rocketLiveFeed) {
+        if (!row.isPlayer && !row.cashedOut && appState.rocketMult >= row.targetMult) {
+          row.cashedOut = true;
+          row.out = Math.round(row.bet * row.targetMult * 100) / 100;
+        }
+      }
+
+      if (appState.rocketMult >= appState.rocketCrashAt) {
+        clearInterval(appState.rocketLoopTimer);
+        appState.rocketPhase = "crashed";
+        appState.rocketHistory.unshift(appState.rocketCrashAt);
+        appState.rocketHistory = appState.rocketHistory.slice(0, 10);
+
+        if (appState.rocketInRound && !appState.rocketCashedOut) {
+          showToast(`💥 Ракетка взорвалась на ${appState.rocketCrashAt.toFixed(2)}x`);
+        }
+        appState.rocketInRound = false;
+        renderRocketUI();
+
+        setTimeout(() => {
+          startRocketCountdown();
+        }, 1200);
+        return;
+      }
+
+      renderRocketUI();
+    }, 100);
+  }
+
+  function initRocketLoop() {
+    if (!appState.rocketLoopTimer) {
+      startRocketCountdown();
+    }
+  }
+
+  function renderRocketUI() {
+    const histEl = document.getElementById("rocketHistory");
+    if (histEl) {
+      histEl.innerHTML = appState.rocketHistory.slice(0, 8).map(x => {
+        const val = Number(x).toFixed(2);
+        const cls = Number(x) >= 3 ? "hi" : (Number(x) < 1.5 ? "lo" : "");
+        return `<span class="h-chip ${cls}">${val}x</span>`;
+      }).join("");
+    }
+
+    const badgeEl = document.getElementById("rocketStatusBadge");
+    const cdEl = document.getElementById("rocketCountdown");
+    const flightBox = document.getElementById("rocketFlightBox");
+    const shipEl = document.getElementById("rocketShip");
+    const multEl = document.getElementById("rocketMult");
+    const subEl = document.getElementById("rocketSubInfo");
+    const btnEl = document.getElementById("rocketActionBtn");
+
+    if (!badgeEl || !cdEl || !flightBox || !shipEl || !multEl || !btnEl) return;
+
+    if (appState.rocketPhase === "countdown") {
+      badgeEl.textContent = `⏳ Старт через ${appState.rocketCountdownSec}с`;
+      cdEl.style.display = "flex";
+      cdEl.textContent = String(appState.rocketCountdownSec);
+      flightBox.style.display = "none";
+    } else if (appState.rocketPhase === "flying") {
+      badgeEl.textContent = "🚀 В полёте";
+      cdEl.style.display = "none";
+      flightBox.style.display = "block";
+      multEl.classList.remove("boom");
+      multEl.textContent = `${appState.rocketMult.toFixed(2)}x`;
+      const lift = Math.min(42, (appState.rocketMult - 1) * 12);
+      shipEl.style.transform = `translate(${lift * 0.5}px, -${lift}px)`;
+      if (subEl) {
+        subEl.textContent = appState.rocketInRound && !appState.rocketCashedOut
+          ? `Твоя ставка: ${fmt(appState.rocketBet)} GRAM`
+          : (appState.rocketCashedOut ? "Выигрыш забран, полёт продолжается" : "Следующий раунд скоро");
+      }
+    } else {
+      badgeEl.textContent = `💥 CRASH ${appState.rocketCrashAt.toFixed(2)}x`;
+      cdEl.style.display = "none";
+      flightBox.style.display = "block";
+      multEl.classList.add("boom");
+      multEl.textContent = `${appState.rocketCrashAt.toFixed(2)}x`;
+      if (subEl) subEl.textContent = "Новый раунд...";
+    }
+
+    if (appState.rocketPhase === "flying" && appState.rocketInRound && !appState.rocketCashedOut) {
+      const potential = Math.round(appState.rocketBet * appState.rocketMult * 100) / 100;
+      btnEl.disabled = false;
+      btnEl.textContent = `Забрать ${fmt(potential)} GRAM`;
+      btnEl.style.background = "linear-gradient(135deg,#10b981,#059669)";
+    } else if (appState.rocketQueuedBet > 0) {
+      btnEl.disabled = true;
+      btnEl.textContent = `Ставка ${fmt(appState.rocketQueuedBet)} GRAM на след. раунд`;
+      btnEl.style.background = "var(--surface-3)";
+    } else if (appState.rocketInRound && appState.rocketCashedOut) {
+      btnEl.disabled = false;
+      btnEl.textContent = "Поставить на след. раунд";
+      btnEl.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
+    } else if (appState.rocketPhase === "countdown") {
+      btnEl.disabled = false;
+      btnEl.textContent = "Сделать ставку";
+      btnEl.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
+    } else {
+      btnEl.disabled = false;
+      btnEl.textContent = "Поставить на след. раунд";
+      btnEl.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
+    }
+
+    const listEl = document.getElementById("rocketBetsList");
+    if (listEl) {
+      listEl.innerHTML = appState.rocketLiveFeed.map(b => {
+        const ini = String(b.name || "U").replace(/^@/, "").slice(0, 1).toUpperCase() || "U";
+        const curMult = b.cashedOut ? b.targetMult : appState.rocketMult;
+        const rightTxt = b.cashedOut ? `◆ ${fmt(b.out)}` : (appState.rocketPhase === "crashed" ? "💥" : `${curMult.toFixed(2)}x`);
+        return `
+          <div class="r-bet-row">
+            <div style="display:flex;align-items:center;gap:9px;min-width:0;">
+              <div class="r-bet-ava">${ini}</div>
+              <div>
+                <div style="font-size:13px;font-weight:800;">${b.name}${b.isPlayer ? " (ты)" : ""}</div>
+                <span class="r-bet-sub">◆ ${fmt(b.bet)} · ${b.cashedOut ? `×${Number(b.targetMult).toFixed(2)}` : "в игре"}</span>
+              </div>
             </div>
+            <div class="r-bet-right">${rightTxt}</div>
           </div>
-          <div class="r-bet-right">◆ ${fmt(b.out)}</div>
-        </div>
-      `;
-    }).join("");
+        `;
+      }).join("");
+    }
   }
 
   function onRocketAction() {
-    if (appState.rocketPhase === "flying") {
-      clearInterval(appState.rocketTimer);
+    if (appState.rocketPhase === "flying" && appState.rocketInRound && !appState.rocketCashedOut) {
       const win = Math.round(appState.rocketBet * appState.rocketMult * 100) / 100;
       appState.balance = Math.round((appState.balance + win) * 100) / 100;
-      saveApp(); renderBalance();
+      appState.rocketCashedOut = true;
+      saveApp();
+      renderBalance();
 
-      appState.rocketLiveFeed.unshift({
-        name: appState.username,
-        bet: appState.rocketBet,
-        mult: appState.rocketMult,
-        out: win
-      });
-      appState.rocketLiveFeed = appState.rocketLiveFeed.slice(0, 8);
-      appState.rocketPhase = "idle";
+      const me = appState.rocketLiveFeed.find(x => x.isPlayer);
+      if (me) {
+        me.cashedOut = true;
+        me.targetMult = appState.rocketMult;
+        me.out = win;
+      }
       renderRocketUI();
-      showToast(`Забрано +${fmt(win)} GRAM (${appState.rocketMult.toFixed(2)}x)`);
+      showToast(`Забрано +${fmt(win)} GRAM на ${appState.rocketMult.toFixed(2)}x`);
       return;
     }
 
     const bet = Math.round(Number(document.getElementById("rocketBet").value) * 100) / 100;
-    if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-    if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
+    if (!bet || bet < MIN_GRAM) {
+      showToast("Ставка от 0.01 GRAM");
+      return;
+    }
+    if (bet > appState.balance) {
+      showToast("Недостаточно GRAM");
+      return;
+    }
 
     appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-    saveApp(); renderBalance();
+    saveApp();
+    renderBalance();
 
-    appState.rocketPhase = "flying";
-    appState.rocketBet = bet;
-    appState.rocketMult = 1.00;
-    appState.rocketCrashAt = Number((1.2 + Math.pow(Math.random(), 2.1) * 6.5).toFixed(2));
-
-    const multEl = document.getElementById("rocketMult");
-    const shipEl = document.getElementById("rocketShip");
-    multEl.classList.remove("boom");
-    shipEl.style.transform = "translate(0px, 0px)";
+    if (appState.rocketPhase === "countdown") {
+      appState.rocketBet = bet;
+      appState.rocketInRound = true;
+      appState.rocketCashedOut = false;
+      appState.rocketLiveFeed.unshift({
+        name: appState.username,
+        bet,
+        targetMult: 999,
+        cashedOut: false,
+        out: 0,
+        isPlayer: true
+      });
+    } else {
+      appState.rocketQueuedBet = bet;
+      showToast(`Ставка ${fmt(bet)} GRAM принята на следующий раунд`);
+    }
     renderRocketUI();
-
-    appState.rocketTimer = setInterval(() => {
-      appState.rocketMult = Number((appState.rocketMult + 0.05).toFixed(2));
-      multEl.textContent = `${appState.rocketMult.toFixed(2)}x`;
-      const lift = Math.min(44, (appState.rocketMult - 1) * 13);
-      shipEl.style.transform = `translate(${lift * 0.55}px, -${lift}px)`;
-      document.getElementById("rocketActionBtn").textContent = `Забрать (${fmt(appState.rocketBet * appState.rocketMult)} GRAM)`;
-
-      if (appState.rocketMult >= appState.rocketCrashAt) {
-        clearInterval(appState.rocketTimer);
-        appState.rocketPhase = "idle";
-        multEl.classList.add("boom");
-        multEl.textContent = `${appState.rocketCrashAt.toFixed(2)}x`;
-        appState.rocketHistory.unshift(appState.rocketCrashAt);
-        renderRocketUI();
-        showToast("Ракета улетела!");
-      }
-    }, 100);
   }
 
-  /* UPGRADER (Reference Wheel + NFT Gift or GRAM) */
+  /* UPGRADER */
   function getAllTargets() {
     const out = [];
     for (const c of appState.cases) {
@@ -2665,7 +2820,7 @@
   renderBalance();
   updateWalletButton();
   renderCasesGrid();
-  renderRocketUI();
+  initRocketLoop();
   renderUpgraderUI();
   renderMinesUI();
   renderPlinkoUI();
