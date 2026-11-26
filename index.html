@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MellstroyGift</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     :root {
       --bg: #05060f;
-      --surface: rgba(19, 23, 46, 0.92);
-      --surface-2: rgba(27, 33, 66, 0.95);
-      --surface-3: rgba(36, 44, 88, 0.95);
+      --surface: #13172e;
+      --surface-2: #1b2142;
+      --surface-3: #242c58;
       --border: rgba(168, 85, 247, 0.34);
       --purple: #a855f7;
       --violet: #7c3aed;
@@ -34,8 +33,8 @@
 
     body {
       background:
-        radial-gradient(circle at 15% -5%, rgba(168, 85, 247, 0.34), transparent 44%),
-        radial-gradient(circle at 88% 5%, rgba(34, 211, 238, 0.2), transparent 42%),
+        radial-gradient(circle at 15% -5%, rgba(168, 85, 247, 0.28), transparent 44%),
+        radial-gradient(circle at 88% 5%, rgba(34, 211, 238, 0.16), transparent 42%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -49,7 +48,6 @@
       padding: 12px;
     }
 
-    /* Top Bar */
     .top-bar {
       display: flex;
       align-items: center;
@@ -95,14 +93,12 @@
       cursor: pointer;
     }
 
-    /* Admin-only Balance Strip */
     .bal-header {
       display: none;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
       background: var(--surface);
-      backdrop-filter: blur(12px);
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 10px 12px;
@@ -175,7 +171,6 @@
       padding: 8px 11px;
       border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
     }
 
     .btn-wd-sm {
@@ -200,7 +195,6 @@
       cursor: pointer;
     }
 
-    /* Live NFT Strip */
     .live-strip {
       display: flex;
       align-items: center;
@@ -230,7 +224,6 @@
       height: 6px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: 0 0 8px var(--green);
     }
 
     .live-card {
@@ -264,7 +257,6 @@
       margin-top: 1px;
     }
 
-    /* Banners */
     .banner-rocket {
       width: 100%;
       border-radius: 20px;
@@ -297,7 +289,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      background: rgba(5, 8, 20, 0.45);
+      background: rgba(5, 8, 20, 0.55);
       color: #fff;
       font-size: 10px;
       font-weight: 800;
@@ -320,7 +312,7 @@
     }
 
     .chip-x {
-      background: rgba(7, 10, 24, 0.72);
+      background: rgba(7, 10, 24, 0.78);
       border: 1px solid rgba(34, 211, 238, 0.35);
       color: var(--cyan);
       font-size: 11px;
@@ -329,11 +321,9 @@
       border-radius: 9px;
     }
 
-    /* Sections */
     .sec { display: none; }
     .sec.active { display: block; }
 
-    /* Cases Grid */
     .cases-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -348,8 +338,8 @@
       cursor: pointer;
     }
 
-    .case-tile:hover {
-      border-color: var(--cyan);
+    .case-tile:active {
+      transform: scale(0.98);
     }
 
     .case-sq {
@@ -377,7 +367,7 @@
       position: absolute;
       top: 8px;
       left: 8px;
-      background: rgba(7, 10, 24, 0.85);
+      background: rgba(7, 10, 24, 0.88);
       border: 1px solid rgba(34, 211, 238, 0.45);
       color: var(--cyan);
       font-size: 10px;
@@ -412,7 +402,6 @@
       flex-shrink: 0;
     }
 
-    /* Open Case */
     .open-case-name {
       font-size: 23px;
       font-weight: 900;
@@ -439,7 +428,6 @@
       width: 3px;
       transform: translateX(-50%);
       background: var(--cyan);
-      box-shadow: 0 0 12px var(--cyan);
       z-index: 6;
     }
 
@@ -449,6 +437,7 @@
       gap: 8px;
       padding-left: 50%;
       will-change: transform;
+      transform: translate3d(0, 0, 0);
     }
 
     .r-card {
@@ -484,7 +473,6 @@
       font-weight: 900;
       cursor: pointer;
       margin-bottom: 14px;
-      box-shadow: 0 8px 22px rgba(249, 115, 22, 0.28);
     }
 
     .btn-orange:disabled {
@@ -502,7 +490,6 @@
       font-size: 14px;
       font-weight: 900;
       cursor: pointer;
-      box-shadow: 0 6px 22px rgba(59, 130, 246, 0.35);
     }
 
     .btn-blue-big:disabled {
@@ -559,7 +546,7 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      background: rgba(7, 10, 24, 0.86);
+      background: rgba(7, 10, 24, 0.88);
       border: 1px solid rgba(34, 211, 238, 0.35);
       color: var(--cyan);
       font-size: 11px;
@@ -572,7 +559,7 @@
       position: absolute;
       bottom: 8px;
       left: 8px;
-      background: rgba(7, 10, 24, 0.86);
+      background: rgba(7, 10, 24, 0.88);
       border: 1px solid rgba(16, 185, 129, 0.45);
       color: #6ee7b7;
       font-size: 10px;
@@ -717,14 +704,12 @@
 
     .rocket-emoji-big {
       font-size: 56px;
-      filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.45));
     }
 
     .rocket-live-mult {
       font-size: 28px;
       font-weight: 900;
       color: var(--cyan);
-      text-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
     }
 
     .rocket-live-mult.boom {
@@ -744,7 +729,7 @@
       font-size: 34px;
       font-weight: 900;
       color: #fff;
-      background: rgba(12, 16, 34, 0.85);
+      background: #0c1022;
       z-index: 4;
     }
 
@@ -863,7 +848,6 @@
       border-left: 11px solid transparent;
       border-right: 11px solid transparent;
       border-top: 19px solid var(--cyan);
-      filter: drop-shadow(0 0 8px var(--cyan));
       z-index: 8;
     }
 
@@ -879,8 +863,8 @@
       align-items: center;
       justify-content: center;
       padding: 14px;
-      box-shadow: 0 0 28px rgba(16, 185, 129, 0.18);
       transition: transform 2.5s cubic-bezier(0.14, 0.86, 0.22, 1);
+      will-change: transform;
     }
 
     .wheel-inner {
@@ -1140,12 +1124,10 @@
       height: 7px;
       border-radius: 50%;
       background: #64748b;
-      transition: transform 0.14s, background 0.14s;
     }
 
     .peg-dot.on {
       background: var(--cyan);
-      box-shadow: 0 0 10px var(--cyan);
       transform: scale(1.35);
     }
 
@@ -1155,7 +1137,6 @@
       height: 15px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, #fff, var(--cyan) 55%, var(--purple));
-      box-shadow: 0 0 14px var(--cyan);
       top: 0;
       left: 50%;
       transform: translate(-50%, 0);
@@ -1222,7 +1203,6 @@
 
     .slot-cell-6x5.win-cell {
       border-color: var(--cyan);
-      box-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
       background: radial-gradient(circle at 30% 30%, #3b2678, #141a38 75%);
     }
 
@@ -1282,7 +1262,6 @@
 
     .speed-seg.on {
       background: var(--cyan);
-      box-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
     }
 
     .slots-spin-wrap {
@@ -1301,7 +1280,6 @@
       font-size: 24px;
       font-weight: 900;
       cursor: pointer;
-      box-shadow: 0 6px 22px rgba(124, 58, 237, 0.45);
     }
 
     .slots-bottom-2 {
@@ -1355,8 +1333,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(8, 11, 24, 0.95);
-      backdrop-filter: blur(14px);
+      background: #080b18;
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-around;
@@ -1388,7 +1365,7 @@
     .modal-bg {
       position: fixed;
       inset: 0;
-      background: rgba(3, 5, 14, 0.82);
+      background: rgba(3, 5, 14, 0.85);
       display: none;
       align-items: center;
       justify-content: center;
@@ -1787,7 +1764,7 @@
     <div class="card">
       <div class="card-title">🗄️ Общая база данных (Supabase)</div>
       <div class="info-line">
-        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Локальный режим</b></span>
+        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Локальный кэш</b></span>
         <button class="btn-edit-sm" onclick="fetchRemoteState(true)">Загрузить</button>
       </div>
       <button class="btn-purple" onclick="pushRemoteState(true)">Сохранить базу сейчас</button>
@@ -2098,7 +2075,7 @@
     editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
-    dbStatus: "Локальный режим",
+    dbStatus: "Локальный кэш",
     /* Rocket */
     rocketPhase: "countdown",
     rocketCountdownSec: 3,
@@ -2137,6 +2114,7 @@
   };
 
   let tonConnectUI = null;
+  let tonSdkPromise = null;
   let autoSpinTimer = null;
   let caseSpinTimer = null;
 
@@ -2222,7 +2200,7 @@
     saveApp();
   }
 
-  /* Manual Supabase sync only from Admin panel */
+  /* Non-blocking background sync with Supabase */
   async function fetchRemoteState(notify = false) {
     try {
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data`;
@@ -2235,24 +2213,28 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rows = await res.json();
       if (Array.isArray(rows) && rows.length && rows[0].data && Array.isArray(rows[0].data.cases) && rows[0].data.cases.length) {
-        appState.cases = normalizeCases(rows[0].data.cases);
+        const nextCases = normalizeCases(rows[0].data.cases);
+        const changed = JSON.stringify(nextCases) !== JSON.stringify(appState.cases);
+        appState.cases = nextCases;
         if (isAdminUser() && typeof rows[0].data.balance === "number") {
           appState.balance = rows[0].data.balance;
         }
         saveApp();
-        renderCasesGrid();
-        renderLiveNftStrip();
-        if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
+        if (changed) {
+          renderCasesGrid();
+          renderLiveNftStrip();
+          if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
+        }
         if (isAdminUser()) {
           renderBalance();
           renderAdminUI();
         }
-        setDbBadge("Загружено из базы");
-        if (notify) showToast("База загружена из Supabase");
+        setDbBadge("Синхронизировано");
+        if (notify) showToast("База загружена");
       }
     } catch (err) {
-      setDbBadge("Локальный режим");
-      if (notify) showToast("Не удалось загрузить базу");
+      setDbBadge("Локальный кэш");
+      if (notify) showToast("Ошибка загрузки базы");
     }
   }
 
@@ -2282,7 +2264,7 @@
       setDbBadge("Сохранено в базе");
       if (notify) showToast("Сохранено в базу");
     } catch (err) {
-      setDbBadge("Локальный режим");
+      setDbBadge("Локальный кэш");
       if (notify) showToast("Сохранено локально");
     }
   }
@@ -2320,16 +2302,30 @@
     }
   }
 
-  function initTON() {
-    try {
-      if (window.TON_CONNECT_UI && window.TON_CONNECT_UI.TonConnectUI) {
-        tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({ manifestUrl: MANIFEST_URL });
-        tonConnectUI.onStatusChange(w => {
-          appState.walletAddr = (w && w.account && w.account.address) ? w.account.address : "";
-          updateWalletButton();
-        });
-      }
-    } catch (e) {}
+  /* Lazy TON Connect loader — zero network blocking on startup */
+  function ensureTonConnect() {
+    if (tonConnectUI) return Promise.resolve(tonConnectUI);
+    if (tonSdkPromise) return tonSdkPromise;
+    tonSdkPromise = new Promise((resolve) => {
+      const s = document.createElement("script");
+      s.src = "https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js";
+      s.async = true;
+      s.onload = () => {
+        try {
+          if (window.TON_CONNECT_UI && window.TON_CONNECT_UI.TonConnectUI) {
+            tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({ manifestUrl: MANIFEST_URL });
+            tonConnectUI.onStatusChange(w => {
+              appState.walletAddr = (w && w.account && w.account.address) ? w.account.address : "";
+              updateWalletButton();
+            });
+          }
+        } catch (e) {}
+        resolve(tonConnectUI);
+      };
+      s.onerror = () => resolve(null);
+      document.head.appendChild(s);
+    });
+    return tonSdkPromise;
   }
 
   function getWallet() {
@@ -2347,15 +2343,16 @@
   }
 
   async function onWalletBtn() {
-    if (!tonConnectUI) { showToast("TON Connect недоступен"); return; }
+    const tc = await ensureTonConnect();
+    if (!tc) { showToast("TON Connect недоступен"); return; }
     try {
       if (getWallet()) {
-        await tonConnectUI.disconnect();
+        await tc.disconnect();
         appState.walletAddr = "";
         updateWalletButton();
         showToast("Кошелёк отключён");
       } else {
-        await tonConnectUI.openModal();
+        await tc.openModal();
       }
     } catch (e) { showToast("Ошибка кошелька"); }
   }
@@ -2406,10 +2403,11 @@
   /* Deposit & Withdraw (Admin only) */
   async function openDepositModal() {
     if (!isAdminUser()) return;
+    const tc = await ensureTonConnect();
     const w = getWallet();
     if (!w) {
       showToast("Сначала подключи кошелёк");
-      if (tonConnectUI) { try { await tonConnectUI.openModal(); } catch (e) {} }
+      if (tc) { try { await tc.openModal(); } catch (e) {} }
       return;
     }
     document.getElementById("depWalletInp").value = w;
@@ -2419,14 +2417,15 @@
 
   async function confirmDeposit() {
     if (!isAdminUser()) return;
+    const tc = await ensureTonConnect();
     const w = getWallet();
-    if (!tonConnectUI || !w) { showToast("Подключи кошелёк"); closeModal("depModal"); return; }
+    if (!tc || !w) { showToast("Подключи кошелёк"); closeModal("depModal"); return; }
     const amt = Math.round(Number(document.getElementById("depAmtInp").value) * 100) / 100;
     if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     const btn = document.getElementById("depConfirmBtn");
     btn.disabled = true;
     try {
-      const res = await tonConnectUI.sendTransaction({
+      const res = await tc.sendTransaction({
         validUntil: Math.floor(Date.now() / 1000) + 300,
         from: w,
         messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
@@ -2488,13 +2487,23 @@
 
     document.getElementById("topBarMain").style.display = "flex";
     document.getElementById("topBarBack").style.display = "none";
+
+    if (sec === "games") {
+      initRocketLoop();
+      renderRocketUI();
+      renderMinesUI();
+      renderPlinkoUI();
+      renderSlotsUI();
+    } else {
+      stopRocketLoop();
+    }
+
     if (sec === "cases") {
       document.getElementById("casesListView").style.display = "block";
       document.getElementById("caseOpenView").style.display = "none";
       renderCasesGrid();
     }
-    if (sec === "games") { renderRocketUI(); renderMinesUI(); renderPlinkoUI(); renderSlotsUI(); }
-    if (sec === "upgrader") renderUpgraderUI();
+    if (sec === "upgrader") { syncAutoUpgradeTarget(); renderUpgraderUI(); }
     if (sec === "inventory") renderInventoryUI();
     if (sec === "admin") renderAdminUI();
   }
@@ -2508,14 +2517,14 @@
     ["rocket", "mines", "plinko", "slots"].forEach(k => {
       document.getElementById("sub-" + k).style.display = k === sub ? "block" : "none";
     });
-    if (sub === "rocket") renderRocketUI();
+    if (sub === "rocket") { initRocketLoop(); renderRocketUI(); }
     if (sub === "mines") renderMinesUI();
     if (sub === "plinko") renderPlinkoUI();
     if (sub === "slots") renderSlotsUI();
   }
 
   function mediaHtml(img, fb = "💎") {
-    return img ? `<img src="${img}" alt="" />` : `<span>${fb}</span>`;
+    return img ? `<img src="${img}" alt="" loading="lazy" />` : `<span>${fb}</span>`;
   }
 
   function readImgFile(inp) {
@@ -2729,7 +2738,7 @@
       if (fileData) g.img = fileData;
       else if (url) g.img = url;
       appState.editingGiftId = null;
-      saveApp();
+      pushRemoteState(false);
       closeModal("editGiftModal");
       renderOpenCase();
       renderLiveNftStrip();
@@ -2748,7 +2757,7 @@
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c) return;
     c.pool = (c.pool || []).filter(item => item.id !== giftId);
-    saveApp();
+    pushRemoteState(false);
     renderOpenCase();
     renderLiveNftStrip();
     showToast("Подарок удалён из кейса");
@@ -2796,6 +2805,9 @@
     track.style.transform = "translate3d(0px, 0, 0)";
     track.innerHTML = tape.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
 
+    /* Force reflow so browser registers translate3d(0,0,0) before starting transition */
+    void track.offsetWidth;
+
     const firstCard = track.querySelector(".r-card");
     const cardW = firstCard ? firstCard.getBoundingClientRect().width : 88;
     const step = cardW + 8;
@@ -2828,7 +2840,7 @@
     c.title = title; c.price = price; c.tag = tag;
     if (file || url) c.img = file || url;
     document.getElementById("edCaseImgFile").value = "";
-    saveApp();
+    pushRemoteState(false);
     renderOpenCase(); renderCasesGrid();
     showToast("Кейс сохранён");
   }
@@ -2849,7 +2861,7 @@
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
-    saveApp();
+    pushRemoteState(false);
     renderOpenCase(); renderLiveNftStrip();
     showToast(`NFT «${name}» добавлен`);
   }
@@ -2867,7 +2879,7 @@
     document.getElementById("newCaseTitle").value = "";
     document.getElementById("newCaseImgUrl").value = "";
     document.getElementById("newCaseImgFile").value = "";
-    saveApp();
+    pushRemoteState(false);
     renderCasesGrid(); renderAdminUI();
     showToast(`Кейс «${title}» создан`);
   }
@@ -2887,7 +2899,7 @@
     document.getElementById("admGiftName").value = "";
     document.getElementById("admGiftImgUrl").value = "";
     document.getElementById("admGiftImgFile").value = "";
-    saveApp();
+    pushRemoteState(false);
     renderAdminUI(); renderLiveNftStrip();
     showToast(`NFT добавлен в «${c.title}»`);
   }
@@ -2896,7 +2908,7 @@
     if (!isAdminUser()) return;
     if (appState.cases.length <= 1) { showToast("Нужен хотя бы 1 кейс"); return; }
     appState.cases = appState.cases.filter(x => x.id !== cid);
-    saveApp();
+    pushRemoteState(false);
     renderCasesGrid(); renderAdminUI();
     showToast("Кейс удалён");
   }
@@ -3056,7 +3068,11 @@
         renderRocketUI();
 
         setTimeout(() => {
-          startRocketCountdown();
+          if (document.getElementById("sec-games").classList.contains("active")) {
+            startRocketCountdown();
+          } else {
+            appState.rocketLoopTimer = null;
+          }
         }, 1200);
         return;
       }
@@ -3069,6 +3085,11 @@
     if (!appState.rocketLoopTimer) {
       startRocketCountdown();
     }
+  }
+
+  function stopRocketLoop() {
+    clearInterval(appState.rocketLoopTimer);
+    appState.rocketLoopTimer = null;
   }
 
   function renderRocketUI() {
@@ -3103,7 +3124,7 @@
       multEl.classList.remove("boom");
       multEl.textContent = `${appState.rocketMult.toFixed(2)}x`;
       const lift = Math.min(42, (appState.rocketMult - 1) * 12);
-      shipEl.style.transform = `translate(${lift * 0.5}px, -${lift}px)`;
+      shipEl.style.transform = `translate3d(${lift * 0.5}px, -${lift}px, 0)`;
       if (subEl) {
         subEl.textContent = appState.rocketInRound && !appState.rocketCashedOut
           ? `Ставка: ${fmt(appState.rocketBet)} GRAM · Выплата: NFT`
@@ -3691,19 +3712,16 @@
     playSlots(true);
   }
 
-  /* Instant Local Boot (Zero Network Requests on Startup) */
+  /* Instant zero-delay boot */
   loadApp();
   initTG();
-  initTON();
   renderBalance();
   updateWalletButton();
   renderLiveNftStrip();
   renderCasesGrid();
-  initRocketLoop();
-  syncAutoUpgradeTarget();
-  renderMinesUI();
-  renderPlinkoUI();
-  renderSlotsUI();
+
+  /* Silent background sync after initial paint */
+  setTimeout(() => { fetchRemoteState(false); }, 600);
 </script>
 </body>
 </html>
