@@ -568,6 +568,19 @@
       border-radius: 9px;
     }
 
+    .item-chance-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(7, 10, 24, 0.86);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+
     .item-name {
       font-size: 13px;
       font-weight: 800;
@@ -583,6 +596,59 @@
       font-weight: 800;
       padding: 3px 11px;
       border-radius: 10px;
+    }
+
+    .gift-edit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .gift-edit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 8px 10px;
+    }
+
+    .gift-edit-meta {
+      min-width: 0;
+    }
+
+    .gift-edit-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gift-edit-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .gift-edit-actions {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .btn-edit-sm {
+      background: rgba(34, 211, 238, 0.16);
+      border: 1px solid rgba(34, 211, 238, 0.45);
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 9px;
+      border-radius: 9px;
+      cursor: pointer;
     }
 
     /* Rocket Screen */
@@ -1485,6 +1551,11 @@
 
         <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;" />
 
+        <div class="card-title" style="font-size:13px;">🛠️ Подарки в этом кейсе</div>
+        <div class="gift-edit-list" id="caseGiftsManageList"></div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;" />
+
         <div class="card-title" style="font-size:13px;">💎 Добавить NFT-подарок в кейс</div>
         <div class="fg">
           <label>Название NFT-подарка</label>
@@ -1772,6 +1843,46 @@
   </div>
 </div>
 
+<!-- Edit Gift In Case Modal -->
+<div class="modal-bg" id="editGiftModal">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <b>✏️ Изменить подарок в кейсе</b>
+      <button class="wallet-mini" onclick="closeModal('editGiftModal')">✕</button>
+    </div>
+    <div class="fg">
+      <label>Название подарка</label>
+      <input class="inp" id="modalGiftName" />
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Цена (от 0.01 GRAM)</label>
+        <input class="inp" id="modalGiftPrice" type="number" step="0.01" min="0.01" />
+      </div>
+      <div class="fg">
+        <label>Вес / шанс</label>
+        <input class="inp" id="modalGiftWeight" type="number" step="1" min="1" />
+      </div>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Бейдж</label>
+        <input class="inp" id="modalGiftBadge" />
+      </div>
+      <div class="fg">
+        <label>Эмодзи-иконка</label>
+        <input class="inp" id="modalGiftIcon" />
+      </div>
+    </div>
+    <div class="fg">
+      <label>Фото подарка (ссылка или новый файл)</label>
+      <input class="inp" id="modalGiftImgUrl" placeholder="https://... (оставь пустым для сохранения текущего)" style="margin-bottom:6px;" />
+      <input class="inp" id="modalGiftImgFile" type="file" accept="image/*" />
+    </div>
+    <button class="btn-purple" onclick="saveEditedGiftInCase()">Сохранить подарок</button>
+  </div>
+</div>
+
 <!-- Upgrader Source Picker -->
 <div class="modal-bg" id="upgSrcModal">
   <div class="modal-card">
@@ -1971,6 +2082,7 @@
     cases: [],
     inventory: [],
     openedCaseId: null,
+    editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
     /* Rocket */
@@ -2042,6 +2154,28 @@
     document.getElementById(id).classList.remove("open");
   }
 
+  function normalizeCases(rawCases) {
+    return rawCases.map((c, cIdx) => {
+      const pool = Array.isArray(c.pool) ? c.pool : [];
+      return {
+        id: c.id || ("c_" + cIdx + "_" + Date.now()),
+        title: c.title || ("Кейс #" + (cIdx + 1)),
+        price: Math.max(MIN_GRAM, Number(c.price) || MIN_GRAM),
+        tag: c.tag || "NFT CASE",
+        img: c.img || "",
+        pool: pool.map((g, gIdx) => ({
+          id: g.id || ("g_" + cIdx + "_" + gIdx + "_" + Math.random().toString(36).slice(2, 5)),
+          name: g.name || "NFT Gift",
+          price: Math.max(MIN_GRAM, Number(g.price) || MIN_GRAM),
+          weight: Math.max(1, Math.floor(Number(g.weight) || 10)),
+          badge: g.badge || "NFT",
+          icon: g.icon || "💎",
+          img: g.img || ""
+        }))
+      };
+    });
+  }
+
   function saveApp() {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({
@@ -2057,13 +2191,13 @@
       const raw = JSON.parse(localStorage.getItem(SAVE_KEY));
       if (raw && Array.isArray(raw.cases) && raw.cases.length) {
         appState.balance = Number(raw.balance) || 0;
-        appState.cases = raw.cases;
+        appState.cases = normalizeCases(raw.cases);
         appState.inventory = Array.isArray(raw.inventory) ? raw.inventory : [];
         return;
       }
     } catch (e) {}
     appState.balance = 0.00;
-    appState.cases = JSON.parse(JSON.stringify(INITIAL_CASES));
+    appState.cases = normalizeCases(JSON.parse(JSON.stringify(INITIAL_CASES)));
     appState.inventory = [];
     saveApp();
   }
@@ -2401,6 +2535,7 @@
     updateCaseButtonText();
 
     const pool = Array.isArray(c.pool) ? c.pool : [];
+    const totalW = pool.reduce((s, g) => s + Math.max(1, Number(g.weight) || 1), 0);
     document.getElementById("openCasePoolCount").textContent = `${pool.length} NFT`;
 
     const track = document.getElementById("rouletteTrack");
@@ -2415,16 +2550,21 @@
     }
 
     document.getElementById("openCasePoolGrid").innerHTML = pool.length
-      ? pool.map(g => `
-          <div class="item-tile">
-            <div class="item-frame">
-              ${mediaHtml(g.img, g.icon || "💎")}
-              <span class="item-price-badge">${fmt(g.price)} ◆</span>
+      ? pool.map(g => {
+          const w = Math.max(1, Number(g.weight) || 1);
+          const pct = totalW > 0 ? ((w / totalW) * 100).toFixed(1) : "0.0";
+          return `
+            <div class="item-tile">
+              <div class="item-frame">
+                ${mediaHtml(g.img, g.icon || "💎")}
+                <span class="item-price-badge">${fmt(g.price)} ◆</span>
+                <span class="item-chance-badge">${pct}%</span>
+              </div>
+              <div class="item-name">${g.name}</div>
+              <span class="item-tag-pill">${g.badge || "NFT"}</span>
             </div>
-            <div class="item-name">${g.name}</div>
-            <span class="item-tag-pill">NFT</span>
-          </div>
-        `).join("")
+          `;
+        }).join("")
       : `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:12px;">Добавь NFT-подарки в этот кейс</div>`;
 
     const ed = document.getElementById("inlineCaseEditor");
@@ -2435,9 +2575,97 @@
       document.getElementById("edCasePrice").value = fmt(c.price);
       document.getElementById("edCaseTag").value = c.tag || "NFT CASE";
       document.getElementById("edCaseImgUrl").value = c.img && !c.img.startsWith("data:") ? c.img : "";
+
+      const listEl = document.getElementById("caseGiftsManageList");
+      if (!pool.length) {
+        listEl.innerHTML = `<div style="font-size:12px;color:var(--muted);">В этом кейсе пока нет подарков</div>`;
+      } else {
+        listEl.innerHTML = pool.map(g => {
+          const w = Math.max(1, Number(g.weight) || 1);
+          const pct = totalW > 0 ? ((w / totalW) * 100).toFixed(1) : "0.0";
+          return `
+            <div class="gift-edit-row">
+              <div class="gift-edit-meta">
+                <div class="gift-edit-title">${g.icon || "💎"} ${g.name}</div>
+                <div class="gift-edit-sub">${fmt(g.price)} GRAM · вес ${w} (${pct}%)</div>
+              </div>
+              <div class="gift-edit-actions">
+                <button class="btn-edit-sm" onclick="openEditGiftModal('${g.id}')">Изменить</button>
+                <button class="btn-red-sm" onclick="deleteGiftFromOpenedCase('${g.id}')">Удалить</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
     } else {
       ed.style.display = "none";
     }
+  }
+
+  function openEditGiftModal(giftId) {
+    if (!isAdminUser()) return;
+    const c = appState.cases.find(x => x.id === appState.openedCaseId);
+    if (!c) return;
+    const g = (c.pool || []).find(item => item.id === giftId);
+    if (!g) return;
+
+    appState.editingGiftId = giftId;
+    document.getElementById("modalGiftName").value = g.name || "";
+    document.getElementById("modalGiftPrice").value = Number(g.price) || MIN_GRAM;
+    document.getElementById("modalGiftWeight").value = Math.max(1, Number(g.weight) || 10);
+    document.getElementById("modalGiftBadge").value = g.badge || "NFT";
+    document.getElementById("modalGiftIcon").value = g.icon || "💎";
+    document.getElementById("modalGiftImgUrl").value = g.img && !g.img.startsWith("data:") ? g.img : "";
+    document.getElementById("modalGiftImgFile").value = "";
+    openModal("editGiftModal");
+  }
+
+  async function saveEditedGiftInCase() {
+    if (!isAdminUser()) return;
+    const c = appState.cases.find(x => x.id === appState.openedCaseId);
+    if (!c || !appState.editingGiftId) return;
+    const g = (c.pool || []).find(item => item.id === appState.editingGiftId);
+    if (!g) return;
+
+    const name = document.getElementById("modalGiftName").value.trim();
+    const price = Math.round(Number(document.getElementById("modalGiftPrice").value) * 100) / 100;
+    const weight = Math.max(1, Math.floor(Number(document.getElementById("modalGiftWeight").value) || 1));
+    const badge = document.getElementById("modalGiftBadge").value.trim() || "NFT";
+    const icon = document.getElementById("modalGiftIcon").value.trim() || "💎";
+    const url = document.getElementById("modalGiftImgUrl").value.trim();
+    const file = await readImgFile(document.getElementById("modalGiftImgFile"));
+
+    if (!name) { showToast("Введи название подарка"); return; }
+    if (!price || price < MIN_GRAM) { showToast("Цена от 0.01 GRAM"); return; }
+
+    g.name = name;
+    g.price = price;
+    g.weight = weight;
+    g.badge = badge;
+    g.icon = icon;
+    if (file) {
+      g.img = file;
+    } else if (url) {
+      g.img = url;
+    }
+
+    appState.editingGiftId = null;
+    closeModal("editGiftModal");
+    saveApp();
+    renderOpenCase();
+    renderLiveNftStrip();
+    showToast(`Подарок «${g.name}» обновлён`);
+  }
+
+  function deleteGiftFromOpenedCase(giftId) {
+    if (!isAdminUser()) return;
+    const c = appState.cases.find(x => x.id === appState.openedCaseId);
+    if (!c) return;
+    c.pool = (c.pool || []).filter(item => item.id !== giftId);
+    saveApp();
+    renderOpenCase();
+    renderLiveNftStrip();
+    showToast("Подарок удалён из кейса");
   }
 
   function onCaseMainAction() {
@@ -2528,11 +2756,12 @@
     const name = document.getElementById("edGiftName").value.trim();
     const price = Math.round(Number(document.getElementById("edGiftPrice").value) * 100) / 100;
     const weight = Math.max(1, Math.floor(Number(document.getElementById("edGiftWeight").value) || 15));
+    const badge = document.getElementById("edGiftBadge").value.trim() || "NFT";
     const url = document.getElementById("edGiftImgUrl").value.trim();
     const file = await readImgFile(document.getElementById("edGiftImgFile"));
     if (!name) { showToast("Введи название NFT"); return; }
     if (!price || price < MIN_GRAM) { showToast("Цена от 0.01 GRAM"); return; }
-    c.pool.push({ id: "g_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5), name, price, weight, badge: "NFT", icon: "💎", img: file || url });
+    c.pool.push({ id: "g_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5), name, price, weight, badge, icon: "💎", img: file || url });
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
