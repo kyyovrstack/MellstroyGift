@@ -651,6 +651,11 @@
       outline: none;
     }
 
+    .inp[readonly] {
+      color: var(--cyan);
+      border-color: rgba(34, 211, 238, 0.25);
+    }
+
     .row2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -993,7 +998,7 @@
   </div>
 </div>
 
-<!-- Real Deposit Modal -->
+<!-- Real Deposit Modal (Strictly from connected wallet) -->
 <div class="modal-bg" id="depModal">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -1001,8 +1006,12 @@
       <button class="btn-w" onclick="closeDepositModal()">✕</button>
     </div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-      Минимум: <b>0.01</b>. Оплата отправляется с подключённого кошелька на адрес получателя.
+      Минимум: <b>0.01</b>. Оплата уйдёт только с подключённого кошелька.
     </p>
+    <div class="fg">
+      <label>Подключённый кошелёк (отправитель)</label>
+      <input class="inp" id="depFromWallet" readonly />
+    </div>
     <div class="fg">
       <label>Сумма (минимум 0.01)</label>
       <input class="inp" id="depAmt" type="number" step="0.01" min="0.01" value="0.01" />
@@ -1114,7 +1123,7 @@
   const MIN_AMOUNT = 0.01;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const STORAGE_KEY = "mellstroy_gift_gram_only_v9";
+  const STORAGE_KEY = "mellstroy_gift_gram_only_v10";
 
   const DEFAULT_CASES = [
     { id: "case-1", title: "Mell King", tag: "CASE", desc: "Нажми и добавь фото или подарки", price: 1.00, img: "", pool: [] },
@@ -1141,6 +1150,15 @@
 
   function isAdmin() {
     return state.userId === ADMIN_ID;
+  }
+
+  function getActiveWalletAddress() {
+    const liveAddr = tonUI && tonUI.wallet && tonUI.wallet.account && tonUI.wallet.account.address;
+    if (liveAddr) {
+      state.connectedAddress = liveAddr;
+      return liveAddr;
+    }
+    return state.connectedAddress || "";
   }
 
   function loadState() {
@@ -1208,7 +1226,7 @@
     el.textContent = msg;
     el.style.display = "block";
     clearTimeout(window._t);
-    window._t = setTimeout(() => { el.style.display = "none"; }, 2200);
+    window._t = setTimeout(() => { el.style.display = "none"; }, 2400);
   }
 
   function shortAddr(addr) {
@@ -1218,13 +1236,14 @@
 
   function renderHeaderAndWallet() {
     document.getElementById("balVal").textContent = fmt(state.balance);
+    const addr = getActiveWalletAddress();
     const dot = document.getElementById("wDot");
     const lbl = document.getElementById("wLabel");
     const btn = document.getElementById("wActionBtn");
 
-    if (state.connectedAddress) {
+    if (addr) {
       dot.classList.add("on");
-      lbl.textContent = shortAddr(state.connectedAddress);
+      lbl.textContent = shortAddr(addr);
       lbl.classList.add("on");
       btn.textContent = "Отключить";
     } else {
@@ -1241,9 +1260,10 @@
       return;
     }
     try {
-      if (state.connectedAddress) {
+      if (getActiveWalletAddress()) {
         await tonUI.disconnect();
         state.connectedAddress = "";
+        closeDepositModal();
         renderHeaderAndWallet();
         toast("Кошелёк отключён");
       } else {
@@ -1254,13 +1274,17 @@
     }
   }
 
-  /* Deposit */
-  function openDepositModal() {
-    if (!state.connectedAddress) {
-      toast("Сначала подключи кошелёк");
-      toggleWalletConnection();
+  /* Deposit (Strictly requires connected wallet) */
+  async function openDepositModal() {
+    const addr = getActiveWalletAddress();
+    if (!addr) {
+      toast("Сначала подключи кошелёк — без него депозит невозможен");
+      if (tonUI) {
+        try { await tonUI.openModal(); } catch (e) {}
+      }
       return;
     }
+    document.getElementById("depFromWallet").value = addr;
     document.getElementById("depAmt").value = "0.01";
     document.getElementById("depModal").classList.add("open");
   }
@@ -1274,18 +1298,23 @@
   }
 
   async function sendRealDeposit() {
-    if (!tonUI || !state.connectedAddress) {
-      toast("Кошелёк не подключён");
+    const connectedAddr = getActiveWalletAddress();
+    if (!tonUI || !connectedAddr) {
+      toast("Подключи кошелёк перед отправкой депозита");
       closeDepositModal();
-      toggleWalletConnection();
+      if (tonUI) {
+        try { await tonUI.openModal(); } catch (e) {}
+      }
       return;
     }
+
     const amt = Math.round(Number(document.getElementById("depAmt").value) * 100) / 100;
     if (!amt || amt < MIN_AMOUNT) {
       toast("Минимум — 0.01");
       return;
     }
 
+    document.getElementById("depFromWallet").value = connectedAddr;
     const btn = document.getElementById("payRealBtn");
     btn.disabled = true;
     btn.textContent = "Подтверди в кошельке...";
@@ -1293,9 +1322,11 @@
     try {
       const txResult = await tonUI.sendTransaction({
         validUntil: Math.floor(Date.now() / 1000) + 300,
+        from: connectedAddr,
         messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
       });
 
+      const verifiedFrom = (tonUI.wallet && tonUI.wallet.account && tonUI.wallet.account.address) || connectedAddr;
       state.balance = Math.round((state.balance + amt) * 100) / 100;
       saveState();
       renderHeaderAndWallet();
@@ -1306,7 +1337,7 @@
         tg.sendData(JSON.stringify({
           action: "real_deposit",
           amount: amt,
-          fromWallet: state.connectedAddress,
+          fromWallet: verifiedFrom,
           toWallet: RECEIVER_WALLET,
           userId: state.userId || null,
           boc: txResult && txResult.boc ? txResult.boc : ""
@@ -1324,7 +1355,7 @@
   /* Real GRAM Withdraw */
   function openWithdrawModal() {
     document.getElementById("wdAvailBal").textContent = `${fmt(state.balance)} GRAM`;
-    document.getElementById("wdWalletInp").value = state.connectedAddress || "";
+    document.getElementById("wdWalletInp").value = getActiveWalletAddress() || "";
     const defAmt = state.balance >= MIN_AMOUNT ? Math.min(state.balance, 0.01).toFixed(2) : "0.01";
     document.getElementById("wdAmtInp").value = defAmt;
     document.getElementById("wdModal").classList.add("open");
@@ -1356,23 +1387,27 @@
       return;
     }
 
+    const tg = window.Telegram && window.Telegram.WebApp;
+    const canSendToBot = Boolean(tg && tg.initData && typeof tg.sendData === "function");
+
+    if (!canSendToBot) {
+      toast("Открой мини-апп через кнопку бота, чтобы заявка ушла в бот");
+      return;
+    }
+
     state.balance = Math.round((state.balance - amt) * 100) / 100;
     saveState();
     renderHeaderAndWallet();
     closeWithdrawModal();
 
     const requestId = "wd_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-    const tg = window.Telegram && window.Telegram.WebApp;
-    if (tg && tg.sendData) {
-      tg.sendData(JSON.stringify({
-        action: "withdraw_gram",
-        requestId,
-        amountGram: amt,
-        wallet,
-        userId: state.userId || null
-      }));
-    }
-    toast(`Заявка на вывод ${fmt(amt)} GRAM отправлена`);
+    tg.sendData(JSON.stringify({
+      action: "withdraw_gram",
+      requestId,
+      amountGram: amt,
+      wallet,
+      userId: state.userId || null
+    }));
   }
 
   /* Navigation & Cases */
