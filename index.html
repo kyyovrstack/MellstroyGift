@@ -820,12 +820,13 @@
       font-weight: 800;
       z-index: 250;
       display: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" onclick="this.style.display='none'"></div>
 
 <div class="app">
   <!-- Header -->
@@ -1111,10 +1112,9 @@
 <script>
   const ADMIN_ID = 5200591975;
   const MIN_AMOUNT = 0.01;
-  // ЗАМЕНИ НА СВОЙ РЕАЛЬНЫЙ АДРЕС КОШЕЛЬКА ПРИЁМА ОПЛАТ (UQ... или EQ...)
-  const RECEIVER_WALLET = "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO";
+  const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const STORAGE_KEY = "mellstroy_gift_gram_only_v8";
+  const STORAGE_KEY = "mellstroy_gift_gram_only_v9";
 
   const DEFAULT_CASES = [
     { id: "case-1", title: "Mell King", tag: "CASE", desc: "Нажми и добавь фото или подарки", price: 1.00, img: "", pool: [] },
@@ -1208,7 +1208,7 @@
     el.textContent = msg;
     el.style.display = "block";
     clearTimeout(window._t);
-    window._t = setTimeout(() => { el.style.display = "none"; }, 2500);
+    window._t = setTimeout(() => { el.style.display = "none"; }, 2200);
   }
 
   function shortAddr(addr) {
@@ -1285,10 +1285,6 @@
       toast("Минимум — 0.01");
       return;
     }
-    if (!RECEIVER_WALLET || RECEIVER_WALLET.includes("AAAA")) {
-      toast("Укажи свой адрес получателя в RECEIVER_WALLET");
-      return;
-    }
 
     const btn = document.getElementById("payRealBtn");
     btn.disabled = true;
@@ -1312,6 +1308,7 @@
           amount: amt,
           fromWallet: state.connectedAddress,
           toWallet: RECEIVER_WALLET,
+          userId: state.userId || null,
           boc: txResult && txResult.boc ? txResult.boc : ""
         }));
       }
