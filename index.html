@@ -3,1028 +3,1459 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MellstroyGift</title>
+  <title>MellstroyGift — NFT Cases</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: #0c0c12;
-      --card: #161620;
-      --card-2: #1e1e2c;
-      --border: #29293b;
-      --accent: #7c5cff;
-      --accent-2: #3b82f6;
-      --gold: #ffb800;
-      --text: #f5f5fa;
-      --muted: #8e8ea6;
-      --success: #2ed573;
+      --bg: #090a12;
+      --bg-card: #121526;
+      --bg-card-2: #181c33;
+      --border: rgba(139, 92, 246, 0.28);
+      --neon-purple: #8b5cf6;
+      --neon-blue: #3b82f6;
+      --neon-cyan: #22d3ee;
+      --gold: #fbbf24;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --success: #10b981;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(circle at top, #19142e 0%, var(--bg) 55%);
+      background: radial-gradient(circle at top, #171533 0%, var(--bg) 55%);
       color: var(--text);
-      padding-bottom: 84px;
-      user-select: none;
       min-height: 100vh;
+      padding-bottom: 86px;
+      overflow-x: hidden;
     }
 
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      background: rgba(12, 12, 18, 0.92);
-      backdrop-filter: blur(12px);
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    /* Header */
+    .header {
       display: flex;
+      align-items: center;
       justify-content: space-between;
+      background: rgba(18, 21, 38, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 0 24px rgba(139, 92, 246, 0.16);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 14px rgba(139, 92, 246, 0.6);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .balance-box {
+      display: flex;
       align-items: center;
       gap: 8px;
+      background: #0d101d;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      padding: 7px 11px;
+      border-radius: 12px;
     }
 
-    .user-box { display: flex; align-items: center; gap: 9px; min-width: 0; }
-
-    .avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 14px; flex-shrink: 0;
+    .balance-val {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--neon-cyan);
     }
 
-    .user-meta { overflow: hidden; }
-    .user-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-sub { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .btn-topup {
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
 
-    .wallet-bar { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    /* Sections */
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
 
-    .balance-pill {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--card); border: 1px solid var(--border);
-      padding: 6px 10px; border-radius: 12px; font-weight: 700; font-size: 13px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Cases Grid */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .case-card {
+      background: linear-gradient(160deg, var(--bg-card-2), var(--bg-card));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .case-card.selected {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.28);
+      transform: translateY(-2px);
+    }
+
+    .case-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.25);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.45);
+    }
+
+    .case-media {
+      width: 76px;
+      height: 76px;
+      margin: 10px auto 8px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      overflow: hidden;
+    }
+
+    .case-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .case-name {
+      font-weight: 800;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .case-price {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 4px 10px;
+      border-radius: 10px;
+    }
+
+    /* Active Case View & Contents */
+    .case-detail-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
+    }
+
+    .case-detail-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .case-detail-info h3 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .case-detail-info p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Roulette */
+    .roulette-wrap {
+      position: relative;
+      height: 112px;
+      background: #0a0c16;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .roulette-pointer {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan);
+      z-index: 5;
+      transform: translateX(-50%);
+    }
+
+    .roulette-track {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 50%;
+      will-change: transform;
+    }
+
+    .roulette-item {
+      width: 88px;
+      height: 92px;
+      flex-shrink: 0;
+      background: var(--bg-card-2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      text-align: center;
+    }
+
+    .roulette-item.nft {
+      border-color: rgba(251, 191, 36, 0.5);
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.12), var(--bg-card-2));
+    }
+
+    .roulette-item img {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .roulette-item .r-emoji {
+      font-size: 32px;
+    }
+
+    .roulette-item .r-name {
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 76px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+      color: #fff;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Case Contents Grid (Bottom of selected case) */
+    .contents-header {
+      margin-top: 16px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .gifts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+    }
+
+    .gift-card {
+      background: var(--bg-card-2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .gift-card.nft {
+      border-color: rgba(251, 191, 36, 0.45);
+      box-shadow: inset 0 0 18px rgba(251, 191, 36, 0.08);
+    }
+
+    .nft-badge {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      font-size: 9px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #111827;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .chance-badge {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      font-size: 10px;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .gift-thumb {
+      width: 64px;
+      height: 64px;
+      margin: 12px 0 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      overflow: hidden;
+    }
+
+    .gift-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gift-title {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.25;
+    }
+
+    .gift-price {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--neon-cyan);
+    }
+
+    .gift-link {
+      margin-top: 5px;
+      font-size: 10px;
+      color: #a78bfa;
+      text-decoration: none;
+    }
+
+    /* Inventory */
+    .inv-actions {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-sm {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
       cursor: pointer;
     }
 
-    .topup-btn {
-      background: linear-gradient(135deg, var(--accent), #5b3df5);
-      color: #fff; border: none; border-radius: 10px;
-      padding: 7px 11px; font-size: 12px; font-weight: 700; cursor: pointer;
+    .btn-sell {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
     }
 
-    .live-strip {
-      display: flex; align-items: center; gap: 8px; padding: 9px 14px;
-      overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none;
-    }
-    .live-strip::-webkit-scrollbar { display: none; }
-
-    .live-badge {
-      font-size: 11px; font-weight: 800; color: var(--success);
-      background: rgba(46, 213, 115, 0.12); border: 1px solid rgba(46, 213, 115, 0.35);
-      padding: 4px 8px; border-radius: 8px; flex-shrink: 0;
+    .btn-withdraw {
+      background: rgba(59, 130, 246, 0.22);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.4);
     }
 
-    .live-item {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 5px 10px; font-size: 12px; white-space: nowrap; flex-shrink: 0;
+    /* Admin Panel */
+    .admin-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
     }
 
-    .screen { display: none; padding: 14px; }
-    .screen.active { display: block; }
-    h2 { margin: 0 0 12px; font-size: 18px; }
-
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-
-    .case-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 10px; text-align: center; cursor: pointer; position: relative; overflow: hidden;
-    }
-    .case-card:active { transform: scale(0.97); border-color: var(--accent); }
-
-    .case-tag {
-      position: absolute; top: 8px; right: 8px; font-size: 10px; font-weight: 800;
-      padding: 2px 7px; border-radius: 999px;
-      background: rgba(15, 15, 22, 0.85); border: 1px solid rgba(124, 92, 255, 0.45);
-      color: #e9d5ff; z-index: 2;
+    .admin-card h4 {
+      font-size: 15px;
+      margin-bottom: 10px;
+      color: var(--neon-cyan);
     }
 
-    .case-art-wrap {
-      width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden;
-      background: #101018; border: 1px solid var(--border); margin-bottom: 8px;
-      display: flex; align-items: center; justify-content: center; font-size: 40px;
-    }
-    .case-art-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .case-title { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
-    .case-desc { font-size: 11px; color: var(--muted); margin-bottom: 8px; min-height: 26px; }
-
-    .price-pill {
-      display: inline-block; background: linear-gradient(135deg, var(--accent), #5b3df5);
-      color: #fff; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 10px;
+    .form-group {
+      margin-bottom: 10px;
     }
 
-    .card-box {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 14px; margin-bottom: 14px;
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
     }
 
-    .roulette-window {
-      position: relative; height: 102px; overflow: hidden; background: #0d0d15;
-      border: 1px solid var(--border); border-radius: 14px; margin: 12px 0 14px;
-    }
-    .roulette-pointer {
-      position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; transform: translateX(-50%);
-      background: var(--gold); box-shadow: 0 0 12px var(--gold); z-index: 5;
-    }
-    .roulette-track { display: flex; align-items: center; height: 100%; gap: 8px; padding: 0 10px; }
-
-    .slot-item {
-      min-width: 82px; height: 82px; background: var(--card-2); border: 1px solid var(--border);
-      border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      font-size: 26px; flex-shrink: 0;
-    }
-    .slot-item span {
-      font-size: 10px; color: var(--muted); margin-top: 3px; max-width: 74px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    .input, .select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: #0b0e1a;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
     }
 
-    .drop-preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-    .drop-mini {
-      background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
-      padding: 8px 6px; text-align: center;
+    .input:focus, .select:focus {
+      border-color: var(--neon-purple);
     }
-    .drop-mini.nft-item { border-color: rgba(255, 184, 0, 0.45); }
-    .drop-mini .em { font-size: 22px; }
-    .drop-mini .nm { font-size: 11px; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .drop-mini .tp { font-size: 9px; font-weight: 700; color: #c4b5fd; margin-top: 1px; }
-    .drop-mini.nft-item .tp { color: var(--gold); }
-    .drop-mini .pr { font-size: 11px; color: var(--success); margin-top: 2px; }
 
-    .upgrade-slots { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 12px 0; }
-    .upg-slot {
-      background: var(--card-2); border: 1px dashed #3d3d58; border-radius: 14px;
-      padding: 12px 8px; text-align: center; min-height: 112px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
-    .upg-slot.filled { border-style: solid; border-color: var(--accent); }
 
-    .upg-bar-wrap { background: #0d0d14; border: 1px solid var(--border); border-radius: 999px; height: 16px; overflow: hidden; margin: 10px 0 12px; }
-    .upg-bar-fill { height: 100%; width: 50%; background: linear-gradient(90deg, var(--accent), var(--success)); transition: width 0.25s ease; }
-
-    .target-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
-    .target-btn {
-      background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
-      padding: 9px; color: var(--text); text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      margin: 8px 0;
     }
-    .target-btn.active { border-color: var(--gold); box-shadow: 0 0 14px rgba(255, 184, 0, 0.22); }
 
-    .inv-item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
-    .inv-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-    .inv-left { display: flex; align-items: center; gap: 10px; }
-    .inv-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-
-    .btn-primary {
-      width: 100%; background: linear-gradient(135deg, var(--accent), #5b3df5);
-      color: #fff; border: none; border-radius: 12px; padding: 13px;
-      font-size: 14px; font-weight: 700; cursor: pointer;
+    .pool-builder-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px;
+      background: #0d101e;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
-    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    .btn-small {
-      background: var(--card-2); color: var(--text); border: 1px solid var(--border);
-      border-radius: 9px; padding: 7px 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+    .pool-builder-item img {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      object-fit: cover;
     }
-    .btn-sell { border-color: rgba(46, 213, 115, 0.4); color: #7bed9f; }
-    .btn-withdraw { border-color: rgba(56, 189, 248, 0.4); color: #7dd3fc; }
-    .btn-upg { border-color: rgba(255, 184, 0, 0.45); color: #fcd34d; }
 
+    .admin-list-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: var(--bg-card-2);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .btn-del {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 4px 8px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 13, 24, 0.96);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 6px 12px;
+      backdrop-filter: blur(12px);
+      z-index: 50;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 10px;
+    }
+
+    .nav-btn.active {
+      color: var(--neon-cyan);
+      background: rgba(34, 211, 238, 0.1);
+    }
+
+    .nav-btn span.ico {
+      font-size: 18px;
+    }
+
+    /* Modal Win */
     .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(6px);
-      z-index: 60; display: none; align-items: flex-end; justify-content: center;
-    }
-    .modal-backdrop.open { display: flex; }
-
-    .modal-sheet {
-      width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
-      background: #151520; border-top-left-radius: 22px; border-top-right-radius: 22px;
-      border: 1px solid var(--border); padding: 18px 16px 26px;
-    }
-
-    .tabs-3 {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
-      background: #0d0d14; padding: 4px; border-radius: 12px; margin: 12px 0;
-    }
-    .tabs-3 button {
-      background: none; border: none; color: var(--muted); padding: 8px 6px;
-      border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer;
-    }
-    .tabs-3 button.active { background: var(--accent); color: #fff; }
-
-    .input-box {
-      width: 100%; background: #0d0d14; border: 1px solid var(--border);
-      border-radius: 11px; padding: 11px 12px; color: var(--text); font-size: 14px; margin-bottom: 10px;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
     }
 
-    .chips-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .chip {
-      background: var(--card-2); border: 1px solid var(--border); color: var(--text);
-      border-radius: 9px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+    .modal-backdrop.open {
+      display: flex;
     }
 
-    .wallet-box {
-      background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px; margin-bottom: 12px;
+    .modal-card {
+      width: 100%;
+      max-width: 340px;
+      background: linear-gradient(170deg, #1b1f3a, #101324);
+      border: 1px solid var(--neon-purple);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 35px rgba(139, 92, 246, 0.45);
     }
 
-    .wallet-apps-row {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;
+    .modal-media {
+      width: 96px;
+      height: 96px;
+      margin: 12px auto;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 54px;
+      overflow: hidden;
     }
 
-    .wallet-app-btn {
-      background: #14141f; border: 1px solid var(--border); border-radius: 10px;
-      padding: 9px 10px; color: var(--text); font-size: 12px; font-weight: 700;
-      cursor: pointer; text-align: center;
+    .modal-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    .wallet-app-btn:active { border-color: var(--accent); }
-
-    .drop-choice-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
-
-    nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: 66px;
-      background: #12121a; border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(4, 1fr); z-index: 40;
-      padding: 0 18px 0 46px;
-    }
-    nav button {
-      background: none; border: none; color: var(--muted); font-size: 11px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer;
-    }
-    nav button.active { color: #fff; font-weight: 700; }
-    nav button .ico { font-size: 18px; line-height: 1.1; }
 
     .toast {
-      position: fixed; top: 66px; left: 50%; transform: translateX(-50%);
-      background: #232336; border: 1px solid var(--accent); color: #fff;
-      padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600;
-      z-index: 90; display: none;
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      border: 1px solid var(--neon-cyan);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 200;
+      display: none;
     }
-    .toast.show { display: block; }
   </style>
 </head>
 <body>
 
-  <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-  <header>
-    <div class="user-box">
-      <div class="avatar" id="user-avatar">MG</div>
-      <div class="user-meta">
-        <div class="user-name" id="user-name">MellstroyGift</div>
-        <div class="user-sub" id="user-sub">Загрузка профиля...</div>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-logo">👑</div>
+      <div>
+        <div class="brand-title">MellstroyGift</div>
+        <div class="brand-sub" id="userLabel">NFT &amp; Gift Cases</div>
       </div>
     </div>
-    <div class="wallet-bar">
-      <div class="balance-pill" onclick="openWalletModal('stars')">
-        <span>⭐ <span id="stars-val">150</span></span>
-        <span style="color:var(--muted);">|</span>
-        <span>💎 <span id="ton-val">0</span></span>
-      </div>
-      <button class="topup-btn" onclick="openWalletModal('ton')">+ Кошелек</button>
+    <div class="balance-box">
+      <span class="balance-val"><span id="balanceAmount">500</span> GRAM</span>
+      <button class="btn-topup" onclick="topUpDemo()" title="Пополнить баланс">+</button>
     </div>
-  </header>
-
-  <div class="live-strip" id="live-strip">
-    <div class="live-badge">● LIVE</div>
-    <div class="live-item">👑 @alex · Gold Crown [NFT]</div>
-    <div class="live-item">🧸 @dima · Plush Bear</div>
-    <div class="live-item">🐸 @kira · Rare Pepe [NFT]</div>
   </div>
 
-  <section id="screen-home" class="screen active">
-    <h2>Кейсы: Обычные + NFT подарки</h2>
-    <div class="grid-2" id="cases-grid"></div>
-  </section>
+  <!-- SECTION: CASES -->
+  <div id="sec-cases" class="section active">
+    <div class="section-title">
+      <span>Выберите кейс</span>
+      <span style="font-size:12px;color:var(--muted);" id="casesCountLabel"></span>
+    </div>
 
-  <section id="screen-case" class="screen">
-    <div class="card-box">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 id="active-case-title" style="margin:0;">Mell King</h2>
-        <button class="btn-small" onclick="switchTab('screen-home')">← Кейсы</button>
+    <!-- All Cases List -->
+    <div class="cases-grid" id="casesGrid"></div>
+
+    <!-- Selected Case & Its Gifts -->
+    <div class="case-detail-box" id="caseDetailBox">
+      <div class="case-detail-head">
+        <div class="case-detail-info">
+          <h3 id="activeCaseTitle">Mell King</h3>
+          <p id="activeCaseDesc">Нажми на любой кейс выше, чтобы посмотреть состав</p>
+        </div>
+        <div class="case-price" id="activeCasePrice">25 GRAM</div>
       </div>
-      <p id="active-case-desc" style="color:var(--muted); font-size:12px; margin:6px 0 0;"></p>
-      <div class="roulette-window">
+
+      <div class="roulette-wrap">
         <div class="roulette-pointer"></div>
-        <div class="roulette-track" id="roulette-track"></div>
-      </div>
-      <button class="btn-primary" id="spin-btn">Открыть за 25 ⭐</button>
-    </div>
-
-    <div class="card-box">
-      <div style="font-size:13px; font-weight:700;">Внутри кейса (Обычные и NFT)</div>
-      <div class="drop-preview-grid" id="case-drops-preview"></div>
-    </div>
-  </section>
-
-  <section id="screen-upgrade" class="screen">
-    <div class="card-box">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">Апгрейд подарков</h2>
-        <span style="font-size:12px; color:var(--gold); font-weight:700;">Защита: <span id="pity-val">0</span>/100</span>
-      </div>
-      <p style="color:var(--muted); font-size:12px; margin:6px 0 0;">
-        Выбери подарок из инвентаря и цель. При промахе копится шкала защиты.
-      </p>
-
-      <div class="upgrade-slots">
-        <div class="upg-slot" id="upg-source-slot" onclick="cycleSourceGift()">
-          <div style="font-size:12px; color:var(--muted);">Ваш подарок</div>
-        </div>
-        <div style="font-size:20px; font-weight:800; color:var(--gold);">➔</div>
-        <div class="upg-slot" id="upg-target-slot">
-          <div style="font-size:12px; color:var(--muted);">Цель</div>
-        </div>
+        <div class="roulette-track" id="rouletteTrack"></div>
       </div>
 
-      <div style="display:flex; justify-content:space-between; font-size:12px;">
-        <span>Шанс успеха:</span>
-        <strong id="upg-chance-text" style="color:var(--success);">50%</strong>
+      <button class="btn-primary" id="openCaseBtn" onclick="spinCase()">
+        Открыть за 25 GRAM
+      </button>
+
+      <!-- Gifts inside selected case -->
+      <div class="contents-header">
+        <span>🎁 Подарки в этом кейсе</span>
+        <span style="font-size:11px;color:var(--muted);" id="activePoolCount">0 шт.</span>
       </div>
-      <div class="upg-bar-wrap">
-        <div class="upg-bar-fill" id="upg-bar-fill"></div>
-      </div>
-
-      <div style="font-size:12px; font-weight:700; margin-bottom:8px;">Выбери цель:</div>
-      <div class="target-list" id="upgrade-targets-list"></div>
-
-      <button class="btn-primary" id="do-upgrade-btn">Запустить апгрейд</button>
-      <p id="upgrade-status" style="text-align:center; font-size:13px; font-weight:600; margin:10px 0 0;"></p>
-    </div>
-  </section>
-
-  <section id="screen-inventory" class="screen">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-      <h2 style="margin:0;">Инвентарь</h2>
-      <button class="btn-small" onclick="openWalletModal('gifts')">+ Внести подарок</button>
-    </div>
-    <div id="inventory-list"></div>
-  </section>
-
-  <nav>
-    <button data-target="screen-home" class="active"><span class="ico">🎁</span><span>Кейсы</span></button>
-    <button data-target="screen-case"><span class="ico">🎰</span><span>Рулетка</span></button>
-    <button data-target="screen-upgrade"><span class="ico">⚡</span><span>Апгрейд</span></button>
-    <button data-target="screen-inventory"><span class="ico">🎒</span><span>Инвентарь</span></button>
-  </nav>
-
-  <!-- Модалка выпавшего подарка -->
-  <div class="modal-backdrop" id="drop-modal">
-    <div class="modal-sheet">
-      <div style="text-align:center;">
-        <div id="drop-modal-badge" style="font-size:11px; color:var(--gold); font-weight:800;">НОВЫЙ ДРОП</div>
-        <div id="drop-modal-emoji" style="font-size:56px; margin:8px 0;">🎁</div>
-        <div id="drop-modal-name" style="font-size:20px; font-weight:800;">Gift</div>
-        <div id="drop-modal-meta" style="font-size:13px; color:var(--muted); margin-top:4px;"></div>
-      </div>
-      <div class="drop-choice-grid">
-        <button class="btn-primary" id="drop-btn-sell" style="background:linear-gradient(135deg,#10b981,#059669);">💰 Продать</button>
-        <button class="btn-primary" id="drop-btn-withdraw" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);">📤 Вывести подарок в Telegram</button>
-        <button class="btn-primary" id="drop-btn-upgrade" style="background:linear-gradient(135deg,#f59e0b,#d97706);">⚡ Отправить в Апгрейд</button>
-        <button class="btn-small" style="padding:10px;" onclick="closeDropModal()">Оставить в инвентаре</button>
-      </div>
+      <div class="gifts-grid" id="caseContentsGrid"></div>
     </div>
   </div>
 
-  <!-- Модалка Кошелька (TON Connect / Stars / Подарки) -->
-  <div class="modal-backdrop" id="wallet-modal">
-    <div class="modal-sheet">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">Кошелек и пополнение</h2>
-        <button class="btn-small" onclick="closeWalletModal()">✕</button>
+  <!-- SECTION: INVENTORY -->
+  <div id="sec-inventory" class="section">
+    <div class="section-title">
+      <span>Мои подарки</span>
+      <span style="font-size:12px;color:var(--muted);" id="invCount">0 шт.</span>
+    </div>
+    <div class="gifts-grid" id="inventoryGrid"></div>
+  </div>
+
+  <!-- SECTION: ADMIN PANEL (Only ID 5200591975) -->
+  <div id="sec-admin" class="section">
+    <div class="section-title">
+      <span>⚙️ Админ-панель</span>
+      <span style="font-size:11px;color:var(--neon-cyan);">ID: 5200591975</span>
+    </div>
+
+    <!-- 1. Add New Gift -->
+    <div class="admin-card">
+      <h4>1. Добавить новый подарок</h4>
+      <div class="form-group">
+        <label>Название подарка</label>
+        <input class="input" id="admGiftName" placeholder="Например: Magic Potion #1182" />
       </div>
-
-      <div class="wallet-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-          <div>
-            <div style="font-size:12px; font-weight:700;" id="tc-status">Кошелек не привязан</div>
-            <div style="font-size:11px; color:var(--muted);" id="tc-address">Выберите кошелек для перехода и подтверждения</div>
-          </div>
-          <button class="btn-small" id="tc-connect-btn" onclick="openTonConnectModal()">Подключить</button>
+      <div class="row-2">
+        <div class="form-group">
+          <label>Цена подарка (GRAM)</label>
+          <input class="input" id="admGiftPrice" type="number" placeholder="220" />
         </div>
-
-        <div class="wallet-apps-row" id="wallet-quick-apps">
-          <button class="wallet-app-btn" onclick="connectSpecificWallet('tonkeeper')">🦎 Tonkeeper</button>
-          <button class="wallet-app-btn" onclick="connectSpecificWallet('telegram-wallet')">✈️ Telegram Wallet</button>
-          <button class="wallet-app-btn" onclick="connectSpecificWallet('mytonwallet')">💼 MyTonWallet</button>
-          <button class="wallet-app-btn" onclick="openTonConnectModal()">🔗 Все кошельки</button>
+        <div class="form-group">
+          <label>Эмодзи (если без фото)</label>
+          <input class="input" id="admGiftEmoji" placeholder="🧪" value="🎁" />
         </div>
       </div>
-
-      <div class="tabs-3">
-        <button id="tab-ton" class="active" onclick="switchWalletTab('ton')">💎 TON / GRAM</button>
-        <button id="tab-stars" onclick="switchWalletTab('stars')">⭐ Звездами</button>
-        <button id="tab-gifts" onclick="switchWalletTab('gifts')">🎁 Подарками</button>
+      <div class="form-group">
+        <label>Ссылка на подарок (t.me/nft/...)</label>
+        <input class="input" id="admGiftUrl" placeholder="https://t.me/nft/MagicPotion-1182" />
       </div>
-
-      <!-- Депозит через привязанный кошелек -->
-      <div id="panel-ton">
-        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
-          Сумма депозита в TON (откроет подтверждение в подключенном кошельке):
-        </div>
-        <input type="number" step="0.05" min="0.05" class="input-box" id="ton-deposit-amount" value="0.2" />
-        <div class="chips-row">
-          <button class="chip" onclick="setTonAmount(0.1)">0.1 TON</button>
-          <button class="chip" onclick="setTonAmount(0.2)">0.2 TON</button>
-          <button class="chip" onclick="setTonAmount(0.5)">0.5 TON</button>
-          <button class="chip" onclick="setTonAmount(1)">1 TON</button>
-        </div>
-        <button class="btn-primary" onclick="sendRealTonDeposit()">Отправить депозит через кошелек</button>
+      <div class="form-group">
+        <label>Фото подарка (ссылка или загрузка файла)</label>
+        <input class="input" id="admGiftImgUrl" placeholder="https://... или img/potion.png" style="margin-bottom:6px;" />
+        <input class="input" id="admGiftImgFile" type="file" accept="image/*" />
       </div>
+      <label class="checkbox-row">
+        <input type="checkbox" id="admGiftIsNft" checked />
+        <span>Это настоящий NFT-подарок (золотая рамка и бейдж NFT)</span>
+      </label>
+      <button class="btn-primary" onclick="adminAddGift()">+ Сохранить подарок</button>
+    </div>
 
-      <!-- Пополнение через Telegram Stars -->
-      <div id="panel-stars" style="display:none;">
-        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">
-          Количество Telegram Stars (оплата через бота):
-        </div>
-        <input type="number" min="10" step="10" class="input-box" id="stars-deposit-amount" value="100" />
-        <div class="chips-row">
-          <button class="chip" onclick="setStarsAmount(50)">50 ⭐</button>
-          <button class="chip" onclick="setStarsAmount(100)">100 ⭐</button>
-          <button class="chip" onclick="setStarsAmount(250)">250 ⭐</button>
-          <button class="chip" onclick="setStarsAmount(500)">500 ⭐</button>
-        </div>
-        <button class="btn-primary" onclick="requestStarsInvoice()">Оплатить Stars через бота</button>
+    <!-- 2. Create New Case -->
+    <div class="admin-card">
+      <h4>2. Создать новый кейс</h4>
+      <div class="form-group">
+        <label>Название кейса</label>
+        <input class="input" id="admCaseTitle" placeholder="Например: Mell VIP" />
       </div>
-
-      <!-- Пополнение подарками -->
-      <div id="panel-gifts" style="display:none;">
-        <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">
-          Выберите подарок и отправьте заявку боту на зачисление:
+      <div class="row-2">
+        <div class="form-group">
+          <label>Цена открытия (GRAM)</label>
+          <input class="input" id="admCasePrice" type="number" placeholder="150" />
         </div>
-        <select class="input-box" id="deposit-gift-select"></select>
-        <button class="btn-primary" onclick="requestGiftDeposit()">Отправить заявку на внесение подарка</button>
+        <div class="form-group">
+          <label>Тег / бейдж</label>
+          <input class="input" id="admCaseTag" placeholder="NFT DROP" value="NEW" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Описание кейса</label>
+        <input class="input" id="admCaseDesc" placeholder="Топовые NFT подарки Меллстроя" />
+      </div>
+      <div class="form-group">
+        <label>Обложка кейса (URL или загрузка фото)</label>
+        <input class="input" id="admCaseImgUrl" placeholder="https://... или оставь пустым" style="margin-bottom:6px;" />
+        <input class="input" id="admCaseImgFile" type="file" accept="image/*" />
+      </div>
+      <div class="form-group">
+        <label>Состав кейса (отметь подарки и укажи шанс/вес):</label>
+        <div id="admNewCaseGiftsList"></div>
+      </div>
+      <button class="btn-primary" onclick="adminCreateCase()">+ Создать кейс</button>
+    </div>
+
+    <!-- 3. Manage Existing Cases & Gifts -->
+    <div class="admin-card">
+      <h4>3. Управление кейсами и подарками</h4>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Кейсы:</div>
+      <div id="admCasesManageList" style="margin-bottom:12px;"></div>
+
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Все подарки в базе:</div>
+      <div id="admGiftsManageList"></div>
+
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn-sm btn-withdraw" onclick="exportConfigJson()">Скопировать JSON</button>
+        <button class="btn-sm btn-del" onclick="resetDefaultData()">Сбросить по умолчанию</button>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    const RECEIVER_TON_ADDRESS = "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO";
-    const BOT_USERNAME = "your_mellstroy_bot";
-    const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-cases" onclick="switchTab('cases')">
+    <span class="ico">🎰</span>
+    <span>Кейсы</span>
+  </button>
+  <button class="nav-btn" id="nav-inventory" onclick="switchTab('inventory')">
+    <span class="ico">🎒</span>
+    <span>Инвентарь</span>
+  </button>
+  <button class="nav-btn" id="nav-admin" onclick="switchTab('admin')" style="display:none;">
+    <span class="ico">⚙️</span>
+    <span>Админка</span>
+  </button>
+</div>
 
-    const WALLET_DEEPLINKS = {
-      "tonkeeper": "https://app.tonkeeper.com/ton-connect",
-      "telegram-wallet": "https://t.me/wallet",
-      "mytonwallet": "https://my.mytonwallet.org/"
-    };
+<!-- Win Modal -->
+<div class="modal-backdrop" id="winModal">
+  <div class="modal-card">
+    <div style="font-size:12px;color:var(--neon-cyan);font-weight:800;">🎉 ТЕБЕ ВЫПАЛ ПОДАРОК!</div>
+    <div class="modal-media" id="winMedia">🎁</div>
+    <div style="font-size:18px;font-weight:800;" id="winName">Gift Name</div>
+    <div style="font-size:13px;color:var(--gold);font-weight:700;margin-top:4px;" id="winPrice">100 GRAM</div>
+    <a id="winExtLink" href="#" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#a78bfa;">Открыть NFT в Telegram ↗</a>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn-primary" style="background:rgba(255,255,255,0.12);box-shadow:none;" onclick="closeWinModal()">В инвентарь</button>
+      <button class="btn-primary" id="winSellNowBtn">Продать</button>
+    </div>
+  </div>
+</div>
 
-    const tg = window.Telegram?.WebApp;
-    let userHandle = "@player";
+<script>
+  const ADMIN_ID = 5200591975;
+  const STORAGE_KEY = "mellstroy_gift_gram_v1";
 
+  const DEFAULT_GIFTS = [
+    { id: "desk_calendar_6412", emoji: "📅", name: "Desk Calendar #6412", isNft: true, price: 80, img: "", externalUrl: "https://t.me/nft/DeskCalendar-6412" },
+    { id: "myth_mask_106735", emoji: "🎭", name: "Myth Mask #106735", isNft: true, price: 95, img: "", externalUrl: "https://t.me/nft/MythMask-106735" },
+    { id: "liberty_figure_120656", emoji: "🗽", name: "Liberty Figure #120656", isNft: true, price: 115, img: "", externalUrl: "https://t.me/nft/LibertyFigure-120656" },
+    { id: "money_pot_53481", emoji: "🍯", name: "Money Pot #53481", isNft: true, price: 130, img: "", externalUrl: "https://t.me/nft/MoneyPot-53481" },
+    { id: "snake_box_2429", emoji: "🐍", name: "Snake Box #2429", isNft: true, price: 145, img: "", externalUrl: "https://t.me/nft/SnakeBox-2429" },
+    { id: "input_key_79499", emoji: "⌨️", name: "Input Key #79499", isNft: true, price: 165, img: "", externalUrl: "https://t.me/nft/InputKey-79499" },
+    { id: "magic_potion_1182", emoji: "🧪", name: "Magic Potion #1182", isNft: true, price: 220, img: "", externalUrl: "https://t.me/nft/MagicPotion-1182" },
+    { id: "swiss_watch_25153", emoji: "⌚", name: "Swiss Watch #25153", isNft: true, price: 360, img: "", externalUrl: "https://t.me/nft/SwissWatch-25153" },
+    { id: "khabibs_papakha_23085", emoji: "🐑", name: "Khabib's Papakha #23085", isNft: true, price: 420, img: "", externalUrl: "https://t.me/nft/KhabibsPapakha-23085" },
+    { id: "plush_pepe_890", emoji: "🐸", name: "Plush Pepe #890", isNft: true, price: 1500, img: "", externalUrl: "https://t.me/nft/PlushPepe-890" }
+  ];
+
+  const DEFAULT_CASES = [
+    {
+      id: "mell-king",
+      title: "Mell King",
+      tag: "ХИТ",
+      desc: "Базовый кейс с реальными NFT-подарками",
+      price: 100,
+      emoji: "👑",
+      img: "",
+      pool: [
+        { giftId: "desk_calendar_6412", weight: 30 },
+        { giftId: "myth_mask_106735", weight: 25 },
+        { giftId: "liberty_figure_120656", weight: 20 },
+        { giftId: "money_pot_53481", weight: 15 },
+        { giftId: "magic_potion_1182", weight: 10 }
+      ]
+    },
+    {
+      id: "mell-cash",
+      title: "Mell Cash",
+      tag: "TOP NFT",
+      desc: "Жирный дроп: Swiss Watch, Папаха и Plush Pepe",
+      price: 250,
+      emoji: "💸",
+      img: "",
+      pool: [
+        { giftId: "snake_box_2429", weight: 28 },
+        { giftId: "input_key_79499", weight: 25 },
+        { giftId: "magic_potion_1182", weight: 22 },
+        { giftId: "swiss_watch_25153", weight: 15 },
+        { giftId: "khabibs_papakha_23085", weight: 8 },
+        { giftId: "plush_pepe_890", weight: 2 }
+      ]
+    }
+  ];
+
+  let state = {
+    balance: 500,
+    gifts: [],
+    cases: [],
+    inventory: [],
+    selectedCaseId: "mell-king",
+    isSpinning: false,
+    currentUserId: null
+  };
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && Array.isArray(saved.gifts) && Array.isArray(saved.cases)) {
+        state.balance = typeof saved.balance === "number" ? saved.balance : 500;
+        state.gifts = saved.gifts;
+        state.cases = saved.cases;
+        state.inventory = Array.isArray(saved.inventory) ? saved.inventory : [];
+        state.selectedCaseId = saved.selectedCaseId || (state.cases[0] && state.cases[0].id) || "";
+        return;
+      }
+    } catch (e) {}
+    state.gifts = JSON.parse(JSON.stringify(DEFAULT_GIFTS));
+    state.cases = JSON.parse(JSON.stringify(DEFAULT_CASES));
+    state.selectedCaseId = state.cases[0].id;
+    saveState();
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      balance: state.balance,
+      gifts: state.gifts,
+      cases: state.cases,
+      inventory: state.inventory,
+      selectedCaseId: state.selectedCaseId
+    }));
+  }
+
+  function initTelegram() {
+    const tg = window.Telegram && window.Telegram.WebApp;
+    let uid = null;
     if (tg) {
       tg.ready();
       tg.expand();
-      const u = tg.initDataUnsafe?.user;
-      if (u) {
-        userHandle = u.username ? `@${u.username}` : (u.first_name || "Игрок");
-        document.getElementById("user-name").textContent = [u.first_name, u.last_name].filter(Boolean).join(" ");
-        document.getElementById("user-sub").textContent = u.username ? `@${u.username}` : `ID: ${u.id}`;
-        document.getElementById("user-avatar").textContent = (u.first_name?.[0] || "M").toUpperCase();
-      } else {
-        document.getElementById("user-sub").textContent = "Mini App Preview";
+      const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+      if (user) {
+        uid = Number(user.id);
+        document.getElementById("userLabel").textContent = user.username ? "@" + user.username : (user.first_name || "Player");
       }
     }
-
-    let tonConnectUI = null;
-
-    async function ensureTonConnectUI() {
-      if (tonConnectUI) return tonConnectUI;
-
-      let UISDK = window.TONCONNECT_UI?.TonConnectUI || window.TonConnectUI;
-
-      if (!UISDK) {
-        try {
-          const mod = await import("https://esm.sh/@tonconnect/ui@latest");
-          UISDK = mod.TonConnectUI || mod.default?.TonConnectUI;
-          if (UISDK) {
-            window.TONCONNECT_UI = { ...(window.TONCONNECT_UI || {}), TonConnectUI: UISDK };
-          }
-        } catch (_) {}
-      }
-
-      if (!UISDK) {
-        throw new Error("TON Connect SDK unavailable");
-      }
-
-      tonConnectUI = new UISDK({
-        manifestUrl: MANIFEST_URL,
-        actionsConfiguration: {
-          twaReturnUrl: `https://t.me/${BOT_USERNAME}`
-        }
-      });
-
-      tonConnectUI.onStatusChange((wallet) => {
-        updateTonWalletStatus(wallet);
-      });
-
-      updateTonWalletStatus(tonConnectUI.wallet);
-      return tonConnectUI;
-    }
-
-    function updateTonWalletStatus(wallet) {
-      const statusEl = document.getElementById("tc-status");
-      const addrEl = document.getElementById("tc-address");
-      const btnEl = document.getElementById("tc-connect-btn");
-      const quickAppsEl = document.getElementById("wallet-quick-apps");
-
-      if (wallet?.account?.address) {
-        const addr = wallet.account.address;
-        const shortAddr = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-        const walletName = wallet.device?.appName || "TON Wallet";
-        statusEl.textContent = `Привязан: ${walletName}`;
-        addrEl.textContent = `Адрес игрока: ${shortAddr}`;
-        btnEl.textContent = "Отключить";
-        quickAppsEl.style.display = "none";
-      } else {
-        statusEl.textContent = "Кошелек не привязан";
-        addrEl.textContent = "Выберите кошелек для перехода и подтверждения";
-        btnEl.textContent = "Подключить";
-        quickAppsEl.style.display = "grid";
+    // Если открыто вне Telegram (в браузере для теста), можно передать ?admin=5200591975 в URL
+    if (!uid) {
+      const params = new URLSearchParams(window.location.search);
+      if (Number(params.get("admin")) === ADMIN_ID) {
+        uid = ADMIN_ID;
       }
     }
-
-    async function openTonConnectModal() {
-      try {
-        const ui = await ensureTonConnectUI();
-        if (ui.account) {
-          await ui.disconnect();
-          showToast("Кошелек отключен");
-        } else {
-          await ui.openModal();
-        }
-      } catch (e) {
-        showToast("Открываю Tonkeeper...");
-        const link = WALLET_DEEPLINKS["tonkeeper"];
-        if (tg?.openLink) tg.openLink(link);
-        else window.open(link, "_blank");
-      }
+    state.currentUserId = uid;
+    if (uid === ADMIN_ID) {
+      document.getElementById("nav-admin").style.display = "flex";
     }
+  }
 
-    async function connectSpecificWallet(appKey) {
-      try {
-        const ui = await ensureTonConnectUI();
-        try {
-          await ui.openSingleWalletModal(appKey);
-        } catch (_) {
-          await ui.openModal();
-        }
-      } catch (e) {
-        const fallbackUrl = WALLET_DEEPLINKS[appKey] || WALLET_DEEPLINKS["tonkeeper"];
-        showToast("Переход в кошелек...");
-        if (tg?.openLink) tg.openLink(fallbackUrl);
-        else window.open(fallbackUrl, "_blank");
-      }
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 2400);
+  }
+
+  function getGiftById(id) {
+    return state.gifts.find(g => g.id === id);
+  }
+
+  function renderMedia(item, fallbackEmoji = "🎁") {
+    if (item && item.img) {
+      return `<img src="${item.img}" alt="${item.name || item.title || ''}" />`;
     }
+    return `<span>${(item && item.emoji) || fallbackEmoji}</span>`;
+  }
 
-    function setTonAmount(v) { document.getElementById("ton-deposit-amount").value = v; }
-    function setStarsAmount(v) { document.getElementById("stars-deposit-amount").value = v; }
+  function renderBalance() {
+    document.getElementById("balanceAmount").textContent = state.balance;
+  }
 
-    async function sendRealTonDeposit() {
-      let ui;
-      try {
-        ui = await ensureTonConnectUI();
-      } catch (e) {
-        return showToast("TON Connect не загрузился");
-      }
+  function topUpDemo() {
+    state.balance += 500;
+    saveState();
+    renderBalance();
+    showToast("+500 GRAM начислено на баланс");
+  }
 
-      if (!ui.account) {
-        showToast("Сначала выбери кошелек и подтверди привязку");
-        await ui.openModal();
-        return;
-      }
+  function switchTab(tab) {
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("sec-" + tab).classList.add("active");
+    document.getElementById("nav-" + tab).classList.add("active");
 
-      const tonVal = parseFloat(document.getElementById("ton-deposit-amount").value);
-      if (!tonVal || tonVal < 0.05) return showToast("Минимум 0.05 TON");
+    if (tab === "inventory") renderInventory();
+    if (tab === "admin") renderAdmin();
+  }
 
-      const nanoAmount = Math.round(tonVal * 1e9).toString();
-      try {
-        await ui.sendTransaction({
-          validUntil: Math.floor(Date.now() / 1000) + 300,
-          messages: [
-            {
-              address: RECEIVER_TON_ADDRESS,
-              amount: nanoAmount
-            }
-          ]
-        });
-        showToast("Подтверди перевод в кошельке — проверяем транзакцию");
-        tonDeposited += tonVal;
-        starsBalance += Math.round(tonVal * 120);
-        updateBalances();
-        closeWalletModal();
-      } catch (err) {
-        showToast("Перевод отменен или отклонен");
-      }
-    }
-
-    function requestStarsInvoice() {
-      const amt = parseInt(document.getElementById("stars-deposit-amount").value, 10);
-      if (!amt || amt < 10) return showToast("Минимум 10 ⭐");
-      const payload = JSON.stringify({ type: "deposit_stars", amount: amt });
-      if (tg?.sendData) {
-        tg.sendData(payload);
-        showToast(`Запрос на счет ${amt} ⭐ отправлен боту`);
-      } else {
-        window.open(`https://t.me/${BOT_USERNAME}?start=stars_${amt}`, "_blank");
-      }
-    }
-
-    function requestGiftDeposit() {
-      const giftId = document.getElementById("deposit-gift-select").value;
-      const g = getGiftById(giftId);
-      const payload = JSON.stringify({ type: "deposit_gift", giftId: g.id });
-      if (tg?.sendData) {
-        tg.sendData(payload);
-        showToast(`Заявка на внесение ${g.name} отправлена боту`);
-      } else {
-        window.open(`https://t.me/${BOT_USERNAME}?start=gift_${g.id}`, "_blank");
-      }
-    }
-
-    const GIFTS = [
-      { id: "bear", emoji: "🧸", name: "Plush Bear", isNft: false, price: 15, sellStars: 12 },
-      { id: "rose", emoji: "🌹", name: "Neon Rose", isNft: false, price: 20, sellStars: 16 },
-      { id: "cake", emoji: "🎂", name: "Party Cake", isNft: false, price: 30, sellStars: 24 },
-      { id: "ring", emoji: "💍", name: "Silver Ring", isNft: true, price: 45, sellStars: 36 },
-      { id: "rocket", emoji: "🚀", name: "Rocket NFT", isNft: true, price: 85, sellStars: 68 },
-      { id: "crown", emoji: "👑", name: "Gold Crown", isNft: true, price: 160, sellStars: 128 },
-      { id: "pepe", emoji: "🐸", name: "Rare Pepe", isNft: true, price: 260, sellStars: 205 }
-    ];
-
-    const CASES = [
-      {
-        id: "mell-king",
-        title: "Mell King",
-        tag: "MEME",
-        desc: "Обычные подарки + шанс на NFT-подарки",
-        price: 25,
-        img: "https://kyyovrstack.github.io/MellstroyGift/case-king.png",
-        fallbackEmoji: "👑",
-        pool: [
-          { giftId: "bear", weight: 46 },
-          { giftId: "rose", weight: 26 },
-          { giftId: "cake", weight: 14 },
-          { giftId: "ring", weight: 9 },
-          { giftId: "rocket", weight: 4 },
-          { giftId: "crown", weight: 1 }
-        ]
-      },
-      {
-        id: "mell-cash",
-        title: "Mell Cash",
-        tag: "NFT + DROP",
-        desc: "Больше NFT-подарков и редких трофеев",
-        price: 75,
-        img: "https://kyyovrstack.github.io/MellstroyGift/case-cash.png",
-        fallbackEmoji: "💸",
-        pool: [
-          { giftId: "rose", weight: 28 },
-          { giftId: "cake", weight: 26 },
-          { giftId: "ring", weight: 22 },
-          { giftId: "rocket", weight: 15 },
-          { giftId: "crown", weight: 7 },
-          { giftId: "pepe", weight: 2 }
-        ]
-      }
-    ];
-
-    let starsBalance = 150;
-    let tonDeposited = 0;
-    let currentCase = CASES[0];
-    let isSpinning = false;
-    let lastDroppedGift = null;
-    let pityPoints = 0;
-    let inventory = [{ ...GIFTS[0], uid: 101 }];
-    let selectedUpgradeInvIndex = 0;
-    let selectedTargetGiftId = GIFTS[4].id;
-
-    function showToast(msg) {
-      const el = document.getElementById("toast");
-      el.textContent = msg;
-      el.classList.add("show");
-      clearTimeout(window._t);
-      window._t = setTimeout(() => el.classList.remove("show"), 2300);
-    }
-
-    function updateBalances() {
-      document.getElementById("stars-val").textContent = starsBalance;
-      document.getElementById("ton-val").textContent = Number(tonDeposited).toFixed(2).replace(/\.00$/, "");
-    }
-
-    function addLiveFeed(text) {
-      const strip = document.getElementById("live-strip");
-      const badge = strip.querySelector(".live-badge");
-      const el = document.createElement("div");
-      el.className = "live-item";
-      el.textContent = text;
-      badge.insertAdjacentElement("afterend", el);
-    }
-
-    function switchTab(id) {
-      document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
-      document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.target === id));
-      if (id === "screen-inventory") renderInventory();
-      if (id === "screen-upgrade") renderUpgradeScreen();
-    }
-
-    document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.target)));
-
-    function getGiftById(id) { return GIFTS.find(g => g.id === id) || GIFTS[0]; }
-
-    function renderCases() {
-      document.getElementById("cases-grid").innerHTML = CASES.map(c => `
-        <div class="case-card" onclick="selectCase('${c.id}')">
-          <div class="case-tag">${c.tag}</div>
-          <div class="case-art-wrap">
-            <img src="${c.img}" alt="${c.title}" onerror="this.style.display='none'; this.parentElement.textContent='${c.fallbackEmoji}';" />
-          </div>
-          <div class="case-title">${c.title}</div>
-          <div class="case-desc">${c.desc}</div>
-          <div class="price-pill">${c.price} ⭐</div>
-        </div>
-      `).join("");
-    }
-
-    function selectCase(id) {
-      currentCase = CASES.find(c => c.id === id) || CASES[0];
-      document.getElementById("active-case-title").textContent = currentCase.title;
-      document.getElementById("active-case-desc").textContent = currentCase.desc;
-      document.getElementById("spin-btn").textContent = `Открыть за ${currentCase.price} ⭐`;
-
-      document.getElementById("case-drops-preview").innerHTML = currentCase.pool.map(p => {
-        const g = getGiftById(p.giftId);
-        return `
-          <div class="drop-mini ${g.isNft ? "nft-item" : ""}">
-            <div class="em">${g.emoji}</div>
-            <div class="nm">${g.name}</div>
-            <div class="tp">${g.isNft ? "NFT GIFT" : "Обычный"}</div>
-            <div class="pr">${g.price} ⭐</div>
-          </div>
-        `;
-      }).join("");
-
-      buildRoulette(currentCase.pool);
-      switchTab("screen-case");
-    }
-
-    function rollFromPool(pool) {
-      const total = pool.reduce((a, b) => a + b.weight, 0);
-      let r = Math.random() * total;
-      for (const item of pool) {
-        r -= item.weight;
-        if (r <= 0) return getGiftById(item.giftId);
-      }
-      return getGiftById(pool[0].giftId);
-    }
-
-    function buildRoulette(pool, winner = null) {
-      const track = document.getElementById("roulette-track");
-      track.style.transition = "none";
-      track.style.transform = "translateX(0px)";
-      track.innerHTML = "";
-
-      const list = Array.from({ length: 34 }, () => rollFromPool(pool));
-      if (winner) list[27] = winner;
-
-      list.forEach(g => {
-        const d = document.createElement("div");
-        d.className = "slot-item";
-        d.innerHTML = `${g.emoji}<span>${g.name}</span>`;
-        track.appendChild(d);
-      });
-    }
-
-    document.getElementById("spin-btn").addEventListener("click", () => {
-      if (isSpinning) return;
-      if (starsBalance < currentCase.price) return showToast("Недостаточно ⭐");
-
-      isSpinning = true;
-      starsBalance -= currentCase.price;
-      updateBalances();
-      document.getElementById("spin-btn").disabled = true;
-
-      const winner = rollFromPool(currentCase.pool);
-      buildRoulette(currentCase.pool, winner);
-
-      const track = document.getElementById("roulette-track");
-      const winWidth = document.querySelector(".roulette-window").offsetWidth;
-      const offset = (27 * 90) - (winWidth / 2) + 41;
-
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        track.style.transition = "transform 3.3s cubic-bezier(0.12, 0.86, 0.2, 1)";
-        track.style.transform = `translateX(-${offset}px)`;
-      }));
-
-      setTimeout(() => {
-        isSpinning = false;
-        document.getElementById("spin-btn").disabled = false;
-        const dropped = { ...winner, uid: Date.now() + Math.random() };
-        inventory.unshift(dropped);
-        lastDroppedGift = dropped;
-        addLiveFeed(`${winner.emoji} ${userHandle} · ${winner.name}${winner.isNft ? " [NFT]" : ""}`);
-        openDropModal(dropped);
-      }, 3400);
-    });
-
-    function openDropModal(g) {
-      lastDroppedGift = g;
-      document.getElementById("drop-modal-badge").textContent = g.isNft ? "NFT ПОДАРОК" : "ОБЫЧНЫЙ ПОДАРОК";
-      document.getElementById("drop-modal-emoji").textContent = g.emoji;
-      document.getElementById("drop-modal-name").textContent = g.name;
-      document.getElementById("drop-modal-meta").textContent = `${g.isNft ? "NFT" : "Обычный"} · Ценность: ${g.price} ⭐`;
-      document.getElementById("drop-btn-sell").textContent = `💰 Продать за +${g.sellStars} ⭐`;
-      document.getElementById("drop-btn-withdraw").textContent = `📤 Вывести ${g.name} в Telegram`;
-      document.getElementById("drop-btn-upgrade").textContent = `⚡ Отправить ${g.name} в Апгрейд`;
-      document.getElementById("drop-modal").classList.add("open");
-    }
-
-    function closeDropModal() { document.getElementById("drop-modal").classList.remove("open"); }
-
-    document.getElementById("drop-btn-sell").addEventListener("click", () => {
-      if (!lastDroppedGift) return;
-      const i = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
-      if (i !== -1) inventory.splice(i, 1);
-      starsBalance += lastDroppedGift.sellStars;
-      updateBalances();
-      closeDropModal();
-      showToast(`Продано за +${lastDroppedGift.sellStars} ⭐`);
-    });
-
-    document.getElementById("drop-btn-withdraw").addEventListener("click", () => {
-      if (!lastDroppedGift) return;
-      const i = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
-      if (i !== -1) inventory.splice(i, 1);
-      closeDropModal();
-      showToast(`Заявка на вывод ${lastDroppedGift.name} отправлена`);
-    });
-
-    document.getElementById("drop-btn-upgrade").addEventListener("click", () => {
-      if (!lastDroppedGift) return;
-      const i = inventory.findIndex(x => x.uid === lastDroppedGift.uid);
-      selectedUpgradeInvIndex = i !== -1 ? i : 0;
-      const next = GIFTS.find(g => g.price > lastDroppedGift.price) || GIFTS[GIFTS.length - 1];
-      selectedTargetGiftId = next.id;
-      closeDropModal();
-      switchTab("screen-upgrade");
-    });
-
-    function renderUpgradeScreen() {
-      document.getElementById("pity-val").textContent = pityPoints;
-      const srcSlot = document.getElementById("upg-source-slot");
-      const tgtSlot = document.getElementById("upg-target-slot");
-
-      if (!inventory.length) {
-        srcSlot.className = "upg-slot";
-        srcSlot.innerHTML = `<div style="font-size:12px; color:var(--muted);">Нет подарков</div>`;
-      } else {
-        if (selectedUpgradeInvIndex >= inventory.length) selectedUpgradeInvIndex = 0;
-        const src = inventory[selectedUpgradeInvIndex];
-        srcSlot.className = "upg-slot filled";
-        srcSlot.innerHTML = `<div style="font-size:32px;">${src.emoji}</div><div style="font-size:12px; font-weight:700;">${src.name}</div><div style="font-size:11px; color:var(--muted);">${src.price} ⭐</div>`;
-      }
-
-      const tgt = getGiftById(selectedTargetGiftId);
-      tgtSlot.className = "upg-slot filled";
-      tgtSlot.innerHTML = `<div style="font-size:32px;">${tgt.emoji}</div><div style="font-size:12px; font-weight:700;">${tgt.name}</div><div style="font-size:11px; color:var(--gold);">${tgt.price} ⭐</div>`;
-
-      document.getElementById("upgrade-targets-list").innerHTML = GIFTS.slice(2).map(g => `
-        <button class="target-btn ${g.id === selectedTargetGiftId ? "active" : ""}" onclick="chooseUpgradeTarget('${g.id}')">
-          <span style="font-size:22px;">${g.emoji}</span>
-          <div>
-            <div style="font-size:12px; font-weight:700;">${g.name}</div>
-            <div style="font-size:11px; color:var(--gold);">${g.price} ⭐</div>
-          </div>
-        </button>
-      `).join("");
-
-      const ch = calcChance();
-      document.getElementById("upg-chance-text").textContent = `${ch}%`;
-      document.getElementById("upg-bar-fill").style.width = `${ch}%`;
-    }
-
-    function cycleSourceGift() {
-      if (!inventory.length) return;
-      selectedUpgradeInvIndex = (selectedUpgradeInvIndex + 1) % inventory.length;
-      renderUpgradeScreen();
-    }
-
-    function chooseUpgradeTarget(id) {
-      selectedTargetGiftId = id;
-      renderUpgradeScreen();
-    }
-
-    function calcChance() {
-      if (!inventory.length) return 0;
-      const src = inventory[selectedUpgradeInvIndex];
-      const tgt = getGiftById(selectedTargetGiftId);
-      return Math.max(8, Math.min(80, Math.round((src.price / Math.max(src.price + 1, tgt.price)) * 75 + pityPoints * 0.25)));
-    }
-
-    document.getElementById("do-upgrade-btn").addEventListener("click", () => {
-      if (!inventory.length) return showToast("Нет подарка для апгрейда");
-      const tgt = getGiftById(selectedTargetGiftId);
-      const win = (Math.random() * 100) < calcChance();
-      inventory.splice(selectedUpgradeInvIndex, 1);
-
-      if (win) {
-        pityPoints = 0;
-        const upg = { ...tgt, uid: Date.now() + Math.random() };
-        inventory.unshift(upg);
-        document.getElementById("upgrade-status").textContent = `Успех! Получен ${tgt.name}`;
-        openDropModal(upg);
-      } else {
-        pityPoints = Math.min(100, pityPoints + 25);
-        document.getElementById("upgrade-status").textContent = `Неудача. +25 к защите`;
-      }
-      renderUpgradeScreen();
-    });
-
-    function renderInventory() {
-      const box = document.getElementById("inventory-list");
-      if (!inventory.length) {
-        box.innerHTML = `<div class="card-box" style="text-align:center; color:var(--muted);">Инвентарь пуст</div>`;
-        return;
-      }
-      box.innerHTML = inventory.map((item, idx) => `
-        <div class="inv-item">
-          <div class="inv-top">
-            <div class="inv-left">
-              <div style="font-size:30px;">${item.emoji}</div>
-              <div>
-                <div style="font-weight:700; font-size:14px;">${item.name} ${item.isNft ? "· NFT" : ""}</div>
-                <div style="font-size:11px; color:var(--muted);">Ценность: ${item.price} ⭐</div>
-              </div>
-            </div>
-          </div>
-          <div class="inv-actions">
-            <button class="btn-small btn-sell" onclick="invSell(${idx})">Продать +${item.sellStars}⭐</button>
-            <button class="btn-small btn-withdraw" onclick="invWithdraw(${idx})">Вывести</button>
-            <button class="btn-small btn-upg" onclick="invToUpgrade(${idx})">Апгрейд</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function invSell(i) {
-      const item = inventory[i];
-      if (!item) return;
-      starsBalance += item.sellStars;
-      inventory.splice(i, 1);
-      updateBalances();
-      renderInventory();
-    }
-
-    function invWithdraw(i) {
-      const item = inventory[i];
-      if (!item) return;
-      inventory.splice(i, 1);
-      renderInventory();
-      showToast(`Заявка на вывод ${item.name} создана`);
-    }
-
-    function invToUpgrade(i) {
-      selectedUpgradeInvIndex = i;
-      const src = inventory[i];
-      const next = GIFTS.find(g => g.price > src.price) || GIFTS[GIFTS.length - 1];
-      selectedTargetGiftId = next.id;
-      switchTab("screen-upgrade");
-    }
-
-    async function openWalletModal(tab = "ton") {
-      document.getElementById("deposit-gift-select").innerHTML = GIFTS.map(g =>
-        `<option value="${g.id}">${g.emoji} ${g.name} (${g.isNft ? "NFT" : "Обычный"} · ${g.price} ⭐)</option>`
-      ).join("");
-      switchWalletTab(tab);
-      document.getElementById("wallet-modal").classList.add("open");
-      try {
-        await ensureTonConnectUI();
-      } catch (_) {}
-    }
-
-    function closeWalletModal() { document.getElementById("wallet-modal").classList.remove("open"); }
-
-    function switchWalletTab(tab) {
-      ["ton", "stars", "gifts"].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.toggle("active", t === tab);
-        document.getElementById(`panel-${t}`).style.display = t === tab ? "block" : "none";
-      });
-    }
-
-    updateBalances();
+  function selectCase(caseId) {
+    if (state.isSpinning) return;
+    state.selectedCaseId = caseId;
+    saveState();
     renderCases();
-    selectCase("mell-king");
-    switchTab("screen-home");
-    ensureTonConnectUI().catch(() => {});
-  </script>
+    renderSelectedCaseDetails();
+  }
+
+  function renderCases() {
+    const grid = document.getElementById("casesGrid");
+    document.getElementById("casesCountLabel").textContent = `${state.cases.length} шт.`;
+    grid.innerHTML = state.cases.map(c => `
+      <div class="case-card ${c.id === state.selectedCaseId ? "selected" : ""}" onclick="selectCase('${c.id}')">
+        <span class="case-tag">${c.tag || "CASE"}</span>
+        <div class="case-media">${renderMedia(c, "📦")}</div>
+        <div class="case-name">${c.title}</div>
+        <div class="case-price">${c.price} GRAM</div>
+      </div>
+    `).join("");
+  }
+
+  function renderSelectedCaseDetails() {
+    const activeCase = state.cases.find(c => c.id === state.selectedCaseId) || state.cases[0];
+    if (!activeCase) return;
+
+    document.getElementById("activeCaseTitle").textContent = activeCase.title;
+    document.getElementById("activeCaseDesc").textContent = activeCase.desc || "Нажми «Открыть», чтобы испытать удачу";
+    document.getElementById("activeCasePrice").textContent = `${activeCase.price} GRAM`;
+
+    const openBtn = document.getElementById("openCaseBtn");
+    openBtn.textContent = `Открыть за ${activeCase.price} GRAM`;
+
+    const validPool = (activeCase.pool || [])
+      .map(p => ({ ...p, gift: getGiftById(p.giftId) }))
+      .filter(p => p.gift);
+
+    const totalWeight = validPool.reduce((sum, p) => sum + (Number(p.weight) || 1), 0);
+    document.getElementById("activePoolCount").textContent = `${validPool.length} подарков`;
+
+    // Render roulette preview
+    const track = document.getElementById("rouletteTrack");
+    track.style.transition = "none";
+    track.style.transform = "translateX(0px)";
+    const previewItems = [];
+    if (validPool.length > 0) {
+      for (let i = 0; i < 18; i++) {
+        const g = validPool[i % validPool.length].gift;
+        previewItems.push(g);
+      }
+    }
+    track.innerHTML = previewItems.map(g => `
+      <div class="roulette-item ${g.isNft ? "nft" : ""}">
+        ${g.img ? `<img src="${g.img}" />` : `<div class="r-emoji">${g.emoji || "🎁"}</div>`}
+        <div class="r-name">${g.name}</div>
+      </div>
+    `).join("");
+
+    // Render Gifts inside this case (Bottom list)
+    const contentsGrid = document.getElementById("caseContentsGrid");
+    if (validPool.length === 0) {
+      contentsGrid.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:13px;text-align:center;padding:12px;">В этом кейсе пока нет подарков</div>`;
+      return;
+    }
+
+    // Sort by price ascending
+    validPool.sort((a, b) => a.gift.price - b.gift.price);
+
+    contentsGrid.innerHTML = validPool.map(item => {
+      const g = item.gift;
+      const chance = totalWeight > 0 ? ((item.weight / totalWeight) * 100).toFixed(1) : "0";
+      return `
+        <div class="gift-card ${g.isNft ? "nft" : ""}">
+          ${g.isNft ? `<span class="nft-badge">NFT</span>` : ""}
+          <span class="chance-badge">${chance}%</span>
+          <div class="gift-thumb">${renderMedia(g)}</div>
+          <div class="gift-title">${g.name}</div>
+          <div class="gift-price">${g.price} GRAM</div>
+          ${g.externalUrl ? `<a class="gift-link" href="${g.externalUrl}" target="_blank">Посмотреть NFT ↗</a>` : ""}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function spinCase() {
+    if (state.isSpinning) return;
+    const activeCase = state.cases.find(c => c.id === state.selectedCaseId);
+    if (!activeCase) return;
+
+    const validPool = (activeCase.pool || [])
+      .map(p => ({ ...p, gift: getGiftById(p.giftId) }))
+      .filter(p => p.gift);
+
+    if (validPool.length === 0) {
+      showToast("В кейсе нет подарков!");
+      return;
+    }
+
+    if (state.balance < activeCase.price) {
+      showToast("Недостаточно GRAM на балансе!");
+      return;
+    }
+
+    state.balance -= activeCase.price;
+    saveState();
+    renderBalance();
+
+    // Weighted random pick
+    const totalWeight = validPool.reduce((s, p) => s + (Number(p.weight) || 1), 0);
+    let rnd = Math.random() * totalWeight;
+    let wonGift = validPool[0].gift;
+    for (const entry of validPool) {
+      rnd -= (Number(entry.weight) || 1);
+      if (rnd <= 0) {
+        wonGift = entry.gift;
+        break;
+      }
+    }
+
+    state.isSpinning = true;
+    const btn = document.getElementById("openCaseBtn");
+    btn.disabled = true;
+    btn.textContent = "Крутим...";
+
+    const track = document.getElementById("rouletteTrack");
+    const winIndex = 34;
+    const totalCards = 42;
+    const tape = [];
+    for (let i = 0; i < totalCards; i++) {
+      if (i === winIndex) {
+        tape.push(wonGift);
+      } else {
+        const randEntry = validPool[Math.floor(Math.random() * validPool.length)];
+        tape.push(randEntry.gift);
+      }
+    }
+
+    track.style.transition = "none";
+    track.style.transform = "translateX(0px)";
+    track.innerHTML = tape.map(g => `
+      <div class="roulette-item ${g.isNft ? "nft" : ""}">
+        ${g.img ? `<img src="${g.img}" />` : `<div class="r-emoji">${g.emoji || "🎁"}</div>`}
+        <div class="r-name">${g.name}</div>
+      </div>
+    `).join("");
+
+    const cardWidth = 96; // 88px + 8px gap
+    const jitter = Math.floor(Math.random() * 36) - 18;
+    const targetOffset = (winIndex * cardWidth) + 44 + jitter;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        track.style.transition = "transform 3.6s cubic-bezier(0.12, 0.85, 0.22, 1)";
+        track.style.transform = `translateX(-${targetOffset}px)`;
+      });
+    });
+
+    setTimeout(() => {
+      state.isSpinning = false;
+      btn.disabled = false;
+      btn.textContent = `Открыть за ${activeCase.price} GRAM`;
+
+      const invItem = {
+        uid: Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        giftId: wonGift.id,
+        wonAt: new Date().toISOString()
+      };
+      state.inventory.unshift(invItem);
+      saveState();
+
+      openWinModal(wonGift, invItem.uid);
+    }, 3750);
+  }
+
+  function openWinModal(gift, invUid) {
+    document.getElementById("winMedia").innerHTML = renderMedia(gift);
+    document.getElementById("winName").textContent = gift.name;
+    document.getElementById("winPrice").textContent = `${gift.price} GRAM`;
+
+    const ext = document.getElementById("winExtLink");
+    if (gift.externalUrl) {
+      ext.href = gift.externalUrl;
+      ext.style.display = "inline-block";
+    } else {
+      ext.style.display = "none";
+    }
+
+    const sellBtn = document.getElementById("winSellNowBtn");
+    sellBtn.textContent = `Продать за ${gift.price} GRAM`;
+    sellBtn.onclick = () => {
+      sellInventoryItem(invUid);
+      closeWinModal();
+    };
+
+    document.getElementById("winModal").classList.add("open");
+  }
+
+  function closeWinModal() {
+    document.getElementById("winModal").classList.remove("open");
+  }
+
+  function renderInventory() {
+    const grid = document.getElementById("inventoryGrid");
+    document.getElementById("invCount").textContent = `${state.inventory.length} шт.`;
+
+    if (state.inventory.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:24px;">Инвентарь пуст — открой первый кейс!</div>`;
+      return;
+    }
+
+    grid.innerHTML = state.inventory.map(item => {
+      const g = getGiftById(item.giftId);
+      if (!g) return "";
+      return `
+        <div class="gift-card ${g.isNft ? "nft" : ""}">
+          ${g.isNft ? `<span class="nft-badge">NFT</span>` : ""}
+          <div class="gift-thumb">${renderMedia(g)}</div>
+          <div class="gift-title">${g.name}</div>
+          <div class="gift-price">${g.price} GRAM</div>
+          <div class="inv-actions">
+            <button class="btn-sm btn-sell" onclick="sellInventoryItem('${item.uid}')">Продать</button>
+            <button class="btn-sm btn-withdraw" onclick="requestWithdraw('${item.uid}')">Вывести</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function sellInventoryItem(uid) {
+    const idx = state.inventory.findIndex(i => i.uid === uid);
+    if (idx === -1) return;
+    const gift = getGiftById(state.inventory[idx].giftId);
+    state.inventory.splice(idx, 1);
+    if (gift) {
+      state.balance += Number(gift.price) || 0;
+      showToast(`Продано за +${gift.price} GRAM`);
+    }
+    saveState();
+    renderBalance();
+    renderInventory();
+  }
+
+  function requestWithdraw(uid) {
+    const item = state.inventory.find(i => i.uid === uid);
+    if (!item) return;
+    const gift = getGiftById(item.giftId);
+    const tg = window.Telegram && window.Telegram.WebApp;
+    const payload = {
+      action: "withdraw_gift",
+      giftId: gift.id,
+      giftName: gift.name,
+      externalUrl: gift.externalUrl || "",
+      priceGram: gift.price
+    };
+
+    if (tg && tg.sendData) {
+      tg.sendData(JSON.stringify(payload));
+    }
+    showToast(`Заявка на вывод «${gift.name}» отправлена!`);
+  }
+
+  /* ================= ADMIN PANEL LOGIC ================= */
+  function readImageFileAsDataUrl(fileInput) {
+    return new Promise(resolve => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return resolve("");
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function adminAddGift() {
+    if (state.currentUserId !== ADMIN_ID) return;
+    const name = document.getElementById("admGiftName").value.trim();
+    const price = Number(document.getElementById("admGiftPrice").value);
+    const emoji = document.getElementById("admGiftEmoji").value.trim() || "🎁";
+    const externalUrl = document.getElementById("admGiftUrl").value.trim();
+    const imgUrlInput = document.getElementById("admGiftImgUrl").value.trim();
+    const isNft = document.getElementById("admGiftIsNft").checked;
+
+    if (!name || !price || price <= 0) {
+      showToast("Укажи название и цену в GRAM!");
+      return;
+    }
+
+    const uploadedDataUrl = await readImageFileAsDataUrl(document.getElementById("admGiftImgFile"));
+    const finalImg = uploadedDataUrl || imgUrlInput;
+
+    const newGift = {
+      id: "gift_" + Date.now(),
+      name,
+      price,
+      emoji,
+      img: finalImg,
+      externalUrl,
+      isNft
+    };
+
+    state.gifts.push(newGift);
+    saveState();
+
+    document.getElementById("admGiftName").value = "";
+    document.getElementById("admGiftPrice").value = "";
+    document.getElementById("admGiftUrl").value = "";
+    document.getElementById("admGiftImgUrl").value = "";
+    document.getElementById("admGiftImgFile").value = "";
+
+    renderAdmin();
+    showToast(`Подарок «${name}» добавлен!`);
+  }
+
+  async function adminCreateCase() {
+    if (state.currentUserId !== ADMIN_ID) return;
+    const title = document.getElementById("admCaseTitle").value.trim();
+    const price = Number(document.getElementById("admCasePrice").value);
+    const tag = document.getElementById("admCaseTag").value.trim() || "CASE";
+    const desc = document.getElementById("admCaseDesc").value.trim() || "Эксклюзивный кейс с подарками";
+    const imgUrlInput = document.getElementById("admCaseImgUrl").value.trim();
+
+    if (!title || !price || price <= 0) {
+      showToast("Укажи название кейса и цену в GRAM!");
+      return;
+    }
+
+    const pool = [];
+    document.querySelectorAll(".adm-case-gift-check:checked").forEach(chk => {
+      const gId = chk.dataset.giftId;
+      const weightInput = document.querySelector(`.adm-case-gift-weight[data-gift-id="${gId}"]`);
+      const weight = Math.max(1, Number(weightInput && weightInput.value) || 10);
+      pool.push({ giftId: gId, weight });
+    });
+
+    if (pool.length === 0) {
+      showToast("Выбери хотя бы один подарок в состав кейса!");
+      return;
+    }
+
+    const uploadedDataUrl = await readImageFileAsDataUrl(document.getElementById("admCaseImgFile"));
+    const finalImg = uploadedDataUrl || imgUrlInput;
+
+    const newCase = {
+      id: "case_" + Date.now(),
+      title,
+      price,
+      tag,
+      desc,
+      emoji: "🎁",
+      img: finalImg,
+      pool
+    };
+
+    state.cases.push(newCase);
+    state.selectedCaseId = newCase.id;
+    saveState();
+
+    document.getElementById("admCaseTitle").value = "";
+    document.getElementById("admCasePrice").value = "";
+    document.getElementById("admCaseDesc").value = "";
+    document.getElementById("admCaseImgUrl").value = "";
+    document.getElementById("admCaseImgFile").value = "";
+
+    renderCases();
+    renderSelectedCaseDetails();
+    renderAdmin();
+    showToast(`Кейс «${title}» создан!`);
+  }
+
+  function adminDeleteCase(caseId) {
+    if (state.cases.length <= 1) {
+      showToast("Должен остаться хотя бы 1 кейс!");
+      return;
+    }
+    state.cases = state.cases.filter(c => c.id !== caseId);
+    if (state.selectedCaseId === caseId) {
+      state.selectedCaseId = state.cases[0].id;
+    }
+    saveState();
+    renderCases();
+    renderSelectedCaseDetails();
+    renderAdmin();
+    showToast("Кейс удалён");
+  }
+
+  function adminDeleteGift(giftId) {
+    state.gifts = state.gifts.filter(g => g.id !== giftId);
+    state.cases.forEach(c => {
+      c.pool = (c.pool || []).filter(p => p.giftId !== giftId);
+    });
+    saveState();
+    renderSelectedCaseDetails();
+    renderAdmin();
+    showToast("Подарок удалён");
+  }
+
+  function renderAdmin() {
+    // 1. Checkboxes of gifts for creating a new case
+    const builder = document.getElementById("admNewCaseGiftsList");
+    builder.innerHTML = state.gifts.map(g => `
+      <div class="pool-builder-item">
+        <label style="display:flex;align-items:center;gap:8px;flex:1;font-size:12px;cursor:pointer;">
+          <input type="checkbox" class="adm-case-gift-check" data-gift-id="${g.id}" />
+          ${g.img ? `<img src="${g.img}" />` : `<span>${g.emoji || "🎁"}</span>`}
+          <span><b>${g.name}</b> (${g.price} GRAM)</span>
+        </label>
+        <input type="number" class="input adm-case-gift-weight" data-gift-id="${g.id}" value="15" min="1" style="width:68px;padding:5px 8px;font-size:12px;" title="Шанс (вес)" />
+      </div>
+    `).join("");
+
+    // 2. Existing cases list
+    document.getElementById("admCasesManageList").innerHTML = state.cases.map(c => `
+      <div class="admin-list-row">
+        <span><b>${c.title}</b> — ${c.price} GRAM (${(c.pool || []).length} подарков)</span>
+        <button class="btn-del" onclick="adminDeleteCase('${c.id}')">Удалить</button>
+      </div>
+    `).join("");
+
+    // 3. Existing gifts list
+    document.getElementById("admGiftsManageList").innerHTML = state.gifts.map(g => `
+      <div class="admin-list-row">
+        <span>${g.emoji || "🎁"} <b>${g.name}</b> — ${g.price} GRAM ${g.isNft ? "⭐NFT" : ""}</span>
+        <button class="btn-del" onclick="adminDeleteGift('${g.id}')">Удалить</button>
+      </div>
+    `).join("");
+  }
+
+  function exportConfigJson() {
+    const dataStr = JSON.stringify({ gifts: state.gifts, cases: state.cases }, null, 2);
+    navigator.clipboard.writeText(dataStr).then(() => {
+      showToast("JSON кейсов и подарков скопирован!");
+    }).catch(() => {
+      alert(dataStr);
+    });
+  }
+
+  function resetDefaultData() {
+    localStorage.removeItem(STORAGE_KEY);
+    loadState();
+    renderCases();
+    renderSelectedCaseDetails();
+    renderAdmin();
+    showToast("База сброшена к стандартной");
+  }
+
+  // Init
+  loadState();
+  initTelegram();
+  renderBalance();
+  renderCases();
+  renderSelectedCaseDetails();
+</script>
 </body>
 </html>
