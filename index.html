@@ -2019,6 +2019,7 @@
   const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
+  const CASE_SPIN_DURATION_MS = 2600;
 
   const INITIAL_CASES = [
     {
@@ -2236,13 +2237,17 @@
   async function fetchRemoteState(notify = false) {
     setDbBadge("warn", "Загрузка базы...");
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data`;
       const res = await fetch(url, {
+        signal: controller.signal,
         headers: {
           apikey: SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
         }
       });
+      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rows = await res.json();
       if (Array.isArray(rows) && rows.length && rows[0].data && Array.isArray(rows[0].data.cases) && rows[0].data.cases.length) {
@@ -2253,7 +2258,7 @@
         saveApp();
         renderCasesGrid();
         renderLiveNftStrip();
-        if (appState.openedCaseId) renderOpenCase();
+        if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
         if (isAdminUser()) {
           renderBalance();
           renderAdminUI();
@@ -2275,9 +2280,12 @@
     if (!isAdminUser()) return;
     setDbBadge("warn", "Сохранение в базу...");
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
       const url = `${SUPABASE_URL}/rest/v1/app_state?on_conflict=id`;
       const res = await fetch(url, {
         method: "POST",
+        signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
           apikey: SUPABASE_PUBLISHABLE_KEY,
@@ -2293,6 +2301,7 @@
           updated_at: new Date().toISOString()
         }])
       });
+      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setDbBadge("ok", "Синхронизировано");
       if (notify) showToast("Сохранено в общую базу");
@@ -2407,7 +2416,7 @@
 
   /* Visual Balance (Admin only) */
   function openVisModal() { if (isAdminUser()) openModal("visModal"); }
-  async function addVisualBal(amount) {
+  function addVisualBal(amount) {
     if (!isAdminUser()) return;
     const v = Math.round(Number(amount) * 100) / 100;
     if (!v || v < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
@@ -2415,7 +2424,7 @@
     renderBalance();
     updateCaseButtonText();
     closeModal("visModal");
-    await pushRemoteState(false);
+    pushRemoteState(false);
     showToast(`Добавлено +${fmt(v)} GRAM`);
   }
 
@@ -2451,7 +2460,7 @@
       renderBalance();
       updateCaseButtonText();
       closeModal("depModal");
-      await pushRemoteState(false);
+      pushRemoteState(false);
       sendBotData({
         action: "real_deposit",
         amount: amt,
@@ -2472,7 +2481,7 @@
     openModal("wdModal");
   }
 
-  async function confirmWithdraw() {
+  function confirmWithdraw() {
     if (!isAdminUser()) return;
     const wallet = document.getElementById("wdWalletInp").value.trim();
     const amt = Math.round(Number(document.getElementById("wdAmtInp").value) * 100) / 100;
@@ -2484,7 +2493,7 @@
     appState.balance = Math.round((appState.balance - amt) * 100) / 100;
     renderBalance();
     closeModal("wdModal");
-    await pushRemoteState(false);
+    pushRemoteState(false);
     sendBotData({
       action: "withdraw_gram",
       requestId: "wd_" + Date.now(),
@@ -2780,6 +2789,9 @@
 
   function spinOpenedCase(c) {
     clearTimeout(caseSpinTimer);
+    appState.spinningCase = true;
+    updateCaseButtonText();
+
     const pool = Array.isArray(c.pool) ? c.pool : [];
     const totalW = pool.reduce((s, g) => s + (Number(g.weight) || 1), 0);
     let won;
@@ -2794,18 +2806,16 @@
     if (isAdminUser()) {
       appState.balance = Math.max(0, Math.round((appState.balance - Number(c.price)) * 100) / 100);
       renderBalance();
+      saveApp();
       pushRemoteState(false);
     } else {
       saveApp();
     }
 
-    appState.spinningCase = true;
-    updateCaseButtonText();
-
-    const winIdx = 22;
+    const winIdx = 36;
     const basePool = pool.length ? pool : [won];
     const tape = [];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 46; i++) {
       tape.push(i === winIdx ? won : basePool[Math.floor(Math.random() * basePool.length)]);
     }
 
@@ -2822,7 +2832,7 @@
       const step = cardW + 8;
       const shift = Math.round(winIdx * step + cardW / 2);
 
-      track.style.transition = "transform 2.4s cubic-bezier(0.14, 0.86, 0.22, 1)";
+      track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.11, 0.88, 0.18, 1)`;
       track.style.transform = `translate3d(-${shift}px, 0, 0)`;
     });
 
@@ -2832,7 +2842,7 @@
       updateCaseButtonText();
       renderLiveNftStrip();
       showToast(`NFT в инвентаре: ${won.name} (${fmt(won.price)} GRAM)`);
-    }, 2500);
+    }, CASE_SPIN_DURATION_MS + 80);
   }
 
   /* Admin Case & Gift Actions */
