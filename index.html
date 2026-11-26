@@ -1762,12 +1762,10 @@
   <!-- 5. ADMIN (ID 5200591975) -->
   <div id="sec-admin" class="sec">
     <div class="card">
-      <div class="card-title">🗄️ Общая база данных (Supabase)</div>
-      <div class="info-line">
-        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Локальный кэш</b></span>
-        <button class="btn-edit-sm" onclick="fetchRemoteState(true)">Загрузить</button>
+      <div class="card-title">🗄️ Автосинхронизация каталога</div>
+      <div class="info-line" style="margin-bottom:0;">
+        <span>Режим: <b style="color:var(--cyan);" id="dbStatusText">Авто (Supabase)</b></span>
       </div>
-      <button class="btn-purple" onclick="pushRemoteState(true)">Сохранить базу сейчас</button>
     </div>
 
     <div class="card">
@@ -1982,7 +1980,7 @@
   const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_nft_all_v2";
+  const SAVE_KEY = "mellstroy_gift_nft_all_v3";
   const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
@@ -2063,7 +2061,7 @@
     editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
-    dbStatus: "Локальный кэш",
+    dbStatus: "Авто (Supabase)",
     lastUpdatedAt: 0,
     /* Rocket */
     rocketPhase: "countdown",
@@ -2128,7 +2126,7 @@
     t.textContent = msg;
     t.style.display = "block";
     clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 2400);
+    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 2200);
   }
 
   function setInp(id, val) {
@@ -2194,17 +2192,16 @@
     saveApp();
   }
 
-  function scheduleSyncAfterEdit() {
+  function autoSaveCatalog() {
     appState.lastUpdatedAt = Date.now();
     saveApp();
     clearTimeout(pushDebounceTimer);
     pushDebounceTimer = setTimeout(() => {
-      pushRemoteState(false);
-    }, 250);
+      pushRemoteState();
+    }, 150);
   }
 
-  /* Two-way Supabase state sync so edits persist across reloads and reach all players */
-  async function fetchRemoteState(notify = false) {
+  async function fetchRemoteState() {
     try {
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data`;
       const res = await fetch(url, {
@@ -2220,9 +2217,8 @@
         const remoteUpdatedAt = Number(rows[0].data.updatedAt) || 0;
         const remoteCases = normalizeCases(rows[0].data.cases);
 
-        /* If admin has newer local edits that failed to push earlier, push them instead of overwriting */
         if (isAdminUser() && appState.lastUpdatedAt > remoteUpdatedAt + 1000) {
-          await pushRemoteState(notify);
+          await pushRemoteState();
           return;
         }
 
@@ -2236,7 +2232,7 @@
         }
         saveApp();
 
-        if (casesChanged || notify) {
+        if (casesChanged) {
           renderCasesGrid();
           renderLiveNftStrip();
           if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
@@ -2245,18 +2241,16 @@
           renderBalance();
           renderAdminUI();
         }
-        setDbBadge("Онлайн (Supabase)");
-        if (notify) showToast("Синхронизировано с базой");
+        setDbBadge("Авто (онлайн)");
       } else if (isAdminUser() && appState.cases.length) {
-        await pushRemoteState(notify);
+        await pushRemoteState();
       }
     } catch (err) {
-      setDbBadge("Офлайн / кэш");
-      if (notify) showToast("Ошибка сети с Supabase");
+      setDbBadge("Авто (кэш)");
     }
   }
 
-  async function pushRemoteState(notify = false) {
+  async function pushRemoteState() {
     appState.lastUpdatedAt = Date.now();
     saveApp();
     if (!isAdminUser()) return;
@@ -2279,15 +2273,10 @@
           }
         }])
       });
-      if (!res.ok) {
-        const errTxt = await res.text().catch(() => "");
-        throw new Error(`HTTP ${res.status} ${errTxt}`);
-      }
-      setDbBadge("Сохранено в базе");
-      if (notify) showToast("Сохранено в базу для всех игроков");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setDbBadge("Авто (онлайн)");
     } catch (err) {
-      setDbBadge("Ошибка записи в БД");
-      if (notify) showToast("Не записалось в БД — проверь RLS/таблицу");
+      setDbBadge("Авто (кэш)");
     }
   }
 
@@ -2414,7 +2403,7 @@
     const v = Math.round(Number(amount) * 100) / 100;
     if (!v || v < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     appState.balance = Math.round((appState.balance + v) * 100) / 100;
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderBalance();
     updateCaseButtonText();
     closeModal("visModal");
@@ -2452,7 +2441,7 @@
         messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
       });
       appState.balance = Math.round((appState.balance + amt) * 100) / 100;
-      scheduleSyncAfterEdit();
+      autoSaveCatalog();
       renderBalance();
       updateCaseButtonText();
       closeModal("depModal");
@@ -2486,7 +2475,7 @@
     const tg = window.Telegram && window.Telegram.WebApp;
     if (!tg || typeof tg.sendData !== "function" || !tg.initData) { showToast("Открой через кнопку бота"); return; }
     appState.balance = Math.round((appState.balance - amt) * 100) / 100;
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderBalance();
     closeModal("wdModal");
     sendBotData({
@@ -2545,7 +2534,7 @@
   }
 
   function mediaHtml(img, fb = "💎") {
-    return img ? `<img src="${img}" alt="" loading="lazy" />` : `<span>${fb}</span>`;
+    return img ? `<img src="${img}" alt="" />` : `<span>${fb}</span>`;
   }
 
   function readImgFile(inp) {
@@ -2759,7 +2748,7 @@
       if (fileData) g.img = fileData;
       else if (url) g.img = url;
       appState.editingGiftId = null;
-      scheduleSyncAfterEdit();
+      autoSaveCatalog();
       closeModal("editGiftModal");
       renderOpenCase();
       renderLiveNftStrip();
@@ -2778,7 +2767,7 @@
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c) return;
     c.pool = (c.pool || []).filter(item => item.id !== giftId);
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderOpenCase();
     renderLiveNftStrip();
     showToast("Подарок удалён из кейса");
@@ -2828,10 +2817,8 @@
 
     void track.offsetWidth;
 
-    const firstCard = track.querySelector(".r-card");
-    const cardW = firstCard ? firstCard.getBoundingClientRect().width : 88;
-    const step = cardW + 8;
-    const shift = Math.round(winIdx * step + cardW / 2);
+    const step = 96;
+    const shift = Math.round(winIdx * step + 44);
 
     track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.08, 0.92, 0.14, 1)`;
     track.style.transform = `translate3d(-${shift}px, 0, 0)`;
@@ -2842,7 +2829,7 @@
       updateCaseButtonText();
       renderLiveNftStrip();
       showToast(`NFT в инвентаре: ${won.name} (${fmt(won.price)} GRAM)`);
-    }, CASE_SPIN_DURATION_MS + 60);
+    }, CASE_SPIN_DURATION_MS + 50);
   }
 
   /* Admin Case & Gift Actions */
@@ -2860,7 +2847,7 @@
     c.title = title; c.price = price; c.tag = tag;
     if (file || url) c.img = file || url;
     document.getElementById("edCaseImgFile").value = "";
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderOpenCase(); renderCasesGrid();
     showToast("Кейс сохранён");
   }
@@ -2881,7 +2868,7 @@
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderOpenCase(); renderLiveNftStrip();
     showToast(`NFT «${name}» добавлен`);
   }
@@ -2899,7 +2886,7 @@
     document.getElementById("newCaseTitle").value = "";
     document.getElementById("newCaseImgUrl").value = "";
     document.getElementById("newCaseImgFile").value = "";
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderCasesGrid(); renderAdminUI();
     showToast(`Кейс «${title}» создан`);
   }
@@ -2919,7 +2906,7 @@
     document.getElementById("admGiftName").value = "";
     document.getElementById("admGiftImgUrl").value = "";
     document.getElementById("admGiftImgFile").value = "";
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderAdminUI(); renderLiveNftStrip();
     showToast(`NFT добавлен в «${c.title}»`);
   }
@@ -2928,7 +2915,7 @@
     if (!isAdminUser()) return;
     if (appState.cases.length <= 1) { showToast("Нужен хотя бы 1 кейс"); return; }
     appState.cases = appState.cases.filter(x => x.id !== cid);
-    scheduleSyncAfterEdit();
+    autoSaveCatalog();
     renderCasesGrid(); renderAdminUI();
     showToast("Кейс удалён");
   }
@@ -3732,7 +3719,7 @@
     playSlots(true);
   }
 
-  /* Instant local boot + live sync for admin and players */
+  /* Instant boot + automatic background sync */
   loadApp();
   initTG();
   renderBalance();
@@ -3740,13 +3727,13 @@
   renderLiveNftStrip();
   renderCasesGrid();
 
-  fetchRemoteState(false);
+  fetchRemoteState();
   clearInterval(livePollTimer);
   livePollTimer = setInterval(() => {
     if (!appState.spinningCase && !appState.upgSpinning && !appState.slotsSpinning && !appState.plinkoDropping) {
-      fetchRemoteState(false);
+      fetchRemoteState();
     }
-  }, 5000);
+  }, 4000);
 </script>
 </body>
 </html>
