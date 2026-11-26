@@ -233,16 +233,6 @@
       box-shadow: 0 0 8px var(--green);
     }
 
-    .live-dot.warn {
-      background: var(--gold);
-      box-shadow: 0 0 8px var(--gold);
-    }
-
-    .live-dot.err {
-      background: var(--red);
-      box-shadow: 0 0 8px var(--red);
-    }
-
     .live-card {
       width: 54px;
       height: 54px;
@@ -1797,8 +1787,8 @@
     <div class="card">
       <div class="card-title">🗄️ Общая база данных (Supabase)</div>
       <div class="info-line">
-        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Готово</b></span>
-        <button class="btn-edit-sm" onclick="fetchRemoteState(true)">Обновить</button>
+        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Локальный режим</b></span>
+        <button class="btn-edit-sm" onclick="fetchRemoteState(true)">Загрузить</button>
       </div>
       <button class="btn-purple" onclick="pushRemoteState(true)">Сохранить базу сейчас</button>
     </div>
@@ -2019,7 +2009,7 @@
   const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
-  const CASE_SPIN_DURATION_MS = 2600;
+  const CASE_SPIN_DURATION_MS = 2700;
 
   const INITIAL_CASES = [
     {
@@ -2108,8 +2098,7 @@
     editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
-    dbStatus: "Кэш загружен",
-    dbMode: "ok",
+    dbStatus: "Локальный режим",
     /* Rocket */
     rocketPhase: "countdown",
     rocketCountdownSec: 3,
@@ -2159,8 +2148,7 @@
     return Number(appState.userId) === ADMIN_ID;
   }
 
-  function setDbBadge(mode, text) {
-    appState.dbMode = mode;
+  function setDbBadge(text) {
     appState.dbStatus = text;
     const el = document.getElementById("dbStatusText");
     if (el) el.textContent = text;
@@ -2234,44 +2222,37 @@
     saveApp();
   }
 
+  /* Manual Supabase sync only from Admin panel */
   async function fetchRemoteState(notify = false) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data`;
       const res = await fetch(url, {
-        signal: controller.signal,
         headers: {
           apikey: SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
         }
       });
-      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rows = await res.json();
       if (Array.isArray(rows) && rows.length && rows[0].data && Array.isArray(rows[0].data.cases) && rows[0].data.cases.length) {
-        const remoteCases = normalizeCases(rows[0].data.cases);
-        const changed = JSON.stringify(remoteCases) !== JSON.stringify(appState.cases);
-        appState.cases = remoteCases;
+        appState.cases = normalizeCases(rows[0].data.cases);
         if (isAdminUser() && typeof rows[0].data.balance === "number") {
           appState.balance = rows[0].data.balance;
         }
         saveApp();
-        if (changed || notify) {
-          renderCasesGrid();
-          renderLiveNftStrip();
-          if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
-          if (isAdminUser()) {
-            renderBalance();
-            renderAdminUI();
-          }
+        renderCasesGrid();
+        renderLiveNftStrip();
+        if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
+        if (isAdminUser()) {
+          renderBalance();
+          renderAdminUI();
         }
-        setDbBadge("ok", "Синхронизировано с базой");
-        if (notify) showToast("База обновлена");
+        setDbBadge("Загружено из базы");
+        if (notify) showToast("База загружена из Supabase");
       }
     } catch (err) {
-      setDbBadge("warn", "Локальный кэш");
-      if (notify) showToast("Используется локальный кэш");
+      setDbBadge("Локальный режим");
+      if (notify) showToast("Не удалось загрузить базу");
     }
   }
 
@@ -2279,12 +2260,9 @@
     saveApp();
     if (!isAdminUser()) return;
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
       const url = `${SUPABASE_URL}/rest/v1/app_state?on_conflict=id`;
       const res = await fetch(url, {
         method: "POST",
-        signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
           apikey: SUPABASE_PUBLISHABLE_KEY,
@@ -2300,12 +2278,11 @@
           updated_at: new Date().toISOString()
         }])
       });
-      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDbBadge("ok", "Сохранено в базе");
-      if (notify) showToast("Сохранено в общую базу");
+      setDbBadge("Сохранено в базе");
+      if (notify) showToast("Сохранено в базу");
     } catch (err) {
-      setDbBadge("warn", "Сохранено локально");
+      setDbBadge("Локальный режим");
       if (notify) showToast("Сохранено локально");
     }
   }
@@ -2394,12 +2371,11 @@
       ? allNfts.slice(0, 6)
       : AUTO_NFT_TEMPLATES.map((t, i) => ({ name: t.name, price: (i + 1) * 12, icon: t.icon, badge: "NFT" }));
 
-    const dotCls = appState.dbMode === "ok" ? "" : (appState.dbMode === "err" ? "err" : "warn");
     document.getElementById("liveNftStrip").innerHTML = `
-      <div class="live-label"><span class="live-dot ${dotCls}"></span>NFT Live</div>
+      <div class="live-label"><span class="live-dot"></span>NFT Live</div>
       ${cards.map(g => `
         <div class="live-card" title="${g.name} · ${fmt(g.price)} GRAM">
-          ${g.img ? `<img src="${g.img}" alt="" loading="lazy" />` : `<span>${g.icon || "💎"}</span><span class="live-nft-tag">NFT</span>`}
+          ${g.img ? `<img src="${g.img}" alt="" />` : `<span>${g.icon || "💎"}</span><span class="live-nft-tag">NFT</span>`}
         </div>
       `).join("")}
     `;
@@ -2420,10 +2396,10 @@
     const v = Math.round(Number(amount) * 100) / 100;
     if (!v || v < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     appState.balance = Math.round((appState.balance + v) * 100) / 100;
+    saveApp();
     renderBalance();
     updateCaseButtonText();
     closeModal("visModal");
-    pushRemoteState(false);
     showToast(`Добавлено +${fmt(v)} GRAM`);
   }
 
@@ -2456,10 +2432,10 @@
         messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
       });
       appState.balance = Math.round((appState.balance + amt) * 100) / 100;
+      saveApp();
       renderBalance();
       updateCaseButtonText();
       closeModal("depModal");
-      pushRemoteState(false);
       sendBotData({
         action: "real_deposit",
         amount: amt,
@@ -2490,9 +2466,9 @@
     const tg = window.Telegram && window.Telegram.WebApp;
     if (!tg || typeof tg.sendData !== "function" || !tg.initData) { showToast("Открой через кнопку бота"); return; }
     appState.balance = Math.round((appState.balance - amt) * 100) / 100;
+    saveApp();
     renderBalance();
     closeModal("wdModal");
-    pushRemoteState(false);
     sendBotData({
       action: "withdraw_gram",
       requestId: "wd_" + Date.now(),
@@ -2539,7 +2515,7 @@
   }
 
   function mediaHtml(img, fb = "💎") {
-    return img ? `<img src="${img}" alt="" loading="lazy" />` : `<span>${fb}</span>`;
+    return img ? `<img src="${img}" alt="" />` : `<span>${fb}</span>`;
   }
 
   function readImgFile(inp) {
@@ -2603,11 +2579,7 @@
     document.getElementById("casesListView").style.display = "none";
     document.getElementById("caseOpenView").style.display = "block";
     if (c) document.getElementById("openCaseTitle").textContent = c.title;
-    updateCaseButtonText();
-
-    requestAnimationFrame(() => {
-      renderOpenCase();
-    });
+    renderOpenCase();
   }
 
   function goBackToCases() {
@@ -2730,7 +2702,7 @@
     openModal("editGiftModal");
   }
 
-  async function saveEditedGiftInCase() {
+  function saveEditedGiftInCase() {
     if (!isAdminUser()) return;
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c || !appState.editingGiftId) return;
@@ -2743,38 +2715,42 @@
     const badge = document.getElementById("modalGiftBadge").value.trim() || "NFT";
     const icon = document.getElementById("modalGiftIcon").value.trim() || "💎";
     const url = document.getElementById("modalGiftImgUrl").value.trim();
-    const file = await readImgFile(document.getElementById("modalGiftImgFile"));
+    const fileInput = document.getElementById("modalGiftImgFile");
 
     if (!name) { showToast("Введи название подарка"); return; }
     if (!price || price < MIN_GRAM) { showToast("Цена от 0.01 GRAM"); return; }
 
-    g.name = name;
-    g.price = price;
-    g.weight = weight;
-    g.badge = badge;
-    g.icon = icon;
-    if (file) {
-      g.img = file;
-    } else if (url) {
-      g.img = url;
-    }
+    const applyChanges = (fileData) => {
+      g.name = name;
+      g.price = price;
+      g.weight = weight;
+      g.badge = badge;
+      g.icon = icon;
+      if (fileData) g.img = fileData;
+      else if (url) g.img = url;
+      appState.editingGiftId = null;
+      saveApp();
+      closeModal("editGiftModal");
+      renderOpenCase();
+      renderLiveNftStrip();
+      showToast(`Подарок «${g.name}» обновлён`);
+    };
 
-    appState.editingGiftId = null;
-    closeModal("editGiftModal");
-    renderOpenCase();
-    renderLiveNftStrip();
-    await pushRemoteState(false);
-    showToast(`Подарок «${g.name}» обновлён`);
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      readImgFile(fileInput).then(applyChanges);
+    } else {
+      applyChanges("");
+    }
   }
 
-  async function deleteGiftFromOpenedCase(giftId) {
+  function deleteGiftFromOpenedCase(giftId) {
     if (!isAdminUser()) return;
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c) return;
     c.pool = (c.pool || []).filter(item => item.id !== giftId);
+    saveApp();
     renderOpenCase();
     renderLiveNftStrip();
-    await pushRemoteState(false);
     showToast("Подарок удалён из кейса");
   }
 
@@ -2820,17 +2796,13 @@
     track.style.transform = "translate3d(0px, 0, 0)";
     track.innerHTML = tape.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
 
-    void track.offsetWidth;
+    const firstCard = track.querySelector(".r-card");
+    const cardW = firstCard ? firstCard.getBoundingClientRect().width : 88;
+    const step = cardW + 8;
+    const shift = Math.round(winIdx * step + cardW / 2);
 
-    requestAnimationFrame(() => {
-      const firstCard = track.querySelector(".r-card");
-      const cardW = firstCard ? firstCard.getBoundingClientRect().width : 88;
-      const step = cardW + 8;
-      const shift = Math.round(winIdx * step + cardW / 2);
-
-      track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.11, 0.88, 0.18, 1)`;
-      track.style.transform = `translate3d(-${shift}px, 0, 0)`;
-    });
+    track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.08, 0.92, 0.14, 1)`;
+    track.style.transform = `translate3d(-${shift}px, 0, 0)`;
 
     caseSpinTimer = setTimeout(() => {
       appState.spinningCase = false;
@@ -2838,7 +2810,7 @@
       updateCaseButtonText();
       renderLiveNftStrip();
       showToast(`NFT в инвентаре: ${won.name} (${fmt(won.price)} GRAM)`);
-    }, CASE_SPIN_DURATION_MS + 80);
+    }, CASE_SPIN_DURATION_MS + 60);
   }
 
   /* Admin Case & Gift Actions */
@@ -2856,8 +2828,8 @@
     c.title = title; c.price = price; c.tag = tag;
     if (file || url) c.img = file || url;
     document.getElementById("edCaseImgFile").value = "";
+    saveApp();
     renderOpenCase(); renderCasesGrid();
-    await pushRemoteState(false);
     showToast("Кейс сохранён");
   }
 
@@ -2877,8 +2849,8 @@
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
+    saveApp();
     renderOpenCase(); renderLiveNftStrip();
-    await pushRemoteState(false);
     showToast(`NFT «${name}» добавлен`);
   }
 
@@ -2895,8 +2867,8 @@
     document.getElementById("newCaseTitle").value = "";
     document.getElementById("newCaseImgUrl").value = "";
     document.getElementById("newCaseImgFile").value = "";
+    saveApp();
     renderCasesGrid(); renderAdminUI();
-    await pushRemoteState(false);
     showToast(`Кейс «${title}» создан`);
   }
 
@@ -2915,22 +2887,22 @@
     document.getElementById("admGiftName").value = "";
     document.getElementById("admGiftImgUrl").value = "";
     document.getElementById("admGiftImgFile").value = "";
+    saveApp();
     renderAdminUI(); renderLiveNftStrip();
-    await pushRemoteState(false);
     showToast(`NFT добавлен в «${c.title}»`);
   }
 
-  async function deleteCaseAdmin(cid) {
+  function deleteCaseAdmin(cid) {
     if (!isAdminUser()) return;
     if (appState.cases.length <= 1) { showToast("Нужен хотя бы 1 кейс"); return; }
     appState.cases = appState.cases.filter(x => x.id !== cid);
+    saveApp();
     renderCasesGrid(); renderAdminUI();
-    await pushRemoteState(false);
     showToast("Кейс удалён");
   }
 
   function renderAdminUI() {
-    setDbBadge(appState.dbMode, appState.dbStatus);
+    setDbBadge(appState.dbStatus);
     document.getElementById("admGiftCaseSel").innerHTML = appState.cases.map(c => `<option value="${c.id}">${c.title} (${fmt(c.price)} GRAM)</option>`).join("");
     document.getElementById("admCasesList").innerHTML = appState.cases.map(c => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
@@ -2993,7 +2965,7 @@
     switchNav("upgrader");
   }
 
-  /* ROCKET (Continuous Online Loop + NFT Rewards) */
+  /* ROCKET */
   function buildRocketRoundFeed() {
     const picked = [...ROCKET_BOT_POOL]
       .sort(() => Math.random() - 0.5)
@@ -3236,7 +3208,7 @@
     renderRocketUI();
   }
 
-  /* UPGRADER (Auto-NFT target by stake & chance + exact wheel angle) */
+  /* UPGRADER */
   function getAllTargets() {
     const out = [];
     for (const c of appState.cases) {
@@ -3352,14 +3324,12 @@
   }
 
   function applyChancePreset(preset) {
-    const srcVal = getSourceValue() || Number(document.getElementById("upgPickGramInp")?.value) || 10;
     let next = 50;
     if (typeof preset === "number") {
       next = preset;
     } else {
       const mult = preset === "x2" ? 2 : (preset === "x4" ? 4 : 8);
       next = (100 / mult) * HOUSE_RTP;
-      void srcVal;
     }
     appState.upgChance = Math.max(5, Math.min(85, Math.round(next * 10) / 10));
     syncAutoUpgradeTarget();
@@ -3432,7 +3402,7 @@
     }, 2550);
   }
 
-  /* MINES (NFT prize on cashout) */
+  /* MINES */
   function newMinesRound() {
     if (appState.minesActive) { showToast("Сначала забери или доиграй"); return; }
     const bet = Math.round(Number(document.getElementById("minesBet").value) * 100) / 100;
@@ -3493,7 +3463,7 @@
     }).join("");
   }
 
-  /* PLINKO (4 Difficulties + Medium Speed Ball + NFT Reward) */
+  /* PLINKO */
   function setPlinkoDiff(diff) {
     if (appState.plinkoDropping) return;
     appState.plinkoDiff = diff;
@@ -3586,7 +3556,7 @@
     }, 220);
   }
 
-  /* SLOTS 6x5 (NFT Reward) */
+  /* SLOTS 6x5 */
   function initSlotsGrid() {
     if (appState.slotsGrid.length !== 30) {
       appState.slotsGrid = Array.from({ length: 30 }, () => SLOT_SYMS[Math.floor(Math.random() * SLOT_SYMS.length)]);
@@ -3721,7 +3691,7 @@
     playSlots(true);
   }
 
-  /* Boot */
+  /* Instant Local Boot (Zero Network Requests on Startup) */
   loadApp();
   initTG();
   initTON();
@@ -3734,7 +3704,6 @@
   renderMinesUI();
   renderPlinkoUI();
   renderSlotsUI();
-  setTimeout(() => { fetchRemoteState(false); }, 50);
 </script>
 </body>
 </html>
