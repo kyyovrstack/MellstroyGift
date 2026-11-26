@@ -1982,7 +1982,7 @@
   const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_nft_all_v1";
+  const SAVE_KEY = "mellstroy_gift_nft_all_v2";
   const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
@@ -2045,22 +2045,10 @@
   ];
 
   const PLINKO_MODES = {
-    easy: {
-      mults: [1.8, 1.4, 1.1, 0.9, 0.8, 0.9, 1.1, 1.4, 1.8],
-      biasCenter: 0.58
-    },
-    medium: {
-      mults: [3.2, 1.8, 1.1, 0.7, 0.5, 0.7, 1.1, 1.8, 3.2],
-      biasCenter: 0.50
-    },
-    hard: {
-      mults: [7.0, 2.8, 1.3, 0.5, 0.25, 0.5, 1.3, 2.8, 7.0],
-      biasCenter: 0.44
-    },
-    extreme: {
-      mults: [16.0, 4.5, 1.5, 0.3, 0.1, 0.3, 1.5, 4.5, 16.0],
-      biasCenter: 0.38
-    }
+    easy: { mults: [1.8, 1.4, 1.1, 0.9, 0.8, 0.9, 1.1, 1.4, 1.8], biasCenter: 0.58 },
+    medium: { mults: [3.2, 1.8, 1.1, 0.7, 0.5, 0.7, 1.1, 1.8, 3.2], biasCenter: 0.50 },
+    hard: { mults: [7.0, 2.8, 1.3, 0.5, 0.25, 0.5, 1.3, 2.8, 7.0], biasCenter: 0.44 },
+    extreme: { mults: [16.0, 4.5, 1.5, 0.3, 0.1, 0.3, 1.5, 4.5, 16.0], biasCenter: 0.38 }
   };
 
   const SLOT_SYMS = ["🐸", "🚀", "🫐", "👑", "📅", "🍭", "🧱", "🐒", "🐈‍⬛", "💋"];
@@ -2076,6 +2064,7 @@
     walletAddr: "",
     spinningCase: false,
     dbStatus: "Локальный кэш",
+    lastUpdatedAt: 0,
     /* Rocket */
     rocketPhase: "countdown",
     rocketCountdownSec: 3,
@@ -2117,6 +2106,8 @@
   let tonSdkPromise = null;
   let autoSpinTimer = null;
   let caseSpinTimer = null;
+  let pushDebounceTimer = null;
+  let livePollTimer = null;
 
   function fmt(v) {
     return (Number(v) || 0).toFixed(2);
@@ -2137,7 +2128,7 @@
     t.textContent = msg;
     t.style.display = "block";
     clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 2300);
+    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 2400);
   }
 
   function setInp(id, val) {
@@ -2179,7 +2170,8 @@
       localStorage.setItem(SAVE_KEY, JSON.stringify({
         balance: appState.balance,
         cases: appState.cases,
-        inventory: appState.inventory
+        inventory: appState.inventory,
+        lastUpdatedAt: appState.lastUpdatedAt
       }));
     } catch (e) {}
   }
@@ -2191,20 +2183,32 @@
         appState.balance = Number(raw.balance) || 0;
         appState.cases = normalizeCases(raw.cases);
         appState.inventory = Array.isArray(raw.inventory) ? raw.inventory : [];
+        appState.lastUpdatedAt = Number(raw.lastUpdatedAt) || 0;
         return;
       }
     } catch (e) {}
     appState.balance = 0.00;
     appState.cases = normalizeCases(JSON.parse(JSON.stringify(INITIAL_CASES)));
     appState.inventory = [];
+    appState.lastUpdatedAt = 0;
     saveApp();
   }
 
-  /* Non-blocking background sync with Supabase */
+  function scheduleSyncAfterEdit() {
+    appState.lastUpdatedAt = Date.now();
+    saveApp();
+    clearTimeout(pushDebounceTimer);
+    pushDebounceTimer = setTimeout(() => {
+      pushRemoteState(false);
+    }, 250);
+  }
+
+  /* Two-way Supabase state sync so edits persist across reloads and reach all players */
   async function fetchRemoteState(notify = false) {
     try {
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data`;
       const res = await fetch(url, {
+        cache: "no-store",
         headers: {
           apikey: SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
@@ -2213,14 +2217,26 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rows = await res.json();
       if (Array.isArray(rows) && rows.length && rows[0].data && Array.isArray(rows[0].data.cases) && rows[0].data.cases.length) {
-        const nextCases = normalizeCases(rows[0].data.cases);
-        const changed = JSON.stringify(nextCases) !== JSON.stringify(appState.cases);
-        appState.cases = nextCases;
+        const remoteUpdatedAt = Number(rows[0].data.updatedAt) || 0;
+        const remoteCases = normalizeCases(rows[0].data.cases);
+
+        /* If admin has newer local edits that failed to push earlier, push them instead of overwriting */
+        if (isAdminUser() && appState.lastUpdatedAt > remoteUpdatedAt + 1000) {
+          await pushRemoteState(notify);
+          return;
+        }
+
+        const casesChanged = JSON.stringify(remoteCases) !== JSON.stringify(appState.cases);
+        appState.cases = remoteCases;
+        if (remoteUpdatedAt > appState.lastUpdatedAt) {
+          appState.lastUpdatedAt = remoteUpdatedAt;
+        }
         if (isAdminUser() && typeof rows[0].data.balance === "number") {
           appState.balance = rows[0].data.balance;
         }
         saveApp();
-        if (changed) {
+
+        if (casesChanged || notify) {
           renderCasesGrid();
           renderLiveNftStrip();
           if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
@@ -2229,16 +2245,19 @@
           renderBalance();
           renderAdminUI();
         }
-        setDbBadge("Синхронизировано");
-        if (notify) showToast("База загружена");
+        setDbBadge("Онлайн (Supabase)");
+        if (notify) showToast("Синхронизировано с базой");
+      } else if (isAdminUser() && appState.cases.length) {
+        await pushRemoteState(notify);
       }
     } catch (err) {
-      setDbBadge("Локальный кэш");
-      if (notify) showToast("Ошибка загрузки базы");
+      setDbBadge("Офлайн / кэш");
+      if (notify) showToast("Ошибка сети с Supabase");
     }
   }
 
   async function pushRemoteState(notify = false) {
+    appState.lastUpdatedAt = Date.now();
     saveApp();
     if (!isAdminUser()) return;
     try {
@@ -2255,17 +2274,20 @@
           id: STATE_ROW_ID,
           data: {
             balance: appState.balance,
-            cases: appState.cases
-          },
-          updated_at: new Date().toISOString()
+            cases: appState.cases,
+            updatedAt: appState.lastUpdatedAt
+          }
         }])
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const errTxt = await res.text().catch(() => "");
+        throw new Error(`HTTP ${res.status} ${errTxt}`);
+      }
       setDbBadge("Сохранено в базе");
-      if (notify) showToast("Сохранено в базу");
+      if (notify) showToast("Сохранено в базу для всех игроков");
     } catch (err) {
-      setDbBadge("Локальный кэш");
-      if (notify) showToast("Сохранено локально");
+      setDbBadge("Ошибка записи в БД");
+      if (notify) showToast("Не записалось в БД — проверь RLS/таблицу");
     }
   }
 
@@ -2302,7 +2324,6 @@
     }
   }
 
-  /* Lazy TON Connect loader — zero network blocking on startup */
   function ensureTonConnect() {
     if (tonConnectUI) return Promise.resolve(tonConnectUI);
     if (tonSdkPromise) return tonSdkPromise;
@@ -2393,7 +2414,7 @@
     const v = Math.round(Number(amount) * 100) / 100;
     if (!v || v < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     appState.balance = Math.round((appState.balance + v) * 100) / 100;
-    saveApp();
+    scheduleSyncAfterEdit();
     renderBalance();
     updateCaseButtonText();
     closeModal("visModal");
@@ -2431,7 +2452,7 @@
         messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
       });
       appState.balance = Math.round((appState.balance + amt) * 100) / 100;
-      saveApp();
+      scheduleSyncAfterEdit();
       renderBalance();
       updateCaseButtonText();
       closeModal("depModal");
@@ -2465,7 +2486,7 @@
     const tg = window.Telegram && window.Telegram.WebApp;
     if (!tg || typeof tg.sendData !== "function" || !tg.initData) { showToast("Открой через кнопку бота"); return; }
     appState.balance = Math.round((appState.balance - amt) * 100) / 100;
-    saveApp();
+    scheduleSyncAfterEdit();
     renderBalance();
     closeModal("wdModal");
     sendBotData({
@@ -2738,7 +2759,7 @@
       if (fileData) g.img = fileData;
       else if (url) g.img = url;
       appState.editingGiftId = null;
-      pushRemoteState(false);
+      scheduleSyncAfterEdit();
       closeModal("editGiftModal");
       renderOpenCase();
       renderLiveNftStrip();
@@ -2757,7 +2778,7 @@
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c) return;
     c.pool = (c.pool || []).filter(item => item.id !== giftId);
-    pushRemoteState(false);
+    scheduleSyncAfterEdit();
     renderOpenCase();
     renderLiveNftStrip();
     showToast("Подарок удалён из кейса");
@@ -2805,7 +2826,6 @@
     track.style.transform = "translate3d(0px, 0, 0)";
     track.innerHTML = tape.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
 
-    /* Force reflow so browser registers translate3d(0,0,0) before starting transition */
     void track.offsetWidth;
 
     const firstCard = track.querySelector(".r-card");
@@ -2840,7 +2860,7 @@
     c.title = title; c.price = price; c.tag = tag;
     if (file || url) c.img = file || url;
     document.getElementById("edCaseImgFile").value = "";
-    pushRemoteState(false);
+    scheduleSyncAfterEdit();
     renderOpenCase(); renderCasesGrid();
     showToast("Кейс сохранён");
   }
@@ -2861,7 +2881,7 @@
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
-    pushRemoteState(false);
+    scheduleSyncAfterEdit();
     renderOpenCase(); renderLiveNftStrip();
     showToast(`NFT «${name}» добавлен`);
   }
@@ -2879,7 +2899,7 @@
     document.getElementById("newCaseTitle").value = "";
     document.getElementById("newCaseImgUrl").value = "";
     document.getElementById("newCaseImgFile").value = "";
-    pushRemoteState(false);
+    scheduleSyncAfterEdit();
     renderCasesGrid(); renderAdminUI();
     showToast(`Кейс «${title}» создан`);
   }
@@ -2899,7 +2919,7 @@
     document.getElementById("admGiftName").value = "";
     document.getElementById("admGiftImgUrl").value = "";
     document.getElementById("admGiftImgFile").value = "";
-    pushRemoteState(false);
+    scheduleSyncAfterEdit();
     renderAdminUI(); renderLiveNftStrip();
     showToast(`NFT добавлен в «${c.title}»`);
   }
@@ -2908,7 +2928,7 @@
     if (!isAdminUser()) return;
     if (appState.cases.length <= 1) { showToast("Нужен хотя бы 1 кейс"); return; }
     appState.cases = appState.cases.filter(x => x.id !== cid);
-    pushRemoteState(false);
+    scheduleSyncAfterEdit();
     renderCasesGrid(); renderAdminUI();
     showToast("Кейс удалён");
   }
@@ -2924,7 +2944,7 @@
     `).join("");
   }
 
-  /* Inventory (NFT only + "В апгрейд" and "Продать") */
+  /* Inventory */
   function renderInventoryUI() {
     document.getElementById("invCount").textContent = `${appState.inventory.length} NFT`;
     const grid = document.getElementById("invGrid");
@@ -3712,7 +3732,7 @@
     playSlots(true);
   }
 
-  /* Instant zero-delay boot */
+  /* Instant local boot + live sync for admin and players */
   loadApp();
   initTG();
   renderBalance();
@@ -3720,8 +3740,13 @@
   renderLiveNftStrip();
   renderCasesGrid();
 
-  /* Silent background sync after initial paint */
-  setTimeout(() => { fetchRemoteState(false); }, 600);
+  fetchRemoteState(false);
+  clearInterval(livePollTimer);
+  livePollTimer = setInterval(() => {
+    if (!appState.spinningCase && !appState.upgSpinning && !appState.slotsSpinning && !appState.plinkoDropping) {
+      fetchRemoteState(false);
+    }
+  }, 5000);
 </script>
 </body>
 </html>
