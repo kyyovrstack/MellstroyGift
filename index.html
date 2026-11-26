@@ -18,7 +18,6 @@
       --text: #f8fafc;
       --muted: #94a3b8;
       --danger: #ef4444;
-      --success: #10b981;
     }
 
     * {
@@ -186,7 +185,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 42px;
+      font-size: 40px;
       overflow: hidden;
     }
 
@@ -244,7 +243,7 @@
     /* Roulette */
     .roulette-wrap {
       position: relative;
-      height: 112px;
+      height: 114px;
       background: #0a0c16;
       border: 1px solid rgba(139, 92, 246, 0.4);
       border-radius: 14px;
@@ -275,8 +274,8 @@
     }
 
     .roulette-item {
-      width: 88px;
-      height: 92px;
+      width: 90px;
+      height: 94px;
       flex-shrink: 0;
       background: var(--bg-card-2);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -295,14 +294,10 @@
     }
 
     .roulette-item img {
-      width: 44px;
-      height: 44px;
+      width: 52px;
+      height: 52px;
       object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .roulette-item .r-emoji {
-      font-size: 32px;
+      border-radius: 10px;
     }
 
     .roulette-item .r-name {
@@ -312,7 +307,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 76px;
+      max-width: 78px;
     }
 
     .btn-primary {
@@ -338,7 +333,7 @@
       cursor: not-allowed;
     }
 
-    /* Case Contents Grid (Bottom of selected case) */
+    /* Case Contents Grid */
     .contents-header {
       margin-top: 16px;
       margin-bottom: 10px;
@@ -397,15 +392,14 @@
     }
 
     .gift-thumb {
-      width: 64px;
-      height: 64px;
+      width: 72px;
+      height: 72px;
       margin: 12px 0 8px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.04);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
       overflow: hidden;
     }
 
@@ -413,6 +407,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    .no-img-box {
+      font-size: 10px;
+      color: var(--muted);
+      padding: 4px;
     }
 
     .gift-title {
@@ -435,6 +435,39 @@
       text-decoration: none;
     }
 
+    .btn-remove-gift {
+      margin-top: 7px;
+      width: 100%;
+      background: rgba(239, 68, 68, 0.18);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 8px;
+      padding: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Inline Admin Editor under Selected Case */
+    .inline-case-editor {
+      margin-top: 16px;
+      background: #0d1020;
+      border: 1px dashed rgba(34, 211, 238, 0.5);
+      border-radius: 14px;
+      padding: 12px;
+      display: none;
+    }
+
+    .inline-case-editor.visible {
+      display: block;
+    }
+
+    .inline-case-editor h4 {
+      font-size: 13px;
+      color: var(--neon-cyan);
+      margin-bottom: 10px;
+    }
+
     /* Inventory */
     .inv-actions {
       display: flex;
@@ -445,7 +478,7 @@
 
     .btn-sm {
       flex: 1;
-      padding: 6px 8px;
+      padding: 7px 8px;
       border-radius: 8px;
       border: none;
       font-size: 11px;
@@ -465,7 +498,18 @@
       border: 1px solid rgba(59, 130, 246, 0.4);
     }
 
-    /* Admin Panel */
+    .btn-del {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 5px 9px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Admin Tab */
     .admin-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -481,7 +525,7 @@
     }
 
     .form-group {
-      margin-bottom: 10px;
+      margin-bottom: 9px;
     }
 
     .form-group label {
@@ -493,7 +537,7 @@
 
     .input, .select {
       width: 100%;
-      padding: 10px 12px;
+      padding: 9px 11px;
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.14);
       background: #0b0e1a;
@@ -516,27 +560,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 13px;
+      font-size: 12px;
       margin: 8px 0;
-    }
-
-    .pool-builder-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 8px;
-      background: #0d101e;
-      border-radius: 10px;
-      margin-bottom: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .pool-builder-item img {
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
-      object-fit: cover;
     }
 
     .admin-list-row {
@@ -548,16 +573,7 @@
       border-radius: 10px;
       margin-bottom: 6px;
       font-size: 12px;
-    }
-
-    .btn-del {
-      background: rgba(239, 68, 68, 0.2);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      padding: 4px 8px;
-      border-radius: 7px;
-      cursor: pointer;
-      font-size: 11px;
+      gap: 8px;
     }
 
     /* Bottom Nav */
@@ -627,15 +643,14 @@
     }
 
     .modal-media {
-      width: 96px;
-      height: 96px;
+      width: 104px;
+      height: 104px;
       margin: 12px auto;
       border-radius: 18px;
       background: rgba(255, 255, 255, 0.06);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 54px;
       overflow: hidden;
     }
 
@@ -689,17 +704,15 @@
       <span style="font-size:12px;color:var(--muted);" id="casesCountLabel"></span>
     </div>
 
-    <!-- All Cases List -->
     <div class="cases-grid" id="casesGrid"></div>
 
-    <!-- Selected Case & Its Gifts -->
     <div class="case-detail-box" id="caseDetailBox">
       <div class="case-detail-head">
         <div class="case-detail-info">
-          <h3 id="activeCaseTitle">Mell King</h3>
-          <p id="activeCaseDesc">Нажми на любой кейс выше, чтобы посмотреть состав</p>
+          <h3 id="activeCaseTitle">Кейс</h3>
+          <p id="activeCaseDesc">Нажми на кейс выше</p>
         </div>
-        <div class="case-price" id="activeCasePrice">25 GRAM</div>
+        <div class="case-price" id="activeCasePrice">0 GRAM</div>
       </div>
 
       <div class="roulette-wrap">
@@ -708,15 +721,48 @@
       </div>
 
       <button class="btn-primary" id="openCaseBtn" onclick="spinCase()">
-        Открыть за 25 GRAM
+        Открыть кейс
       </button>
 
       <!-- Gifts inside selected case -->
       <div class="contents-header">
         <span>🎁 Подарки в этом кейсе</span>
-        <span style="font-size:11px;color:var(--muted);" id="activePoolCount">0 шт.</span>
+        <span style="font-size:11px;color:var(--muted);" id="activePoolCount">0 подарков</span>
       </div>
       <div class="gifts-grid" id="caseContentsGrid"></div>
+
+      <!-- Admin-only: Add gift directly to currently clicked case -->
+      <div class="inline-case-editor" id="inlineCaseEditor">
+        <h4>✏️ Редактор кейса «<span id="editorCaseName"></span>» (только для админа)</h4>
+        <div class="form-group">
+          <label>Название подарка</label>
+          <input class="input" id="inGiftName" placeholder="Например: Magic Potion #1182" />
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Цена (GRAM)</label>
+            <input class="input" id="inGiftPrice" type="number" placeholder="220" />
+          </div>
+          <div class="form-group">
+            <label>Вес / шанс (например 15)</label>
+            <input class="input" id="inGiftWeight" type="number" value="15" min="1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ссылка на подарок (необязательно)</label>
+          <input class="input" id="inGiftUrl" placeholder="https://t.me/nft/..." />
+        </div>
+        <div class="form-group">
+          <label>Фото подарка (файл с устройства или ссылка)</label>
+          <input class="input" id="inGiftImgUrl" placeholder="https://... или img/gift.png" style="margin-bottom:6px;" />
+          <input class="input" id="inGiftImgFile" type="file" accept="image/*" />
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="inGiftIsNft" checked />
+          <span>Пометить как NFT</span>
+        </label>
+        <button class="btn-primary" onclick="addGiftToSelectedCase()">+ Добавить подарок в этот кейс</button>
+      </div>
     </div>
   </div>
 
@@ -736,42 +782,8 @@
       <span style="font-size:11px;color:var(--neon-cyan);">ID: 5200591975</span>
     </div>
 
-    <!-- 1. Add New Gift -->
     <div class="admin-card">
-      <h4>1. Добавить новый подарок</h4>
-      <div class="form-group">
-        <label>Название подарка</label>
-        <input class="input" id="admGiftName" placeholder="Например: Magic Potion #1182" />
-      </div>
-      <div class="row-2">
-        <div class="form-group">
-          <label>Цена подарка (GRAM)</label>
-          <input class="input" id="admGiftPrice" type="number" placeholder="220" />
-        </div>
-        <div class="form-group">
-          <label>Эмодзи (если без фото)</label>
-          <input class="input" id="admGiftEmoji" placeholder="🧪" value="🎁" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Ссылка на подарок (t.me/nft/...)</label>
-        <input class="input" id="admGiftUrl" placeholder="https://t.me/nft/MagicPotion-1182" />
-      </div>
-      <div class="form-group">
-        <label>Фото подарка (ссылка или загрузка файла)</label>
-        <input class="input" id="admGiftImgUrl" placeholder="https://... или img/potion.png" style="margin-bottom:6px;" />
-        <input class="input" id="admGiftImgFile" type="file" accept="image/*" />
-      </div>
-      <label class="checkbox-row">
-        <input type="checkbox" id="admGiftIsNft" checked />
-        <span>Это настоящий NFT-подарок (золотая рамка и бейдж NFT)</span>
-      </label>
-      <button class="btn-primary" onclick="adminAddGift()">+ Сохранить подарок</button>
-    </div>
-
-    <!-- 2. Create New Case -->
-    <div class="admin-card">
-      <h4>2. Создать новый кейс</h4>
+      <h4>Создать новый кейс</h4>
       <div class="form-group">
         <label>Название кейса</label>
         <input class="input" id="admCaseTitle" placeholder="Например: Mell VIP" />
@@ -782,38 +794,28 @@
           <input class="input" id="admCasePrice" type="number" placeholder="150" />
         </div>
         <div class="form-group">
-          <label>Тег / бейдж</label>
-          <input class="input" id="admCaseTag" placeholder="NFT DROP" value="NEW" />
+          <label>Тег</label>
+          <input class="input" id="admCaseTag" placeholder="VIP" value="VIP" />
         </div>
       </div>
       <div class="form-group">
-        <label>Описание кейса</label>
-        <input class="input" id="admCaseDesc" placeholder="Топовые NFT подарки Меллстроя" />
+        <label>Описание</label>
+        <input class="input" id="admCaseDesc" placeholder="Описание кейса" />
       </div>
       <div class="form-group">
-        <label>Обложка кейса (URL или загрузка фото)</label>
+        <label>Фото кейса (файл или ссылка)</label>
         <input class="input" id="admCaseImgUrl" placeholder="https://... или оставь пустым" style="margin-bottom:6px;" />
         <input class="input" id="admCaseImgFile" type="file" accept="image/*" />
-      </div>
-      <div class="form-group">
-        <label>Состав кейса (отметь подарки и укажи шанс/вес):</label>
-        <div id="admNewCaseGiftsList"></div>
       </div>
       <button class="btn-primary" onclick="adminCreateCase()">+ Создать кейс</button>
     </div>
 
-    <!-- 3. Manage Existing Cases & Gifts -->
     <div class="admin-card">
-      <h4>3. Управление кейсами и подарками</h4>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Кейсы:</div>
-      <div id="admCasesManageList" style="margin-bottom:12px;"></div>
-
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Все подарки в базе:</div>
-      <div id="admGiftsManageList"></div>
-
-      <div style="display:flex;gap:8px;margin-top:12px;">
+      <h4>Список кейсов</h4>
+      <div id="admCasesManageList"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="btn-sm btn-withdraw" onclick="exportConfigJson()">Скопировать JSON</button>
-        <button class="btn-sm btn-del" onclick="resetDefaultData()">Сбросить по умолчанию</button>
+        <button class="btn-sm btn-del" onclick="clearAllStorage()">Очистить всё</button>
       </div>
     </div>
   </div>
@@ -839,10 +841,10 @@
 <div class="modal-backdrop" id="winModal">
   <div class="modal-card">
     <div style="font-size:12px;color:var(--neon-cyan);font-weight:800;">🎉 ТЕБЕ ВЫПАЛ ПОДАРОК!</div>
-    <div class="modal-media" id="winMedia">🎁</div>
-    <div style="font-size:18px;font-weight:800;" id="winName">Gift Name</div>
-    <div style="font-size:13px;color:var(--gold);font-weight:700;margin-top:4px;" id="winPrice">100 GRAM</div>
-    <a id="winExtLink" href="#" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#a78bfa;">Открыть NFT в Telegram ↗</a>
+    <div class="modal-media" id="winMedia"></div>
+    <div style="font-size:18px;font-weight:800;" id="winName">Gift</div>
+    <div style="font-size:13px;color:var(--gold);font-weight:700;margin-top:4px;" id="winPrice">0 GRAM</div>
+    <a id="winExtLink" href="#" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#a78bfa;">Открыть ссылку ↗</a>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button class="btn-primary" style="background:rgba(255,255,255,0.12);box-shadow:none;" onclick="closeWinModal()">В инвентарь</button>
       <button class="btn-primary" id="winSellNowBtn">Продать</button>
@@ -852,60 +854,31 @@
 
 <script>
   const ADMIN_ID = 5200591975;
-  const STORAGE_KEY = "mellstroy_gift_gram_v1";
+  const STORAGE_KEY = "mellstroy_gift_clean_v2";
 
-  const DEFAULT_GIFTS = [
-    { id: "desk_calendar_6412", emoji: "📅", name: "Desk Calendar #6412", isNft: true, price: 80, img: "", externalUrl: "https://t.me/nft/DeskCalendar-6412" },
-    { id: "myth_mask_106735", emoji: "🎭", name: "Myth Mask #106735", isNft: true, price: 95, img: "", externalUrl: "https://t.me/nft/MythMask-106735" },
-    { id: "liberty_figure_120656", emoji: "🗽", name: "Liberty Figure #120656", isNft: true, price: 115, img: "", externalUrl: "https://t.me/nft/LibertyFigure-120656" },
-    { id: "money_pot_53481", emoji: "🍯", name: "Money Pot #53481", isNft: true, price: 130, img: "", externalUrl: "https://t.me/nft/MoneyPot-53481" },
-    { id: "snake_box_2429", emoji: "🐍", name: "Snake Box #2429", isNft: true, price: 145, img: "", externalUrl: "https://t.me/nft/SnakeBox-2429" },
-    { id: "input_key_79499", emoji: "⌨️", name: "Input Key #79499", isNft: true, price: 165, img: "", externalUrl: "https://t.me/nft/InputKey-79499" },
-    { id: "magic_potion_1182", emoji: "🧪", name: "Magic Potion #1182", isNft: true, price: 220, img: "", externalUrl: "https://t.me/nft/MagicPotion-1182" },
-    { id: "swiss_watch_25153", emoji: "⌚", name: "Swiss Watch #25153", isNft: true, price: 360, img: "", externalUrl: "https://t.me/nft/SwissWatch-25153" },
-    { id: "khabibs_papakha_23085", emoji: "🐑", name: "Khabib's Papakha #23085", isNft: true, price: 420, img: "", externalUrl: "https://t.me/nft/KhabibsPapakha-23085" },
-    { id: "plush_pepe_890", emoji: "🐸", name: "Plush Pepe #890", isNft: true, price: 1500, img: "", externalUrl: "https://t.me/nft/PlushPepe-890" }
-  ];
-
-  const DEFAULT_CASES = [
+  const INITIAL_CASES = [
     {
       id: "mell-king",
       title: "Mell King",
-      tag: "ХИТ",
-      desc: "Базовый кейс с реальными NFT-подарками",
+      tag: "CASE",
+      desc: "Добавь подарки в этот кейс через редактор ниже",
       price: 100,
-      emoji: "👑",
       img: "",
-      pool: [
-        { giftId: "desk_calendar_6412", weight: 30 },
-        { giftId: "myth_mask_106735", weight: 25 },
-        { giftId: "liberty_figure_120656", weight: 20 },
-        { giftId: "money_pot_53481", weight: 15 },
-        { giftId: "magic_potion_1182", weight: 10 }
-      ]
+      pool: []
     },
     {
       id: "mell-cash",
       title: "Mell Cash",
-      tag: "TOP NFT",
-      desc: "Жирный дроп: Swiss Watch, Папаха и Plush Pepe",
+      tag: "TOP",
+      desc: "Добавь подарки в этот кейс через редактор ниже",
       price: 250,
-      emoji: "💸",
       img: "",
-      pool: [
-        { giftId: "snake_box_2429", weight: 28 },
-        { giftId: "input_key_79499", weight: 25 },
-        { giftId: "magic_potion_1182", weight: 22 },
-        { giftId: "swiss_watch_25153", weight: 15 },
-        { giftId: "khabibs_papakha_23085", weight: 8 },
-        { giftId: "plush_pepe_890", weight: 2 }
-      ]
+      pool: []
     }
   ];
 
   let state = {
     balance: 500,
-    gifts: [],
     cases: [],
     inventory: [],
     selectedCaseId: "mell-king",
@@ -913,20 +886,22 @@
     currentUserId: null
   };
 
+  function isAdmin() {
+    return state.currentUserId === ADMIN_ID;
+  }
+
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && Array.isArray(saved.gifts) && Array.isArray(saved.cases)) {
+      if (saved && Array.isArray(saved.cases)) {
         state.balance = typeof saved.balance === "number" ? saved.balance : 500;
-        state.gifts = saved.gifts;
         state.cases = saved.cases;
         state.inventory = Array.isArray(saved.inventory) ? saved.inventory : [];
         state.selectedCaseId = saved.selectedCaseId || (state.cases[0] && state.cases[0].id) || "";
         return;
       }
     } catch (e) {}
-    state.gifts = JSON.parse(JSON.stringify(DEFAULT_GIFTS));
-    state.cases = JSON.parse(JSON.stringify(DEFAULT_CASES));
+    state.cases = JSON.parse(JSON.stringify(INITIAL_CASES));
     state.selectedCaseId = state.cases[0].id;
     saveState();
   }
@@ -934,7 +909,6 @@
   function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       balance: state.balance,
-      gifts: state.gifts,
       cases: state.cases,
       inventory: state.inventory,
       selectedCaseId: state.selectedCaseId
@@ -953,7 +927,6 @@
         document.getElementById("userLabel").textContent = user.username ? "@" + user.username : (user.first_name || "Player");
       }
     }
-    // Если открыто вне Telegram (в браузере для теста), можно передать ?admin=5200591975 в URL
     if (!uid) {
       const params = new URLSearchParams(window.location.search);
       if (Number(params.get("admin")) === ADMIN_ID) {
@@ -961,8 +934,9 @@
       }
     }
     state.currentUserId = uid;
-    if (uid === ADMIN_ID) {
+    if (isAdmin()) {
       document.getElementById("nav-admin").style.display = "flex";
+      document.getElementById("inlineCaseEditor").classList.add("visible");
     }
   }
 
@@ -974,15 +948,11 @@
     window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 2400);
   }
 
-  function getGiftById(id) {
-    return state.gifts.find(g => g.id === id);
-  }
-
-  function renderMedia(item, fallbackEmoji = "🎁") {
-    if (item && item.img) {
-      return `<img src="${item.img}" alt="${item.name || item.title || ''}" />`;
+  function renderImageHtml(imgSrc, altText = "") {
+    if (imgSrc) {
+      return `<img src="${imgSrc}" alt="${altText}" />`;
     }
-    return `<span>${(item && item.emoji) || fallbackEmoji}</span>`;
+    return `<span class="no-img-box">Нет фото</span>`;
   }
 
   function renderBalance() {
@@ -993,17 +963,18 @@
     state.balance += 500;
     saveState();
     renderBalance();
-    showToast("+500 GRAM начислено на баланс");
+    showToast("+500 GRAM");
   }
 
   function switchTab(tab) {
+    if (tab === "admin" && !isAdmin()) return;
     document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
     document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
     document.getElementById("sec-" + tab).classList.add("active");
     document.getElementById("nav-" + tab).classList.add("active");
 
     if (tab === "inventory") renderInventory();
-    if (tab === "admin") renderAdmin();
+    if (tab === "admin") renderAdminCasesList();
   }
 
   function selectCase(caseId) {
@@ -1020,7 +991,7 @@
     grid.innerHTML = state.cases.map(c => `
       <div class="case-card ${c.id === state.selectedCaseId ? "selected" : ""}" onclick="selectCase('${c.id}')">
         <span class="case-tag">${c.tag || "CASE"}</span>
-        <div class="case-media">${renderMedia(c, "📦")}</div>
+        <div class="case-media">${renderImageHtml(c.img, c.title)}</div>
         <div class="case-name">${c.title}</div>
         <div class="case-price">${c.price} GRAM</div>
       </div>
@@ -1032,58 +1003,52 @@
     if (!activeCase) return;
 
     document.getElementById("activeCaseTitle").textContent = activeCase.title;
-    document.getElementById("activeCaseDesc").textContent = activeCase.desc || "Нажми «Открыть», чтобы испытать удачу";
+    document.getElementById("activeCaseDesc").textContent = activeCase.desc || "";
     document.getElementById("activeCasePrice").textContent = `${activeCase.price} GRAM`;
+    document.getElementById("openCaseBtn").textContent = `Открыть за ${activeCase.price} GRAM`;
 
-    const openBtn = document.getElementById("openCaseBtn");
-    openBtn.textContent = `Открыть за ${activeCase.price} GRAM`;
+    if (isAdmin()) {
+      document.getElementById("inlineCaseEditor").classList.add("visible");
+      document.getElementById("editorCaseName").textContent = activeCase.title;
+    }
 
-    const validPool = (activeCase.pool || [])
-      .map(p => ({ ...p, gift: getGiftById(p.giftId) }))
-      .filter(p => p.gift);
+    const pool = Array.isArray(activeCase.pool) ? activeCase.pool : [];
+    const totalWeight = pool.reduce((sum, g) => sum + (Number(g.weight) || 1), 0);
+    document.getElementById("activePoolCount").textContent = `${pool.length} подарков`;
 
-    const totalWeight = validPool.reduce((sum, p) => sum + (Number(p.weight) || 1), 0);
-    document.getElementById("activePoolCount").textContent = `${validPool.length} подарков`;
-
-    // Render roulette preview
     const track = document.getElementById("rouletteTrack");
     track.style.transition = "none";
     track.style.transform = "translateX(0px)";
-    const previewItems = [];
-    if (validPool.length > 0) {
-      for (let i = 0; i < 18; i++) {
-        const g = validPool[i % validPool.length].gift;
-        previewItems.push(g);
-      }
+    if (pool.length === 0) {
+      track.innerHTML = `<div style="color:var(--muted);font-size:12px;padding-left:16px;">Подарки ещё не добавлены</div>`;
+    } else {
+      const preview = [];
+      for (let i = 0; i < 16; i++) preview.push(pool[i % pool.length]);
+      track.innerHTML = preview.map(g => `
+        <div class="roulette-item ${g.isNft ? "nft" : ""}">
+          ${renderImageHtml(g.img, g.name)}
+          <div class="r-name">${g.name}</div>
+        </div>
+      `).join("");
     }
-    track.innerHTML = previewItems.map(g => `
-      <div class="roulette-item ${g.isNft ? "nft" : ""}">
-        ${g.img ? `<img src="${g.img}" />` : `<div class="r-emoji">${g.emoji || "🎁"}</div>`}
-        <div class="r-name">${g.name}</div>
-      </div>
-    `).join("");
 
-    // Render Gifts inside this case (Bottom list)
     const contentsGrid = document.getElementById("caseContentsGrid");
-    if (validPool.length === 0) {
-      contentsGrid.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:13px;text-align:center;padding:12px;">В этом кейсе пока нет подарков</div>`;
+    if (pool.length === 0) {
+      contentsGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:12px;">В этом кейсе пока нет подарков</div>`;
       return;
     }
 
-    // Sort by price ascending
-    validPool.sort((a, b) => a.gift.price - b.gift.price);
-
-    contentsGrid.innerHTML = validPool.map(item => {
-      const g = item.gift;
-      const chance = totalWeight > 0 ? ((item.weight / totalWeight) * 100).toFixed(1) : "0";
+    contentsGrid.innerHTML = pool.map(g => {
+      const chance = totalWeight > 0 ? (((Number(g.weight) || 1) / totalWeight) * 100).toFixed(1) : "0";
       return `
         <div class="gift-card ${g.isNft ? "nft" : ""}">
           ${g.isNft ? `<span class="nft-badge">NFT</span>` : ""}
           <span class="chance-badge">${chance}%</span>
-          <div class="gift-thumb">${renderMedia(g)}</div>
+          <div class="gift-thumb">${renderImageHtml(g.img, g.name)}</div>
           <div class="gift-title">${g.name}</div>
           <div class="gift-price">${g.price} GRAM</div>
-          ${g.externalUrl ? `<a class="gift-link" href="${g.externalUrl}" target="_blank">Посмотреть NFT ↗</a>` : ""}
+          ${g.externalUrl ? `<a class="gift-link" href="${g.externalUrl}" target="_blank">Ссылка ↗</a>` : ""}
+          ${isAdmin() ? `<button class="btn-remove-gift" onclick="removeGiftFromCase('${activeCase.id}', '${g.id}')">Удалить из кейса</button>` : ""}
         </div>
       `;
     }).join("");
@@ -1092,19 +1057,12 @@
   function spinCase() {
     if (state.isSpinning) return;
     const activeCase = state.cases.find(c => c.id === state.selectedCaseId);
-    if (!activeCase) return;
-
-    const validPool = (activeCase.pool || [])
-      .map(p => ({ ...p, gift: getGiftById(p.giftId) }))
-      .filter(p => p.gift);
-
-    if (validPool.length === 0) {
-      showToast("В кейсе нет подарков!");
+    if (!activeCase || !activeCase.pool || activeCase.pool.length === 0) {
+      showToast("В этом кейсе нет подарков!");
       return;
     }
-
     if (state.balance < activeCase.price) {
-      showToast("Недостаточно GRAM на балансе!");
+      showToast("Недостаточно GRAM!");
       return;
     }
 
@@ -1112,14 +1070,14 @@
     saveState();
     renderBalance();
 
-    // Weighted random pick
-    const totalWeight = validPool.reduce((s, p) => s + (Number(p.weight) || 1), 0);
+    const pool = activeCase.pool;
+    const totalWeight = pool.reduce((s, g) => s + (Number(g.weight) || 1), 0);
     let rnd = Math.random() * totalWeight;
-    let wonGift = validPool[0].gift;
-    for (const entry of validPool) {
-      rnd -= (Number(entry.weight) || 1);
+    let wonGift = pool[0];
+    for (const item of pool) {
+      rnd -= (Number(item.weight) || 1);
       if (rnd <= 0) {
-        wonGift = entry.gift;
+        wonGift = item;
         break;
       }
     }
@@ -1130,34 +1088,28 @@
     btn.textContent = "Крутим...";
 
     const track = document.getElementById("rouletteTrack");
-    const winIndex = 34;
-    const totalCards = 42;
+    const winIndex = 32;
     const tape = [];
-    for (let i = 0; i < totalCards; i++) {
-      if (i === winIndex) {
-        tape.push(wonGift);
-      } else {
-        const randEntry = validPool[Math.floor(Math.random() * validPool.length)];
-        tape.push(randEntry.gift);
-      }
+    for (let i = 0; i < 40; i++) {
+      tape.push(i === winIndex ? wonGift : pool[Math.floor(Math.random() * pool.length)]);
     }
 
     track.style.transition = "none";
     track.style.transform = "translateX(0px)";
     track.innerHTML = tape.map(g => `
       <div class="roulette-item ${g.isNft ? "nft" : ""}">
-        ${g.img ? `<img src="${g.img}" />` : `<div class="r-emoji">${g.emoji || "🎁"}</div>`}
+        ${renderImageHtml(g.img, g.name)}
         <div class="r-name">${g.name}</div>
       </div>
     `).join("");
 
-    const cardWidth = 96; // 88px + 8px gap
-    const jitter = Math.floor(Math.random() * 36) - 18;
-    const targetOffset = (winIndex * cardWidth) + 44 + jitter;
+    const cardWidth = 98; // 90px + 8px gap
+    const jitter = Math.floor(Math.random() * 34) - 17;
+    const targetOffset = (winIndex * cardWidth) + 45 + jitter;
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        track.style.transition = "transform 3.6s cubic-bezier(0.12, 0.85, 0.22, 1)";
+        track.style.transition = "transform 3.5s cubic-bezier(0.12, 0.85, 0.22, 1)";
         track.style.transform = `translateX(-${targetOffset}px)`;
       });
     });
@@ -1167,20 +1119,18 @@
       btn.disabled = false;
       btn.textContent = `Открыть за ${activeCase.price} GRAM`;
 
-      const invItem = {
-        uid: Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-        giftId: wonGift.id,
-        wonAt: new Date().toISOString()
-      };
-      state.inventory.unshift(invItem);
+      const invUid = Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+      state.inventory.unshift({
+        uid: invUid,
+        gift: { ...wonGift }
+      });
       saveState();
-
-      openWinModal(wonGift, invItem.uid);
-    }, 3750);
+      openWinModal(wonGift, invUid);
+    }, 3650);
   }
 
   function openWinModal(gift, invUid) {
-    document.getElementById("winMedia").innerHTML = renderMedia(gift);
+    document.getElementById("winMedia").innerHTML = renderImageHtml(gift.img, gift.name);
     document.getElementById("winName").textContent = gift.name;
     document.getElementById("winPrice").textContent = `${gift.price} GRAM`;
 
@@ -1193,7 +1143,7 @@
     }
 
     const sellBtn = document.getElementById("winSellNowBtn");
-    sellBtn.textContent = `Продать за ${gift.price} GRAM`;
+    sellBtn.textContent = `Продать (${gift.price} GRAM)`;
     sellBtn.onclick = () => {
       sellInventoryItem(invUid);
       closeWinModal();
@@ -1209,24 +1159,21 @@
   function renderInventory() {
     const grid = document.getElementById("inventoryGrid");
     document.getElementById("invCount").textContent = `${state.inventory.length} шт.`;
-
     if (state.inventory.length === 0) {
-      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:24px;">Инвентарь пуст — открой первый кейс!</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:24px;">Инвентарь пуст</div>`;
       return;
     }
-
-    grid.innerHTML = state.inventory.map(item => {
-      const g = getGiftById(item.giftId);
-      if (!g) return "";
+    grid.innerHTML = state.inventory.map(entry => {
+      const g = entry.gift;
       return `
         <div class="gift-card ${g.isNft ? "nft" : ""}">
           ${g.isNft ? `<span class="nft-badge">NFT</span>` : ""}
-          <div class="gift-thumb">${renderMedia(g)}</div>
+          <div class="gift-thumb">${renderImageHtml(g.img, g.name)}</div>
           <div class="gift-title">${g.name}</div>
           <div class="gift-price">${g.price} GRAM</div>
           <div class="inv-actions">
-            <button class="btn-sm btn-sell" onclick="sellInventoryItem('${item.uid}')">Продать</button>
-            <button class="btn-sm btn-withdraw" onclick="requestWithdraw('${item.uid}')">Вывести</button>
+            <button class="btn-sm btn-sell" onclick="sellInventoryItem('${entry.uid}')">Продать</button>
+            <button class="btn-sm btn-withdraw" onclick="requestWithdraw('${entry.uid}')">Вывести</button>
           </div>
         </div>
       `;
@@ -1236,38 +1183,32 @@
   function sellInventoryItem(uid) {
     const idx = state.inventory.findIndex(i => i.uid === uid);
     if (idx === -1) return;
-    const gift = getGiftById(state.inventory[idx].giftId);
+    const price = Number(state.inventory[idx].gift.price) || 0;
     state.inventory.splice(idx, 1);
-    if (gift) {
-      state.balance += Number(gift.price) || 0;
-      showToast(`Продано за +${gift.price} GRAM`);
-    }
+    state.balance += price;
     saveState();
     renderBalance();
     renderInventory();
+    showToast(`Продано за +${price} GRAM`);
   }
 
   function requestWithdraw(uid) {
-    const item = state.inventory.find(i => i.uid === uid);
-    if (!item) return;
-    const gift = getGiftById(item.giftId);
+    const entry = state.inventory.find(i => i.uid === uid);
+    if (!entry) return;
     const tg = window.Telegram && window.Telegram.WebApp;
-    const payload = {
-      action: "withdraw_gift",
-      giftId: gift.id,
-      giftName: gift.name,
-      externalUrl: gift.externalUrl || "",
-      priceGram: gift.price
-    };
-
     if (tg && tg.sendData) {
-      tg.sendData(JSON.stringify(payload));
+      tg.sendData(JSON.stringify({
+        action: "withdraw_gift",
+        giftName: entry.gift.name,
+        priceGram: entry.gift.price,
+        externalUrl: entry.gift.externalUrl || ""
+      }));
     }
-    showToast(`Заявка на вывод «${gift.name}» отправлена!`);
+    showToast(`Заявка на вывод «${entry.gift.name}» отправлена`);
   }
 
-  /* ================= ADMIN PANEL LOGIC ================= */
-  function readImageFileAsDataUrl(fileInput) {
+  /* ================= ADMIN ACTIONS ================= */
+  function readFileAsDataUrl(fileInput) {
     return new Promise(resolve => {
       const file = fileInput.files && fileInput.files[0];
       if (!file) return resolve("");
@@ -1278,74 +1219,73 @@
     });
   }
 
-  async function adminAddGift() {
-    if (state.currentUserId !== ADMIN_ID) return;
-    const name = document.getElementById("admGiftName").value.trim();
-    const price = Number(document.getElementById("admGiftPrice").value);
-    const emoji = document.getElementById("admGiftEmoji").value.trim() || "🎁";
-    const externalUrl = document.getElementById("admGiftUrl").value.trim();
-    const imgUrlInput = document.getElementById("admGiftImgUrl").value.trim();
-    const isNft = document.getElementById("admGiftIsNft").checked;
+  async function addGiftToSelectedCase() {
+    if (!isAdmin()) return;
+    const activeCase = state.cases.find(c => c.id === state.selectedCaseId);
+    if (!activeCase) return;
+
+    const name = document.getElementById("inGiftName").value.trim();
+    const price = Number(document.getElementById("inGiftPrice").value);
+    const weight = Math.max(1, Number(document.getElementById("inGiftWeight").value) || 10);
+    const externalUrl = document.getElementById("inGiftUrl").value.trim();
+    const imgUrlInput = document.getElementById("inGiftImgUrl").value.trim();
+    const isNft = document.getElementById("inGiftIsNft").checked;
 
     if (!name || !price || price <= 0) {
-      showToast("Укажи название и цену в GRAM!");
+      showToast("Укажи название и цену подарка в GRAM");
       return;
     }
 
-    const uploadedDataUrl = await readImageFileAsDataUrl(document.getElementById("admGiftImgFile"));
-    const finalImg = uploadedDataUrl || imgUrlInput;
+    const fileData = await readFileAsDataUrl(document.getElementById("inGiftImgFile"));
+    const img = fileData || imgUrlInput;
 
-    const newGift = {
-      id: "gift_" + Date.now(),
+    if (!Array.isArray(activeCase.pool)) activeCase.pool = [];
+    activeCase.pool.push({
+      id: "g_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
       name,
       price,
-      emoji,
-      img: finalImg,
+      weight,
       externalUrl,
+      img,
       isNft
-    };
+    });
 
-    state.gifts.push(newGift);
     saveState();
+    renderSelectedCaseDetails();
 
-    document.getElementById("admGiftName").value = "";
-    document.getElementById("admGiftPrice").value = "";
-    document.getElementById("admGiftUrl").value = "";
-    document.getElementById("admGiftImgUrl").value = "";
-    document.getElementById("admGiftImgFile").value = "";
+    document.getElementById("inGiftName").value = "";
+    document.getElementById("inGiftPrice").value = "";
+    document.getElementById("inGiftUrl").value = "";
+    document.getElementById("inGiftImgUrl").value = "";
+    document.getElementById("inGiftImgFile").value = "";
+    showToast(`Подарок «${name}» добавлен в «${activeCase.title}»`);
+  }
 
-    renderAdmin();
-    showToast(`Подарок «${name}» добавлен!`);
+  function removeGiftFromCase(caseId, giftId) {
+    if (!isAdmin()) return;
+    const targetCase = state.cases.find(c => c.id === caseId);
+    if (!targetCase || !Array.isArray(targetCase.pool)) return;
+    targetCase.pool = targetCase.pool.filter(g => g.id !== giftId);
+    saveState();
+    renderSelectedCaseDetails();
+    showToast("Подарок удалён из кейса");
   }
 
   async function adminCreateCase() {
-    if (state.currentUserId !== ADMIN_ID) return;
+    if (!isAdmin()) return;
     const title = document.getElementById("admCaseTitle").value.trim();
     const price = Number(document.getElementById("admCasePrice").value);
     const tag = document.getElementById("admCaseTag").value.trim() || "CASE";
-    const desc = document.getElementById("admCaseDesc").value.trim() || "Эксклюзивный кейс с подарками";
+    const desc = document.getElementById("admCaseDesc").value.trim() || "";
     const imgUrlInput = document.getElementById("admCaseImgUrl").value.trim();
 
     if (!title || !price || price <= 0) {
-      showToast("Укажи название кейса и цену в GRAM!");
+      showToast("Укажи название и цену кейса в GRAM");
       return;
     }
 
-    const pool = [];
-    document.querySelectorAll(".adm-case-gift-check:checked").forEach(chk => {
-      const gId = chk.dataset.giftId;
-      const weightInput = document.querySelector(`.adm-case-gift-weight[data-gift-id="${gId}"]`);
-      const weight = Math.max(1, Number(weightInput && weightInput.value) || 10);
-      pool.push({ giftId: gId, weight });
-    });
-
-    if (pool.length === 0) {
-      showToast("Выбери хотя бы один подарок в состав кейса!");
-      return;
-    }
-
-    const uploadedDataUrl = await readImageFileAsDataUrl(document.getElementById("admCaseImgFile"));
-    const finalImg = uploadedDataUrl || imgUrlInput;
+    const fileData = await readFileAsDataUrl(document.getElementById("admCaseImgFile"));
+    const img = fileData || imgUrlInput;
 
     const newCase = {
       id: "case_" + Date.now(),
@@ -1353,9 +1293,8 @@
       price,
       tag,
       desc,
-      emoji: "🎁",
-      img: finalImg,
-      pool
+      img,
+      pool: []
     };
 
     state.cases.push(newCase);
@@ -1370,13 +1309,14 @@
 
     renderCases();
     renderSelectedCaseDetails();
-    renderAdmin();
-    showToast(`Кейс «${title}» создан!`);
+    renderAdminCasesList();
+    showToast(`Кейс «${title}» создан`);
   }
 
   function adminDeleteCase(caseId) {
+    if (!isAdmin()) return;
     if (state.cases.length <= 1) {
-      showToast("Должен остаться хотя бы 1 кейс!");
+      showToast("Должен остаться хотя бы один кейс");
       return;
     }
     state.cases = state.cases.filter(c => c.id !== caseId);
@@ -1386,71 +1326,34 @@
     saveState();
     renderCases();
     renderSelectedCaseDetails();
-    renderAdmin();
+    renderAdminCasesList();
     showToast("Кейс удалён");
   }
 
-  function adminDeleteGift(giftId) {
-    state.gifts = state.gifts.filter(g => g.id !== giftId);
-    state.cases.forEach(c => {
-      c.pool = (c.pool || []).filter(p => p.giftId !== giftId);
-    });
-    saveState();
-    renderSelectedCaseDetails();
-    renderAdmin();
-    showToast("Подарок удалён");
-  }
-
-  function renderAdmin() {
-    // 1. Checkboxes of gifts for creating a new case
-    const builder = document.getElementById("admNewCaseGiftsList");
-    builder.innerHTML = state.gifts.map(g => `
-      <div class="pool-builder-item">
-        <label style="display:flex;align-items:center;gap:8px;flex:1;font-size:12px;cursor:pointer;">
-          <input type="checkbox" class="adm-case-gift-check" data-gift-id="${g.id}" />
-          ${g.img ? `<img src="${g.img}" />` : `<span>${g.emoji || "🎁"}</span>`}
-          <span><b>${g.name}</b> (${g.price} GRAM)</span>
-        </label>
-        <input type="number" class="input adm-case-gift-weight" data-gift-id="${g.id}" value="15" min="1" style="width:68px;padding:5px 8px;font-size:12px;" title="Шанс (вес)" />
-      </div>
-    `).join("");
-
-    // 2. Existing cases list
+  function renderAdminCasesList() {
     document.getElementById("admCasesManageList").innerHTML = state.cases.map(c => `
       <div class="admin-list-row">
         <span><b>${c.title}</b> — ${c.price} GRAM (${(c.pool || []).length} подарков)</span>
         <button class="btn-del" onclick="adminDeleteCase('${c.id}')">Удалить</button>
       </div>
     `).join("");
-
-    // 3. Existing gifts list
-    document.getElementById("admGiftsManageList").innerHTML = state.gifts.map(g => `
-      <div class="admin-list-row">
-        <span>${g.emoji || "🎁"} <b>${g.name}</b> — ${g.price} GRAM ${g.isNft ? "⭐NFT" : ""}</span>
-        <button class="btn-del" onclick="adminDeleteGift('${g.id}')">Удалить</button>
-      </div>
-    `).join("");
   }
 
   function exportConfigJson() {
-    const dataStr = JSON.stringify({ gifts: state.gifts, cases: state.cases }, null, 2);
-    navigator.clipboard.writeText(dataStr).then(() => {
-      showToast("JSON кейсов и подарков скопирован!");
-    }).catch(() => {
-      alert(dataStr);
-    });
+    const json = JSON.stringify({ cases: state.cases }, null, 2);
+    navigator.clipboard.writeText(json).then(() => showToast("JSON скопирован")).catch(() => alert(json));
   }
 
-  function resetDefaultData() {
+  function clearAllStorage() {
     localStorage.removeItem(STORAGE_KEY);
     loadState();
     renderCases();
     renderSelectedCaseDetails();
-    renderAdmin();
-    showToast("База сброшена к стандартной");
+    renderInventory();
+    renderAdminCasesList();
+    showToast("Данные очищены");
   }
 
-  // Init
   loadState();
   initTelegram();
   renderBalance();
