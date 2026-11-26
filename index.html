@@ -95,9 +95,9 @@
       cursor: pointer;
     }
 
-    /* Balance Strip */
+    /* Admin-only Balance Strip */
     .bal-header {
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
@@ -107,6 +107,10 @@
       border-radius: 18px;
       padding: 10px 12px;
       margin-bottom: 12px;
+    }
+
+    .bal-header.admin-visible {
+      display: flex;
     }
 
     .bal-left {
@@ -194,10 +198,9 @@
       padding: 8px 9px;
       border-radius: 12px;
       cursor: pointer;
-      display: none;
     }
 
-    /* Live Strip */
+    /* Live NFT Strip */
     .live-strip {
       display: flex;
       align-items: center;
@@ -236,19 +239,29 @@
       aspect-ratio: 1 / 1;
       border-radius: 13px;
       background: linear-gradient(145deg, #252e5e, #151933);
-      border: 1px solid rgba(168, 85, 247, 0.25);
+      border: 1px solid rgba(34, 211, 238, 0.35);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 20px;
       flex-shrink: 0;
       overflow: hidden;
+      position: relative;
     }
 
     .live-card img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    .live-nft-tag {
+      font-size: 8px;
+      font-weight: 900;
+      color: var(--cyan);
+      letter-spacing: 0.4px;
+      margin-top: 1px;
     }
 
     /* Banners */
@@ -350,6 +363,7 @@
       overflow: hidden;
       margin-bottom: 9px;
       font-size: 44px;
+      position: relative;
     }
 
     .case-sq img {
@@ -357,6 +371,19 @@
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    .nft-corner-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(7, 10, 24, 0.85);
+      border: 1px solid rgba(34, 211, 238, 0.45);
+      color: var(--cyan);
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 8px;
     }
 
     .case-foot {
@@ -432,11 +459,12 @@
       background: linear-gradient(150deg, #7c3aed, #2563eb);
       border: 1px solid rgba(34, 211, 238, 0.35);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       overflow: hidden;
-      font-size: 32px;
+      font-size: 30px;
     }
 
     .r-card img {
@@ -543,12 +571,12 @@
 
     .item-tag-pill {
       display: inline-block;
-      background: var(--surface-3);
-      border: 1px solid var(--border);
-      color: #cbd5e1;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 12px;
+      background: rgba(34, 211, 238, 0.14);
+      border: 1px solid rgba(34, 211, 238, 0.4);
+      color: var(--cyan);
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 11px;
       border-radius: 10px;
     }
 
@@ -869,7 +897,7 @@
       cursor: pointer;
     }
 
-    /* Other Cards & Forms */
+    /* Cards & Forms */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -986,7 +1014,7 @@
       border-color: var(--red);
     }
 
-    /* Plinko with 4 difficulties + medium speed ball */
+    /* Plinko */
     .diff-pills {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1089,7 +1117,7 @@
       transform: scale(1.04);
     }
 
-    /* Reference-styled 6x5 Slots Grid */
+    /* Slots 6x5 */
     .slots-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1350,22 +1378,22 @@
 <div class="app">
   <!-- Top Bar -->
   <div class="top-bar" id="topBarMain">
-    <div class="brand-pill">🎁 MellstroyGift</div>
+    <div class="brand-pill">🎁 MellstroyGift · NFT</div>
     <button class="wallet-mini" id="walletBtn" onclick="onWalletBtn()">Кошелёк</button>
   </div>
 
   <div class="top-bar" id="topBarBack" style="display:none;">
     <button class="back-btn" onclick="goBackToCases()">← Назад</button>
-    <div class="brand-pill">🎁 MellstroyGift</div>
+    <div class="brand-pill">🎁 MellstroyGift · NFT</div>
     <button class="wallet-mini" onclick="onWalletBtn()">Кошелёк</button>
   </div>
 
-  <!-- Balance Strip -->
-  <div class="bal-header">
+  <!-- Balance Strip (Shown only for ADMIN_ID 5200591975) -->
+  <div class="bal-header" id="balHeaderAdmin">
     <div class="bal-left">
       <div class="ava-circle" id="avaText">MG</div>
       <div>
-        <div class="bal-caption" id="userLabel">Ваш баланс</div>
+        <div class="bal-caption" id="userLabel">Админ</div>
         <div class="bal-amount-row">
           <span style="color:var(--cyan);font-size:12px;font-weight:900;">◆</span>
           <span class="bal-num" id="balNum">0.00</span>
@@ -1380,23 +1408,15 @@
     </div>
   </div>
 
-  <!-- LIVE STRIP -->
-  <div class="live-strip">
-    <div class="live-label"><span class="live-dot"></span>Live</div>
-    <div class="live-card">⭐</div>
-    <div class="live-card">💎</div>
-    <div class="live-card">🧸</div>
-    <div class="live-card">👑</div>
-    <div class="live-card">🚀</div>
-    <div class="live-card">🍀</div>
-  </div>
+  <!-- LIVE NFT STRIP -->
+  <div class="live-strip" id="liveNftStrip"></div>
 
   <!-- 1. CASES -->
   <div id="sec-cases" class="sec active">
     <div id="casesListView">
       <div class="banner-rocket" onclick="openGameTab('rocket')">
         <div>
-          <div class="badge-pill">🔥 ХИТ</div>
+          <div class="badge-pill">🔥 ХИТ · NFT</div>
           <div class="banner-title">🚀 РАКЕТКА</div>
         </div>
         <div class="banner-chips">
@@ -1408,7 +1428,7 @@
 
       <div class="banner-playhub" onclick="openGameTab('mines')">
         <div>
-          <div class="badge-pill">⚡ GRAM</div>
+          <div class="badge-pill">⚡ NFT DROP</div>
           <div class="banner-title">🎮 PLAY HUB</div>
         </div>
         <div class="banner-chips">
@@ -1422,21 +1442,21 @@
     </div>
 
     <div id="caseOpenView" style="display:none;">
-      <div class="open-case-name" id="openCaseTitle">Кейс</div>
+      <div class="open-case-name" id="openCaseTitle">NFT Кейс</div>
       <div class="roulette-wrap">
         <div class="roulette-pointer"></div>
         <div class="roulette-track" id="rouletteTrack"></div>
       </div>
-      <button class="btn-orange" id="caseActionBtn" onclick="onCaseMainAction()">💳 Пополнить баланс</button>
+      <button class="btn-orange" id="caseActionBtn" onclick="onCaseMainAction()">🎁 Открыть NFT-кейс</button>
 
       <div class="col-heading">
-        <span>📦 Коллекции в этом кейсе</span>
-        <span style="font-size:12px;color:var(--muted);" id="openCasePoolCount">0 шт.</span>
+        <span>💎 NFT-коллекция в кейсе</span>
+        <span style="font-size:12px;color:var(--muted);" id="openCasePoolCount">0 NFT</span>
       </div>
       <div class="items-grid" id="openCasePoolGrid"></div>
 
       <div class="card" id="inlineCaseEditor" style="display:none;margin-top:14px;border-color:rgba(34,211,238,0.45);">
-        <div class="card-title">✏️ Редактор кейса «<span id="edTitleSpan"></span>»</div>
+        <div class="card-title">✏️ Редактор NFT-кейса «<span id="edTitleSpan"></span>»</div>
         <div class="fg">
           <label>Название кейса</label>
           <input class="inp" id="edCaseName" />
@@ -1460,10 +1480,10 @@
 
         <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;" />
 
-        <div class="card-title" style="font-size:13px;">🎁 Добавить подарок в этот кейс</div>
+        <div class="card-title" style="font-size:13px;">💎 Добавить NFT-подарок в кейс</div>
         <div class="fg">
-          <label>Название подарка</label>
-          <input class="inp" id="edGiftName" placeholder="Название подарка" />
+          <label>Название NFT-подарка</label>
+          <input class="inp" id="edGiftName" placeholder="Название NFT" />
         </div>
         <div class="row2">
           <div class="fg">
@@ -1476,7 +1496,7 @@
           </div>
         </div>
         <div class="fg">
-          <label>Фото подарка (ссылка или файл)</label>
+          <label>Фото NFT (ссылка или файл)</label>
           <input class="inp" id="edGiftImgUrl" placeholder="https://..." style="margin-bottom:6px;" />
           <input class="inp" id="edGiftImgFile" type="file" accept="image/*" />
         </div>
@@ -1484,7 +1504,7 @@
           <label>Бейдж</label>
           <input class="inp" id="edGiftBadge" value="NFT" />
         </div>
-        <button class="btn-green" onclick="addGiftToOpenedCase()">+ Добавить подарок</button>
+        <button class="btn-green" onclick="addGiftToOpenedCase()">+ Добавить NFT</button>
       </div>
     </div>
   </div>
@@ -1529,7 +1549,7 @@
 
     <!-- MINES -->
     <div id="sub-mines" class="card" style="display:none;">
-      <div class="card-title">💣 Мины (GRAM)</div>
+      <div class="card-title">💣 Мины · NFT-награда</div>
       <div class="row2">
         <div class="fg">
           <label>Ставка (GRAM)</label>
@@ -1552,11 +1572,11 @@
       <div class="mines-grid" id="minesBoard"></div>
       <div class="row2">
         <button class="btn-purple" onclick="newMinesRound()">Новая игра</button>
-        <button class="btn-green" id="minesTakeBtn" onclick="takeMinesWin()" disabled>Забрать GRAM</button>
+        <button class="btn-green" id="minesTakeBtn" onclick="takeMinesWin()" disabled>Забрать NFT</button>
       </div>
     </div>
 
-    <!-- PLINKO (4 Difficulties + Medium Speed Ball) -->
+    <!-- PLINKO -->
     <div id="sub-plinko" class="card" style="display:none;">
       <div class="card-title">🟡 Плинко · Режимы сложности</div>
 
@@ -1582,7 +1602,7 @@
       <button class="btn-purple" id="plinkoDropBtn" onclick="playPlinko()">Сбросить шар</button>
     </div>
 
-    <!-- SLOTS (6x5 Grid matching reference screenshot) -->
+    <!-- SLOTS 6x5 -->
     <div id="sub-slots" class="slots-panel" style="display:none;">
       <div class="slots-board-6x5" id="slotsBoard6x5"></div>
 
@@ -1614,7 +1634,7 @@
       <div class="slots-bottom-2">
         <button class="slots-bonus-btn" onclick="buySlotsBonus()">
           <div>🎁 Купить бонус</div>
-          <div style="font-size:11px;margin-top:2px;">◆ <span id="slotsBonusCost">10.00</span></div>
+          <div style="font-size:11px;margin-top:2px;">◆ <span id="slotsBonusCost">2.00</span></div>
         </button>
         <button class="slots-chance-btn" id="slotsDoubleChanceBtn" onclick="toggleDoubleChance()">
           <div>⚡ Двойной шанс</div>
@@ -1629,16 +1649,16 @@
     <div class="upg-card">
       <div class="rocket-hud-top">
         <div class="ava-circle" style="width:34px;height:34px;font-size:11px;" id="upgAva">MG</div>
-        <span class="ping-pill" style="color:var(--cyan);">⚡ Апгрейдер · NFT или GRAM</span>
+        <span class="ping-pill" style="color:var(--cyan);">⚡ Авто-NFT Апгрейдер</span>
       </div>
 
       <div class="wheel-stage">
         <div class="wheel-pointer"></div>
         <div class="wheel-ring" id="upgWheelRing" style="--win-deg:126deg;">
           <div class="wheel-inner">
-            <div style="font-size:24px;margin-bottom:4px;" id="upgWheelIcon">🎁</div>
-            <div style="font-size:12px;font-weight:900;color:var(--cyan);" id="upgWheelChance">35.0%</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:2px;" id="upgWheelSub">Выберите NFT или GRAM</div>
+            <div style="font-size:24px;margin-bottom:4px;" id="upgWheelIcon">💎</div>
+            <div style="font-size:12px;font-weight:900;color:var(--cyan);" id="upgWheelChance">50.0%</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;" id="upgWheelSub">Автоподбор NFT</div>
           </div>
         </div>
       </div>
@@ -1652,10 +1672,10 @@
 
         <div class="upg-arrow-btn">➔</div>
 
-        <div class="upg-box" onclick="openUpgTargetPicker()">
-          <div class="upg-plus-circle">+</div>
-          <div style="font-size:12px;font-weight:900;color:#e2e8f0;" id="upgRightTitle">Выберите цель</div>
-          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;" id="upgRightSub">Подарок из кейсов</div>
+        <div class="upg-box" onclick="syncAutoUpgradeTarget()">
+          <div class="upg-plus-circle">⚡</div>
+          <div style="font-size:12px;font-weight:900;color:var(--cyan);" id="upgRightTitle">Авто-NFT цель</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;" id="upgRightSub">Подбор под %</div>
         </div>
       </div>
 
@@ -1664,13 +1684,13 @@
         <button class="preset-btn" onclick="applyChancePreset('x4')">X4</button>
         <button class="preset-btn" onclick="applyChancePreset('x8')">X8</button>
         <button class="preset-btn" onclick="applyChancePreset(35)">35%</button>
-        <button class="preset-btn" onclick="applyChancePreset(55)">55%</button>
-        <button class="preset-btn" onclick="applyChancePreset(75)">75%</button>
+        <button class="preset-btn" onclick="applyChancePreset(50)">50%</button>
+        <button class="preset-btn" onclick="applyChancePreset(70)">70%</button>
       </div>
 
       <div class="fg">
-        <label>Шанс успеха: <b style="color:var(--cyan);" id="upgSliderLbl">35.0%</b></label>
-        <input type="range" min="5" max="85" step="0.5" value="35" id="upgSlider" style="width:100%;" oninput="onUpgSlider()" />
+        <label>Шанс успеха: <b style="color:var(--cyan);" id="upgSliderLbl">50.0%</b></label>
+        <input type="range" min="5" max="85" step="0.5" value="50" id="upgSlider" style="width:100%;" oninput="onUpgSlider()" />
       </div>
 
       <button class="btn-blue-big" id="upgRunBtn" onclick="startWheelUpgrade()">Запустить апгрейд</button>
@@ -1680,8 +1700,8 @@
   <!-- 4. INVENTORY -->
   <div id="sec-inventory" class="sec">
     <div class="col-heading">
-      <span>🎒 Инвентарь</span>
-      <span style="font-size:12px;color:var(--muted);" id="invCount">0 шт.</span>
+      <span>🎒 Инвентарь NFT</span>
+      <span style="font-size:12px;color:var(--muted);" id="invCount">0 NFT</span>
     </div>
     <div class="items-grid" id="invGrid"></div>
   </div>
@@ -1689,7 +1709,7 @@
   <!-- 5. ADMIN (ID 5200591975) -->
   <div id="sec-admin" class="sec">
     <div class="card">
-      <div class="card-title">➕ Создать кейс</div>
+      <div class="card-title">➕ Создать NFT-кейс</div>
       <div class="fg">
         <label>Название кейса</label>
         <input class="inp" id="newCaseTitle" placeholder="Название кейса" />
@@ -1701,7 +1721,7 @@
         </div>
         <div class="fg">
           <label>Тег</label>
-          <input class="inp" id="newCaseTag" value="CASE" />
+          <input class="inp" id="newCaseTag" value="NFT CASE" />
         </div>
       </div>
       <div class="fg">
@@ -1713,14 +1733,14 @@
     </div>
 
     <div class="card">
-      <div class="card-title">🎁 Добавить подарок в кейс</div>
+      <div class="card-title">💎 Добавить NFT-подарок в кейс</div>
       <div class="fg">
         <label>Выбери кейс</label>
         <select class="inp" id="admGiftCaseSel"></select>
       </div>
       <div class="fg">
-        <label>Название подарка</label>
-        <input class="inp" id="admGiftName" placeholder="Название подарка" />
+        <label>Название NFT-подарка</label>
+        <input class="inp" id="admGiftName" placeholder="Название NFT" />
       </div>
       <div class="row2">
         <div class="fg">
@@ -1733,11 +1753,11 @@
         </div>
       </div>
       <div class="fg">
-        <label>Фото подарка (ссылка или файл)</label>
+        <label>Фото NFT (ссылка или файл)</label>
         <input class="inp" id="admGiftImgUrl" placeholder="https://..." style="margin-bottom:6px;" />
         <input class="inp" id="admGiftImgFile" type="file" accept="image/*" />
       </div>
-      <button class="btn-green" onclick="addGiftAdmin()">Добавить подарок</button>
+      <button class="btn-green" onclick="addGiftAdmin()">Добавить NFT</button>
     </div>
 
     <div class="card">
@@ -1758,7 +1778,7 @@
     <div class="fg">
       <label>Вариант 1: Сумма в GRAM (от 0.01)</label>
       <div class="row2">
-        <input class="inp" id="upgPickGramInp" type="number" step="0.01" min="0.01" value="1.00" />
+        <input class="inp" id="upgPickGramInp" type="number" step="0.01" min="0.01" value="10.00" />
         <button class="btn-green" onclick="chooseGramAsSource()">Выбрать GRAM</button>
       </div>
     </div>
@@ -1767,17 +1787,6 @@
 
     <div style="font-size:12px;font-weight:800;color:var(--cyan);margin-bottom:7px;">Вариант 2: NFT-подарок из инвентаря</div>
     <div id="upgNftPickList"></div>
-  </div>
-</div>
-
-<!-- Upgrader Target Picker -->
-<div class="modal-bg" id="upgDstModal">
-  <div class="modal-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <b>Цель апгрейда</b>
-      <button class="wallet-mini" onclick="closeModal('upgDstModal')">✕</button>
-    </div>
-    <div id="upgTargetPickList"></div>
   </div>
 </div>
 
@@ -1868,58 +1877,67 @@
 <script>
   const ADMIN_ID = 5200591975;
   const MIN_GRAM = 0.01;
+  const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_full_v4";
+  const SAVE_KEY = "mellstroy_gift_nft_all_v1";
 
   const INITIAL_CASES = [
     {
       id: "c_arm",
-      title: "Arm Кейс",
+      title: "NFT Arm Кейс",
       price: 10.00,
-      tag: "TOP",
+      tag: "NFT TOP",
       img: "",
       pool: [
-        { id: "g1", name: "Mighty Arm", price: 137.82, weight: 8, badge: "NFT", img: "" },
-        { id: "g2", name: "Artisan Brick", price: 86.43, weight: 14, badge: "NFT", img: "" },
-        { id: "g3", name: "Star Gem", price: 25.00, weight: 20, badge: "NFT", img: "" },
-        { id: "g4", name: "Cyan Ring", price: 12.50, weight: 28, badge: "NFT", img: "" }
+        { id: "g1", name: "Mighty Arm #014", price: 137.82, weight: 8, badge: "NFT", icon: "💪", img: "" },
+        { id: "g2", name: "Artisan Brick #077", price: 86.43, weight: 14, badge: "NFT", icon: "🧱", img: "" },
+        { id: "g3", name: "Star Gem #209", price: 25.00, weight: 20, badge: "NFT", icon: "💎", img: "" },
+        { id: "g4", name: "Cyan Ring #412", price: 12.50, weight: 28, badge: "NFT", icon: "💍", img: "" }
       ]
     },
     {
       id: "c_movie",
-      title: "Movie",
+      title: "NFT Movie",
       price: 4.00,
-      tag: "NEW",
+      tag: "NFT NEW",
       img: "",
       pool: [
-        { id: "g5", name: "Golden Oscar", price: 24.50, weight: 15, badge: "NFT", img: "" },
-        { id: "g6", name: "Cinema Pop", price: 6.20, weight: 40, badge: "NFT", img: "" }
+        { id: "g5", name: "Golden Oscar #009", price: 24.50, weight: 15, badge: "NFT", icon: "🏆", img: "" },
+        { id: "g6", name: "Cinema Pop #318", price: 6.20, weight: 40, badge: "NFT", icon: "🍿", img: "" }
       ]
     },
     {
       id: "c_telegram",
-      title: "Telegram",
+      title: "NFT Telegram",
       price: 5.00,
-      tag: "HIT",
+      tag: "NFT HIT",
       img: "",
       pool: [
-        { id: "g7", name: "Heart Gift", price: 18.00, weight: 20, badge: "NFT", img: "" },
-        { id: "g8", name: "Ton Spark", price: 7.50, weight: 35, badge: "NFT", img: "" }
+        { id: "g7", name: "Heart Gift #102", price: 18.00, weight: 20, badge: "NFT", icon: "💖", img: "" },
+        { id: "g8", name: "Ton Spark #511", price: 7.50, weight: 35, badge: "NFT", icon: "⚡", img: "" }
       ]
     }
   ];
 
-  const ROCKET_BOT_POOL = [
-    { name: "Amir", bet: 1.00, target: 2.35 },
-    { name: "kUfUH", bet: 0.20, target: 1.65 },
-    { name: "Saeed", bet: 0.50, target: 3.10 },
-    { name: "Вовчік", bet: 0.30, target: 1.85 },
-    { name: "Nika", bet: 1.50, target: 4.20 },
-    { name: "MaxPayne", bet: 0.40, target: 1.40 }
+  const AUTO_NFT_TEMPLATES = [
+    { name: "Neon Pepe Relic", badge: "NFT", icon: "🐸" },
+    { name: "Quantum Brick", badge: "NFT", icon: "🧱" },
+    { name: "Starlight Crown", badge: "NFT", icon: "👑" },
+    { name: "Cyber Rocket Core", badge: "NFT", icon: "🚀" },
+    { name: "Velvet Rose NFT", badge: "NFT", icon: "🌹" },
+    { name: "Diamond Trophy", badge: "NFT", icon: "🏆" }
   ];
 
-  /* Plinko difficulty tables (8 rows -> 9 slots) */
+  const ROCKET_BOT_POOL = [
+    { name: "Amir", bet: 1.00, target: 2.35, nftIcon: "🐸" },
+    { name: "kUfUH", bet: 0.20, target: 1.65, nftIcon: "👑" },
+    { name: "Saeed", bet: 0.50, target: 3.10, nftIcon: "🚀" },
+    { name: "Вовчік", bet: 0.30, target: 1.85, nftIcon: "💎" },
+    { name: "Nika", bet: 1.50, target: 4.20, nftIcon: "🏆" },
+    { name: "MaxPayne", bet: 0.40, target: 1.40, nftIcon: "🧱" }
+  ];
+
   const PLINKO_MODES = {
     easy: {
       mults: [1.8, 1.4, 1.1, 0.9, 0.8, 0.9, 1.1, 1.4, 1.8],
@@ -1939,7 +1957,6 @@
     }
   };
 
-  /* 6x5 Slots symbols */
   const SLOT_SYMS = ["🐸", "🚀", "🫐", "👑", "📅", "🍭", "🧱", "🐒", "🐈‍⬛", "💋"];
 
   const appState = {
@@ -1966,7 +1983,7 @@
     /* Upgrader */
     upgSource: null,
     upgTarget: null,
-    upgChance: 35.0,
+    upgChance: 50.0,
     upgSpinning: false,
     upgAngle: 0,
     /* Mines */
@@ -2060,13 +2077,19 @@
       if (Number(q.get("admin")) === ADMIN_ID) uid = ADMIN_ID;
     }
     appState.userId = uid;
+
     const initials = appState.username.replace(/^@/, "").slice(0, 2).toUpperCase() || "MG";
     document.getElementById("avaText").textContent = initials;
     document.getElementById("upgAva").textContent = initials;
     document.getElementById("userLabel").textContent = appState.username;
+
+    const balHeader = document.getElementById("balHeaderAdmin");
     if (isAdminUser()) {
+      balHeader.classList.add("admin-visible");
       document.getElementById("nav-admin").style.display = "flex";
-      document.getElementById("visBtn").style.display = "inline-block";
+    } else {
+      balHeader.classList.remove("admin-visible");
+      document.getElementById("nav-admin").style.display = "none";
     }
   }
 
@@ -2111,7 +2134,24 @@
   }
 
   function renderBalance() {
+    if (!isAdminUser()) return;
     document.getElementById("balNum").textContent = fmt(appState.balance);
+  }
+
+  function renderLiveNftStrip() {
+    const allNfts = getAllTargets();
+    const cards = allNfts.length
+      ? allNfts.slice(0, 6)
+      : AUTO_NFT_TEMPLATES.map((t, i) => ({ name: t.name, price: (i + 1) * 12, icon: t.icon, badge: "NFT" }));
+
+    document.getElementById("liveNftStrip").innerHTML = `
+      <div class="live-label"><span class="live-dot"></span>NFT Live</div>
+      ${cards.map(g => `
+        <div class="live-card" title="${g.name} · ${fmt(g.price)} GRAM">
+          ${g.img ? `<img src="${g.img}" alt="" />` : `<span>${g.icon || "💎"}</span><span class="live-nft-tag">NFT</span>`}
+        </div>
+      `).join("")}
+    `;
   }
 
   function sendBotData(obj) {
@@ -2122,7 +2162,7 @@
     return false;
   }
 
-  /* Visual Balance */
+  /* Visual Balance (Admin only) */
   function openVisModal() { if (isAdminUser()) openModal("visModal"); }
   function addVisualBal(amount) {
     if (!isAdminUser()) return;
@@ -2136,8 +2176,9 @@
     showToast(`Добавлено +${fmt(v)} GRAM`);
   }
 
-  /* Deposit & Withdraw */
+  /* Deposit & Withdraw (Admin only) */
   async function openDepositModal() {
+    if (!isAdminUser()) return;
     const w = getWallet();
     if (!w) {
       showToast("Сначала подключи кошелёк");
@@ -2150,6 +2191,7 @@
   }
 
   async function confirmDeposit() {
+    if (!isAdminUser()) return;
     const w = getWallet();
     if (!tonConnectUI || !w) { showToast("Подключи кошелёк"); closeModal("depModal"); return; }
     const amt = Math.round(Number(document.getElementById("depAmtInp").value) * 100) / 100;
@@ -2181,12 +2223,14 @@
   }
 
   function openWithdrawModal() {
+    if (!isAdminUser()) return;
     document.getElementById("wdWalletInp").value = getWallet() || "";
     document.getElementById("wdAmtInp").value = appState.balance >= MIN_GRAM ? Math.min(appState.balance, 0.01).toFixed(2) : "0.01";
     openModal("wdModal");
   }
 
   function confirmWithdraw() {
+    if (!isAdminUser()) return;
     const wallet = document.getElementById("wdWalletInp").value.trim();
     const amt = Math.round(Number(document.getElementById("wdAmtInp").value) * 100) / 100;
     if (!wallet || wallet.length < 10) { showToast("Укажи кошелёк"); return; }
@@ -2243,7 +2287,7 @@
     if (sub === "slots") renderSlotsUI();
   }
 
-  function mediaHtml(img, fb = "🎁") {
+  function mediaHtml(img, fb = "💎") {
     return img ? `<img src="${img}" alt="" />` : `<span>${fb}</span>`;
   }
 
@@ -2258,11 +2302,37 @@
     });
   }
 
+  function createNftGiftObject(amountGram, prefix = "NFT Relic") {
+    const val = Math.max(MIN_GRAM, Math.round(Number(amountGram) * 100) / 100);
+    const tpl = AUTO_NFT_TEMPLATES[Math.floor(Math.random() * AUTO_NFT_TEMPLATES.length)];
+    const code = Math.floor(100 + Math.random() * 899);
+    return {
+      id: "nft_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
+      name: `${tpl.name} #${code}`,
+      price: val,
+      badge: "NFT",
+      icon: tpl.icon || "💎",
+      img: "",
+      tag: prefix
+    };
+  }
+
+  function addNftToInventory(gift) {
+    appState.inventory.unshift({
+      uid: "inv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+      gift: { ...gift, badge: "NFT" }
+    });
+    saveApp();
+  }
+
   /* Cases */
   function renderCasesGrid() {
     document.getElementById("casesGrid").innerHTML = appState.cases.map(c => `
       <div class="case-tile" onclick="openCaseById('${c.id}')">
-        <div class="case-sq">${mediaHtml(c.img, "🎁")}</div>
+        <div class="case-sq">
+          <span class="nft-corner-badge">NFT</span>
+          ${mediaHtml(c.img, "🎁")}
+        </div>
         <div class="case-foot">
           <span class="case-title-txt">${c.title}</span>
           <span class="case-price-pill">◆ ${fmt(c.price)}</span>
@@ -2298,41 +2368,41 @@
     const btn = document.getElementById("caseActionBtn");
     if (appState.spinningCase) {
       btn.disabled = true;
-      btn.textContent = "Крутим...";
-    } else if (appState.balance < Number(c.price)) {
+      btn.textContent = "Крутим NFT...";
+    } else if (isAdminUser() && appState.balance < Number(c.price)) {
       btn.disabled = false;
       btn.textContent = "💳 Пополнить баланс";
     } else {
       btn.disabled = false;
-      btn.textContent = `Открыть за ${fmt(c.price)} GRAM`;
+      btn.textContent = `Открыть NFT-кейс (${fmt(c.price)} GRAM)`;
     }
 
     const pool = Array.isArray(c.pool) ? c.pool : [];
-    document.getElementById("openCasePoolCount").textContent = `${pool.length} шт.`;
+    document.getElementById("openCasePoolCount").textContent = `${pool.length} NFT`;
 
     const track = document.getElementById("rouletteTrack");
     track.style.transition = "none";
     track.style.transform = "translateX(0px)";
     if (!pool.length) {
-      track.innerHTML = `<div style="padding-left:14px;color:var(--muted);font-size:12px;">Подарков пока нет</div>`;
+      track.innerHTML = `<div style="padding-left:14px;color:var(--muted);font-size:12px;">NFT-подарков пока нет</div>`;
     } else {
       const strip = [];
       for (let i = 0; i < 16; i++) strip.push(pool[i % pool.length]);
-      track.innerHTML = strip.map(g => `<div class="r-card">${mediaHtml(g.img, "🎁")}</div>`).join("");
+      track.innerHTML = strip.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
     }
 
     document.getElementById("openCasePoolGrid").innerHTML = pool.length
       ? pool.map(g => `
           <div class="item-tile">
             <div class="item-frame">
-              ${mediaHtml(g.img, "🎁")}
+              ${mediaHtml(g.img, g.icon || "💎")}
               <span class="item-price-badge">${fmt(g.price)} ◆</span>
             </div>
             <div class="item-name">${g.name}</div>
-            <span class="item-tag-pill">${g.badge || "NFT"}</span>
+            <span class="item-tag-pill">NFT</span>
           </div>
         `).join("")
-      : `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:12px;">Добавь подарки в этот кейс</div>`;
+      : `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:12px;">Добавь NFT-подарки в этот кейс</div>`;
 
     const ed = document.getElementById("inlineCaseEditor");
     if (isAdminUser()) {
@@ -2340,7 +2410,7 @@
       document.getElementById("edTitleSpan").textContent = c.title;
       document.getElementById("edCaseName").value = c.title;
       document.getElementById("edCasePrice").value = fmt(c.price);
-      document.getElementById("edCaseTag").value = c.tag || "CASE";
+      document.getElementById("edCaseTag").value = c.tag || "NFT CASE";
       document.getElementById("edCaseImgUrl").value = c.img && !c.img.startsWith("data:") ? c.img : "";
     } else {
       ed.style.display = "none";
@@ -2351,34 +2421,40 @@
     if (appState.spinningCase) return;
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c) return;
-    if (appState.balance < Number(c.price)) { openDepositModal(); return; }
+    if (isAdminUser() && appState.balance < Number(c.price)) { openDepositModal(); return; }
     spinOpenedCase(c);
   }
 
   function spinOpenedCase(c) {
     const pool = Array.isArray(c.pool) ? c.pool : [];
-    if (!pool.length) { showToast("В кейсе нет подарков"); return; }
-
-    appState.balance = Math.round((appState.balance - Number(c.price)) * 100) / 100;
-    saveApp();
-    renderBalance();
-
     const totalW = pool.reduce((s, g) => s + (Number(g.weight) || 1), 0);
-    let r = Math.random() * totalW;
-    let won = pool[0];
-    for (const g of pool) { r -= (Number(g.weight) || 1); if (r <= 0) { won = g; break; } }
+    let won;
+    if (pool.length && totalW > 0) {
+      let r = Math.random() * totalW;
+      won = pool[0];
+      for (const g of pool) { r -= (Number(g.weight) || 1); if (r <= 0) { won = g; break; } }
+    } else {
+      won = createNftGiftObject(Math.max(0.5, Number(c.price) * 1.2));
+    }
+
+    if (isAdminUser()) {
+      appState.balance = Math.max(0, Math.round((appState.balance - Number(c.price)) * 100) / 100);
+      renderBalance();
+    }
+    saveApp();
 
     appState.spinningCase = true;
     renderOpenCase();
 
     const winIdx = 28;
+    const basePool = pool.length ? pool : [won];
     const tape = [];
-    for (let i = 0; i < 36; i++) tape.push(i === winIdx ? won : pool[Math.floor(Math.random() * pool.length)]);
+    for (let i = 0; i < 36; i++) tape.push(i === winIdx ? won : basePool[Math.floor(Math.random() * basePool.length)]);
 
     const track = document.getElementById("rouletteTrack");
     track.style.transition = "none";
     track.style.transform = "translateX(0px)";
-    track.innerHTML = tape.map(g => `<div class="r-card">${mediaHtml(g.img, "🎁")}</div>`).join("");
+    track.innerHTML = tape.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -2389,13 +2465,10 @@
 
     setTimeout(() => {
       appState.spinningCase = false;
-      appState.inventory.unshift({
-        uid: "inv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-        gift: { ...won }
-      });
-      saveApp();
+      addNftToInventory(won);
       renderOpenCase();
-      showToast(`Выигрыш: ${won.name} (${fmt(won.price)} GRAM)`);
+      renderLiveNftStrip();
+      showToast(`NFT в инвентаре: ${won.name} (${fmt(won.price)} GRAM)`);
     }, 3300);
   }
 
@@ -2406,7 +2479,7 @@
     if (!c) return;
     const title = document.getElementById("edCaseName").value.trim();
     const price = Math.round(Number(document.getElementById("edCasePrice").value) * 100) / 100;
-    const tag = document.getElementById("edCaseTag").value.trim() || "CASE";
+    const tag = document.getElementById("edCaseTag").value.trim() || "NFT CASE";
     const url = document.getElementById("edCaseImgUrl").value.trim();
     const file = await readImgFile(document.getElementById("edCaseImgFile"));
     if (!title) { showToast("Введи название кейса"); return; }
@@ -2424,23 +2497,22 @@
     const name = document.getElementById("edGiftName").value.trim();
     const price = Math.round(Number(document.getElementById("edGiftPrice").value) * 100) / 100;
     const weight = Math.max(1, Math.floor(Number(document.getElementById("edGiftWeight").value) || 15));
-    const badge = document.getElementById("edGiftBadge").value.trim() || "NFT";
     const url = document.getElementById("edGiftImgUrl").value.trim();
     const file = await readImgFile(document.getElementById("edGiftImgFile"));
-    if (!name) { showToast("Введи название подарка"); return; }
-    if (!price || price < MIN_GRAM) { showToast("Цена подарка от 0.01 GRAM"); return; }
-    c.pool.push({ id: "g_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5), name, price, weight, badge, img: file || url });
+    if (!name) { showToast("Введи название NFT"); return; }
+    if (!price || price < MIN_GRAM) { showToast("Цена от 0.01 GRAM"); return; }
+    c.pool.push({ id: "g_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5), name, price, weight, badge: "NFT", icon: "💎", img: file || url });
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
-    saveApp(); renderOpenCase(); showToast(`Подарок «${name}» добавлен`);
+    saveApp(); renderOpenCase(); renderLiveNftStrip(); showToast(`NFT «${name}» добавлен`);
   }
 
   async function createCaseAdmin() {
     if (!isAdminUser()) return;
     const title = document.getElementById("newCaseTitle").value.trim();
     const price = Math.round(Number(document.getElementById("newCasePrice").value) * 100) / 100;
-    const tag = document.getElementById("newCaseTag").value.trim() || "CASE";
+    const tag = document.getElementById("newCaseTag").value.trim() || "NFT CASE";
     const url = document.getElementById("newCaseImgUrl").value.trim();
     const file = await readImgFile(document.getElementById("newCaseImgFile"));
     if (!title) { showToast("Введи название кейса"); return; }
@@ -2461,13 +2533,13 @@
     const weight = Math.max(1, Math.floor(Number(document.getElementById("admGiftWeight").value) || 15));
     const url = document.getElementById("admGiftImgUrl").value.trim();
     const file = await readImgFile(document.getElementById("admGiftImgFile"));
-    if (!name) { showToast("Введи название подарка"); return; }
+    if (!name) { showToast("Введи название NFT"); return; }
     if (!price || price < MIN_GRAM) { showToast("Цена от 0.01 GRAM"); return; }
-    c.pool.push({ id: "g_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5), name, price, weight, badge: "NFT", img: file || url });
+    c.pool.push({ id: "g_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5), name, price, weight, badge: "NFT", icon: "💎", img: file || url });
     document.getElementById("admGiftName").value = "";
     document.getElementById("admGiftImgUrl").value = "";
     document.getElementById("admGiftImgFile").value = "";
-    saveApp(); renderAdminUI(); showToast(`Добавлено в «${c.title}»`);
+    saveApp(); renderAdminUI(); renderLiveNftStrip(); showToast(`NFT добавлен в «${c.title}»`);
   }
 
   function deleteCaseAdmin(cid) {
@@ -2481,53 +2553,52 @@
     document.getElementById("admGiftCaseSel").innerHTML = appState.cases.map(c => `<option value="${c.id}">${c.title} (${fmt(c.price)} GRAM)</option>`).join("");
     document.getElementById("admCasesList").innerHTML = appState.cases.map(c => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
-        <span><b>${c.title}</b> — ${fmt(c.price)} GRAM (${c.pool.length} шт.)</span>
+        <span><b>${c.title}</b> — ${fmt(c.price)} GRAM (${c.pool.length} NFT)</span>
         <button class="btn-red-sm" onclick="deleteCaseAdmin('${c.id}')">Удалить</button>
       </div>
     `).join("");
   }
 
-  /* Inventory */
+  /* Inventory (NFT only) */
   function renderInventoryUI() {
-    document.getElementById("invCount").textContent = `${appState.inventory.length} шт.`;
+    document.getElementById("invCount").textContent = `${appState.inventory.length} NFT`;
     const grid = document.getElementById("invGrid");
     if (!appState.inventory.length) {
-      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:24px;">Инвентарь пуст</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:24px;">NFT-инвентарь пуст</div>`;
       return;
     }
     grid.innerHTML = appState.inventory.map(row => `
       <div class="item-tile">
         <div class="item-frame">
-          ${mediaHtml(row.gift.img, "🎁")}
+          ${mediaHtml(row.gift.img, row.gift.icon || "💎")}
           <span class="item-price-badge">${fmt(row.gift.price)} ◆</span>
         </div>
         <div class="item-name">${row.gift.name}</div>
-        <div class="row2">
-          <button class="btn-green" style="padding:7px;font-size:11px;" onclick="sellInventoryItem('${row.uid}')">Продать</button>
-          <button class="btn-purple" style="padding:7px;font-size:11px;" onclick="pickNftFromInvToUpgrader('${row.uid}')">Апгрейд</button>
+        <span class="item-tag-pill" style="margin-bottom:6px;">NFT</span>
+        <div class="row2" style="margin-top:6px;">
+          <button class="btn-purple" style="padding:7px;font-size:11px;" onclick="pickNftFromInvToUpgrader('${row.uid}')">В апгрейд</button>
+          <button class="btn-green" style="padding:7px;font-size:11px;" onclick="useNftAsUpgradeTarget('${row.uid}')">В цель</button>
         </div>
       </div>
     `).join("");
-  }
-
-  function sellInventoryItem(uid) {
-    const idx = appState.inventory.findIndex(x => x.uid === uid);
-    if (idx === -1) return;
-    const price = Number(appState.inventory[idx].gift.price) || 0;
-    appState.inventory.splice(idx, 1);
-    appState.balance = Math.round((appState.balance + price) * 100) / 100;
-    saveApp(); renderBalance(); renderInventoryUI();
-    showToast(`Продано за +${fmt(price)} GRAM`);
   }
 
   function pickNftFromInvToUpgrader(uid) {
     const item = appState.inventory.find(x => x.uid === uid);
     if (!item) return;
     appState.upgSource = { type: "nft", uid: item.uid, gift: item.gift };
+    syncAutoUpgradeTarget();
     switchNav("upgrader");
   }
 
-  /* ROCKET */
+  function useNftAsUpgradeTarget(uid) {
+    const item = appState.inventory.find(x => x.uid === uid);
+    if (!item) return;
+    appState.upgTarget = { ...item.gift, badge: "NFT" };
+    switchNav("upgrader");
+  }
+
+  /* ROCKET (Continuous Online Loop + NFT Rewards) */
   function buildRocketRoundFeed() {
     const picked = [...ROCKET_BOT_POOL]
       .sort(() => Math.random() - 0.5)
@@ -2540,6 +2611,7 @@
           targetMult: Math.max(1.15, mult),
           cashedOut: false,
           out: 0,
+          nftIcon: p.nftIcon,
           isPlayer: false
         };
       });
@@ -2555,6 +2627,7 @@
         targetMult: 999,
         cashedOut: false,
         out: 0,
+        nftIcon: "💎",
         isPlayer: true
       });
     }
@@ -2666,8 +2739,8 @@
       shipEl.style.transform = `translate(${lift * 0.5}px, -${lift}px)`;
       if (subEl) {
         subEl.textContent = appState.rocketInRound && !appState.rocketCashedOut
-          ? `Твоя ставка: ${fmt(appState.rocketBet)} GRAM`
-          : (appState.rocketCashedOut ? "Выигрыш забран, полёт продолжается" : "Следующий раунд скоро");
+          ? `Ставка: ${fmt(appState.rocketBet)} GRAM · Выплата: NFT`
+          : (appState.rocketCashedOut ? "NFT забран, полёт продолжается" : "Следующий раунд скоро");
       }
     } else {
       badgeEl.textContent = `💥 CRASH ${appState.rocketCrashAt.toFixed(2)}x`;
@@ -2681,7 +2754,7 @@
     if (appState.rocketPhase === "flying" && appState.rocketInRound && !appState.rocketCashedOut) {
       const potential = Math.round(appState.rocketBet * appState.rocketMult * 100) / 100;
       btnEl.disabled = false;
-      btnEl.textContent = `Забрать ${fmt(potential)} GRAM`;
+      btnEl.textContent = `Забрать NFT (${fmt(potential)} GRAM)`;
       btnEl.style.background = "linear-gradient(135deg,#10b981,#059669)";
     } else if (appState.rocketQueuedBet > 0) {
       btnEl.disabled = true;
@@ -2702,14 +2775,14 @@
       listEl.innerHTML = appState.rocketLiveFeed.map(b => {
         const ini = String(b.name || "U").replace(/^@/, "").slice(0, 1).toUpperCase() || "U";
         const curMult = b.cashedOut ? b.targetMult : appState.rocketMult;
-        const rightTxt = b.cashedOut ? `◆ ${fmt(b.out)}` : (appState.rocketPhase === "crashed" ? "💥" : `${curMult.toFixed(2)}x`);
+        const rightTxt = b.cashedOut ? `💎 ${fmt(b.out)}` : (appState.rocketPhase === "crashed" ? "💥" : `${curMult.toFixed(2)}x`);
         return `
           <div class="r-bet-row">
             <div style="display:flex;align-items:center;gap:9px;min-width:0;">
               <div class="r-bet-ava">${ini}</div>
               <div>
                 <div style="font-size:13px;font-weight:800;">${b.name}${b.isPlayer ? " (ты)" : ""}</div>
-                <span class="r-bet-sub">◆ ${fmt(b.bet)} · ${b.cashedOut ? `×${Number(b.targetMult).toFixed(2)}` : "в игре"}</span>
+                <span class="r-bet-sub">◆ ${fmt(b.bet)} · ${b.cashedOut ? `×${Number(b.targetMult).toFixed(2)} · NFT` : "в игре"}</span>
               </div>
             </div>
             <div class="r-bet-right">${rightTxt}</div>
@@ -2721,30 +2794,32 @@
 
   function onRocketAction() {
     if (appState.rocketPhase === "flying" && appState.rocketInRound && !appState.rocketCashedOut) {
-      const win = Math.round(appState.rocketBet * appState.rocketMult * 100) / 100;
-      appState.balance = Math.round((appState.balance + win) * 100) / 100;
+      const winVal = Math.round(appState.rocketBet * appState.rocketMult * 100) / 100;
+      const nftWon = createNftGiftObject(winVal, "Rocket NFT");
       appState.rocketCashedOut = true;
-      saveApp();
-      renderBalance();
+      addNftToInventory(nftWon);
 
       const me = appState.rocketLiveFeed.find(x => x.isPlayer);
       if (me) {
         me.cashedOut = true;
         me.targetMult = appState.rocketMult;
-        me.out = win;
+        me.out = winVal;
       }
       renderRocketUI();
-      showToast(`Забрано +${fmt(win)} GRAM на ${appState.rocketMult.toFixed(2)}x`);
+      renderLiveNftStrip();
+      showToast(`NFT забран: ${nftWon.name} (${fmt(winVal)} GRAM)`);
       return;
     }
 
     const bet = Math.round(Number(document.getElementById("rocketBet").value) * 100) / 100;
     if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-    if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
 
-    appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-    saveApp();
-    renderBalance();
+    if (isAdminUser()) {
+      if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
+      appState.balance = Math.round((appState.balance - bet) * 100) / 100;
+      saveApp();
+      renderBalance();
+    }
 
     if (appState.rocketPhase === "countdown") {
       appState.rocketBet = bet;
@@ -2756,20 +2831,21 @@
         targetMult: 999,
         cashedOut: false,
         out: 0,
+        nftIcon: "💎",
         isPlayer: true
       });
     } else {
       appState.rocketQueuedBet = bet;
-      showToast(`Ставка ${fmt(bet)} GRAM принята на следующий раунд`);
+      showToast(`Ставка ${fmt(bet)} GRAM на NFT-раунд принята`);
     }
     renderRocketUI();
   }
 
-  /* UPGRADER (Exact pointer-to-sector angle synchronization) */
+  /* UPGRADER (Auto-NFT target by stake & chance + exact wheel angle) */
   function getAllTargets() {
     const out = [];
     for (const c of appState.cases) {
-      for (const g of (c.pool || [])) out.push(g);
+      for (const g of (c.pool || [])) out.push({ ...g, badge: "NFT" });
     }
     return out;
   }
@@ -2781,7 +2857,40 @@
     return 0;
   }
 
+  function autoPickUpgradeTarget(stake, chancePct) {
+    const safeStake = Math.max(MIN_GRAM, Number(stake) || 10);
+    const safeChance = Math.max(1, Math.min(95, Number(chancePct) || 50));
+    const targetPrice = Math.max(MIN_GRAM, Math.round(safeStake * (100 / safeChance) * HOUSE_RTP * 100) / 100);
+
+    const pool = getAllTargets();
+    if (pool.length > 0) {
+      let bestGift = pool[0];
+      let bestDiff = Math.abs((Number(bestGift.price) || 0) - targetPrice);
+      for (const g of pool) {
+        const diff = Math.abs((Number(g.price) || 0) - targetPrice);
+        if (diff < bestDiff) { bestDiff = diff; bestGift = g; }
+      }
+      if (bestDiff <= targetPrice * 0.35) {
+        return { ...bestGift, badge: "NFT", autoPrice: targetPrice };
+      }
+    }
+
+    const generated = createNftGiftObject(targetPrice, "Auto NFT");
+    return { ...generated, autoPrice: targetPrice };
+  }
+
+  function syncAutoUpgradeTarget() {
+    const stake = getSourceValue() || Number(document.getElementById("upgPickGramInp")?.value) || 10;
+    const chance = Number(appState.upgChance) || 50;
+    appState.upgTarget = autoPickUpgradeTarget(stake, chance);
+    renderUpgraderUI();
+  }
+
   function renderUpgraderUI() {
+    if (!appState.upgTarget) {
+      appState.upgTarget = autoPickUpgradeTarget(getSourceValue() || 10, appState.upgChance || 50);
+    }
+
     const leftTitle = document.getElementById("upgLeftTitle");
     const leftSub = document.getElementById("upgLeftSub");
     if (!appState.upgSource) {
@@ -2795,24 +2904,16 @@
       leftSub.textContent = `NFT · ${fmt(appState.upgSource.gift.price)} GRAM`;
     }
 
-    const targets = getAllTargets();
-    if (!appState.upgTarget && targets.length) appState.upgTarget = targets[0];
-
     const rightTitle = document.getElementById("upgRightTitle");
     const rightSub = document.getElementById("upgRightSub");
-    if (appState.upgTarget) {
-      rightTitle.textContent = appState.upgTarget.name;
-      rightSub.textContent = `${fmt(appState.upgTarget.price)} GRAM`;
-    } else {
-      rightTitle.textContent = "Выберите цель";
-      rightSub.textContent = "Подарок из кейсов";
-    }
+    rightTitle.textContent = appState.upgTarget.name;
+    rightSub.textContent = `NFT · ${fmt(appState.upgTarget.price)} GRAM`;
 
-    const ch = Number(appState.upgChance) || 35;
+    const ch = Number(appState.upgChance) || 50;
     document.getElementById("upgSlider").value = ch;
     document.getElementById("upgSliderLbl").textContent = `${ch.toFixed(1)}%`;
     document.getElementById("upgWheelChance").textContent = `${ch.toFixed(1)}%`;
-    document.getElementById("upgWheelSub").textContent = appState.upgTarget ? appState.upgTarget.name : "Выберите цель";
+    document.getElementById("upgWheelSub").textContent = `${appState.upgTarget.name} (${fmt(appState.upgTarget.price)})`;
 
     const deg = (ch / 100) * 360;
     document.getElementById("upgWheelRing").style.setProperty("--win-deg", `${deg.toFixed(2)}deg`);
@@ -2820,16 +2921,14 @@
 
   function openUpgSourcePicker() {
     if (appState.upgSpinning) return;
-    document.getElementById("upgPickGramInp").value = appState.balance >= MIN_GRAM ? Math.min(appState.balance, 1.00).toFixed(2) : "0.01";
-
     const nftBox = document.getElementById("upgNftPickList");
     if (!appState.inventory.length) {
       nftBox.innerHTML = `<div style="font-size:11.5px;color:var(--muted);">В инвентаре пока нет NFT-подарков</div>`;
     } else {
       nftBox.innerHTML = appState.inventory.map(r => `
         <div class="pick-row" onclick="chooseNftAsSource('${r.uid}')">
-          <span><b>${r.gift.name}</b> <span style="color:var(--muted);">(${r.gift.badge || "NFT"})</span></span>
-          <b style="color:var(--cyan);">${fmt(r.gift.price)} GRAM</b>
+          <span><b>${r.gift.name}</b> <span style="color:var(--cyan);">(NFT)</span></span>
+          <b style="color:var(--gold);">${fmt(r.gift.price)} GRAM</b>
         </div>
       `).join("");
     }
@@ -2841,7 +2940,7 @@
     if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     appState.upgSource = { type: "gram", amount: amt };
     closeModal("upgSrcModal");
-    renderUpgraderUI();
+    syncAutoUpgradeTarget();
   }
 
   function chooseNftAsSource(uid) {
@@ -2849,80 +2948,59 @@
     if (!row) return;
     appState.upgSource = { type: "nft", uid: row.uid, gift: row.gift };
     closeModal("upgSrcModal");
-    renderUpgraderUI();
-  }
-
-  function openUpgTargetPicker() {
-    if (appState.upgSpinning) return;
-    const targets = getAllTargets();
-    const box = document.getElementById("upgTargetPickList");
-    if (!targets.length) {
-      box.innerHTML = `<div style="font-size:12px;color:var(--muted);">Сначала добавь подарки в кейсы</div>`;
-    } else {
-      box.innerHTML = targets.map(g => `
-        <div class="pick-row" onclick="chooseTargetGift('${g.id}')">
-          <span><b>${g.name}</b></span>
-          <b style="color:var(--gold);">${fmt(g.price)} GRAM</b>
-        </div>
-      `).join("");
-    }
-    openModal("upgDstModal");
-  }
-
-  function chooseTargetGift(gid) {
-    const g = getAllTargets().find(x => x.id === gid);
-    if (!g) return;
-    appState.upgTarget = g;
-    closeModal("upgDstModal");
-    renderUpgraderUI();
+    syncAutoUpgradeTarget();
   }
 
   function onUpgSlider() {
-    appState.upgChance = Number(document.getElementById("upgSlider").value) || 35;
-    renderUpgraderUI();
+    appState.upgChance = Number(document.getElementById("upgSlider").value) || 50;
+    syncAutoUpgradeTarget();
   }
 
   function applyChancePreset(preset) {
-    const srcVal = getSourceValue();
-    const dstVal = Number(appState.upgTarget && appState.upgTarget.price) || 0;
-    let next = 35;
+    const srcVal = getSourceValue() || Number(document.getElementById("upgPickGramInp")?.value) || 10;
+    let next = 50;
     if (typeof preset === "number") {
       next = preset;
-    } else if (srcVal > 0 && dstVal > 0) {
+    } else {
       const mult = preset === "x2" ? 2 : (preset === "x4" ? 4 : 8);
-      next = (srcVal / Math.max(0.01, dstVal)) * (80 / mult);
+      next = (100 / mult) * HOUSE_RTP;
+      void srcVal;
     }
     appState.upgChance = Math.max(5, Math.min(85, Math.round(next * 10) / 10));
-    renderUpgraderUI();
+    syncAutoUpgradeTarget();
   }
 
   function startWheelUpgrade() {
     if (appState.upgSpinning) return;
-    if (!appState.upgSource) { showToast("Выбери NFT-подарок или GRAM"); return; }
-    if (!appState.upgTarget) { showToast("Выбери цель апгрейда"); return; }
+    if (!appState.upgSource) {
+      const fallbackGram = Math.max(MIN_GRAM, Number(document.getElementById("upgPickGramInp")?.value) || 10);
+      appState.upgSource = { type: "gram", amount: fallbackGram };
+    }
+    if (!appState.upgTarget) {
+      syncAutoUpgradeTarget();
+    }
 
     if (appState.upgSource.type === "gram") {
       const amt = Number(appState.upgSource.amount) || 0;
       if (amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
-      if (amt > appState.balance) { showToast("Недостаточно GRAM"); return; }
-      appState.balance = Math.round((appState.balance - amt) * 100) / 100;
-      renderBalance();
+      if (isAdminUser()) {
+        if (amt > appState.balance) { showToast("Недостаточно GRAM"); return; }
+        appState.balance = Math.round((appState.balance - amt) * 100) / 100;
+        renderBalance();
+      }
     } else {
       const idx = appState.inventory.findIndex(x => x.uid === appState.upgSource.uid);
       if (idx === -1) { showToast("NFT-подарок не найден"); appState.upgSource = null; renderUpgraderUI(); return; }
       appState.inventory.splice(idx, 1);
     }
 
-    const chance = Number(appState.upgChance) || 35;
+    const chance = Number(appState.upgChance) || 50;
     const winDeg = (chance / 100) * 360;
-
-    // Выбираем целевую точку на диске (внутри зелёного [0..winDeg] или серого [winDeg..360])
     const wantsWin = Math.random() * 100 < chance;
     const targetSectorAngle = wantsWin
       ? (Math.random() * Math.max(2, winDeg - 6) + 3)
       : (winDeg + 3 + Math.random() * Math.max(2, 354 - winDeg));
 
-    // Колесо крутится по часовой стрелке на deltaAngle, чтобы targetSectorAngle оказался под верхним указателем (0 deg)
     const currentMod = ((appState.upgAngle % 360) + 360) % 360;
     const desiredMod = (360 - targetSectorAngle) % 360;
     const stepDiff = (desiredMod - currentMod + 360) % 360;
@@ -2933,7 +3011,7 @@
     document.getElementById("upgRunBtn").disabled = true;
     document.getElementById("upgWheelRing").style.transform = `rotate(${appState.upgAngle}deg)`;
 
-    const targetCopy = { ...appState.upgTarget };
+    const targetCopy = { ...appState.upgTarget, badge: "NFT" };
 
     setTimeout(() => {
       const finalMod = ((appState.upgAngle % 360) + 360) % 360;
@@ -2944,11 +3022,9 @@
       document.getElementById("upgRunBtn").disabled = false;
 
       if (isActuallyWon) {
-        appState.inventory.unshift({
-          uid: "upg_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
-          gift: targetCopy
-        });
-        showToast(`Удача! Выигран ${targetCopy.name}`);
+        addNftToInventory(targetCopy);
+        renderLiveNftStrip();
+        showToast(`Удача! Выигран NFT: ${targetCopy.name}`);
       } else {
         showToast(`Проигрыш! Стрелка в серой зоне`);
       }
@@ -2957,20 +3033,23 @@
         appState.upgSource = null;
       }
       saveApp();
-      renderUpgraderUI();
+      syncAutoUpgradeTarget();
     }, 2550);
   }
 
-  /* MINES */
+  /* MINES (NFT prize on cashout) */
   function newMinesRound() {
     if (appState.minesActive) { showToast("Сначала забери или доиграй"); return; }
     const bet = Math.round(Number(document.getElementById("minesBet").value) * 100) / 100;
     const mCnt = Number(document.getElementById("minesCount").value) || 3;
     if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-    if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
 
-    appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-    saveApp(); renderBalance();
+    if (isAdminUser()) {
+      if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
+      appState.balance = Math.round((appState.balance - bet) * 100) / 100;
+      renderBalance();
+    }
+    saveApp();
 
     const grid = Array(25).fill(0);
     let put = 0;
@@ -2996,12 +3075,14 @@
 
   function takeMinesWin() {
     if (!appState.minesActive) return;
-    const win = Math.round(appState.minesBetVal * appState.minesMultVal * 100) / 100;
-    appState.balance = Math.round((appState.balance + win) * 100) / 100;
+    const winVal = Math.round(appState.minesBetVal * appState.minesMultVal * 100) / 100;
+    const nftPrize = createNftGiftObject(winVal, "Mines NFT");
     appState.minesActive = false;
     document.getElementById("minesTakeBtn").disabled = true;
-    saveApp(); renderBalance(); renderMinesUI();
-    showToast(`Забрано +${fmt(win)} GRAM`);
+    addNftToInventory(nftPrize);
+    renderMinesUI();
+    renderLiveNftStrip();
+    showToast(`Получен NFT: ${nftPrize.name} (${fmt(winVal)} GRAM)`);
   }
 
   function renderMinesUI() {
@@ -3017,7 +3098,7 @@
     }).join("");
   }
 
-  /* PLINKO (4 Difficulties + Medium Speed Step-by-Step Ball) */
+  /* PLINKO (4 Difficulties + Medium Speed Ball + NFT Reward) */
   function setPlinkoDiff(diff) {
     if (appState.plinkoDropping) return;
     appState.plinkoDiff = diff;
@@ -3045,11 +3126,13 @@
     if (appState.plinkoDropping) return;
     const bet = Math.round(Number(document.getElementById("plinkoBet").value) * 100) / 100;
     if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-    if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
 
-    appState.balance = Math.round((appState.balance - bet) * 100) / 100;
+    if (isAdminUser()) {
+      if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
+      appState.balance = Math.round((appState.balance - bet) * 100) / 100;
+      renderBalance();
+    }
     saveApp();
-    renderBalance();
 
     const mode = PLINKO_MODES[appState.plinkoDiff] || PLINKO_MODES.easy;
     appState.plinkoDropping = true;
@@ -3065,7 +3148,6 @@
     let pos = 0;
     let step = 0;
 
-    // Средняя скорость падения: 220 мс на каждый ряд
     const stepInterval = setInterval(() => {
       document.querySelectorAll(".peg-dot.on").forEach(d => d.classList.remove("on"));
 
@@ -3097,19 +3179,19 @@
 
           const idx = Math.min(mode.mults.length - 1, Math.max(0, pos));
           const mult = mode.mults[idx];
-          const win = Math.round(bet * mult * 100) / 100;
+          const winVal = Math.max(MIN_GRAM, Math.round(bet * mult * 100) / 100);
+          const nftPrize = createNftGiftObject(winVal, "Plinko NFT");
 
           renderPlinkoUI(idx);
-          appState.balance = Math.round((appState.balance + win) * 100) / 100;
-          saveApp();
-          renderBalance();
-          showToast(`Плинко (${mult}x): +${fmt(win)} GRAM`);
+          addNftToInventory(nftPrize);
+          renderLiveNftStrip();
+          showToast(`Плинко ${mult}x → NFT: ${nftPrize.name} (${fmt(winVal)})`);
         }, 220);
       }
     }, 220);
   }
 
-  /* SLOTS (6x5 Reference Grid) */
+  /* SLOTS 6x5 (NFT Reward) */
   function initSlotsGrid() {
     if (appState.slotsGrid.length !== 30) {
       appState.slotsGrid = Array.from({ length: 30 }, () => SLOT_SYMS[Math.floor(Math.random() * SLOT_SYMS.length)]);
@@ -3119,7 +3201,6 @@
   function renderSlotsUI(winIndices = []) {
     initSlotsGrid();
     document.getElementById("slotsBetVal").textContent = fmt(appState.slotsBet);
-    const totalCost = getSlotsRoundCost(false);
     document.getElementById("slotsBonusCost").textContent = fmt(Math.max(0.01, appState.slotsBet * 20));
     document.getElementById("slotsChanceCost").textContent = fmt(Math.max(0.01, appState.slotsBet * 0.25));
 
@@ -3177,17 +3258,19 @@
     if (appState.slotsSpinning) return;
     const cost = getSlotsRoundCost(isBonus);
     if (cost < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-    if (cost > appState.balance) {
-      appState.slotsAutoSpin = false;
-      clearInterval(autoSpinTimer);
-      renderSlotsUI();
-      showToast("Недостаточно GRAM");
-      return;
-    }
 
-    appState.balance = Math.round((appState.balance - cost) * 100) / 100;
+    if (isAdminUser()) {
+      if (cost > appState.balance) {
+        appState.slotsAutoSpin = false;
+        clearInterval(autoSpinTimer);
+        renderSlotsUI();
+        showToast("Недостаточно GRAM");
+        return;
+      }
+      appState.balance = Math.round((appState.balance - cost) * 100) / 100;
+      renderBalance();
+    }
     saveApp();
-    renderBalance();
 
     appState.slotsSpinning = true;
     document.getElementById("slotsSpinBtn").disabled = true;
@@ -3214,22 +3297,22 @@
       counts[sym].push(idx);
     });
 
-    let totalMult = 0;
+    let totalMult = isBonus ? 2.2 : 0;
     const winIndices = [];
-    for (const [sym, idxs] of Object.entries(counts)) {
-      if (idxs.length >= 6) {
-        const m = idxs.length >= 8 ? (isBonus ? 5.5 : 3.5) : (isBonus ? 2.6 : 1.6);
+    for (const [, idxs] of Object.entries(counts)) {
+      if (idxs.length >= 5) {
+        const m = idxs.length >= 7 ? 4.2 : 2.0;
         totalMult += m;
         winIndices.push(...idxs);
       }
     }
 
-    const win = Math.round(appState.slotsBet * totalMult * 100) / 100;
-    if (win > 0) {
-      appState.balance = Math.round((appState.balance + win) * 100) / 100;
-      saveApp();
-      renderBalance();
-      showToast(`Слоты: +${fmt(win)} GRAM`);
+    if (totalMult > 0) {
+      const winVal = Math.max(MIN_GRAM, Math.round(appState.slotsBet * totalMult * 100) / 100);
+      const nftPrize = createNftGiftObject(winVal, "Slots NFT");
+      addNftToInventory(nftPrize);
+      renderLiveNftStrip();
+      showToast(`Слоты → NFT: ${nftPrize.name} (${fmt(winVal)})`);
     } else {
       showToast("Спин завершён");
     }
@@ -3249,9 +3332,10 @@
   initTON();
   renderBalance();
   updateWalletButton();
+  renderLiveNftStrip();
   renderCasesGrid();
   initRocketLoop();
-  renderUpgraderUI();
+  syncAutoUpgradeTarget();
   renderMinesUI();
   renderPlinkoUI();
   renderSlotsUI();
