@@ -756,14 +756,14 @@
 
     .wheel-pointer {
       position: absolute;
-      top: -4px;
+      top: -5px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 18px solid var(--cyan);
+      border-left: 11px solid transparent;
+      border-right: 11px solid transparent;
+      border-top: 19px solid var(--cyan);
       filter: drop-shadow(0 0 8px var(--cyan));
       z-index: 8;
     }
@@ -781,7 +781,7 @@
       justify-content: center;
       padding: 14px;
       box-shadow: 0 0 28px rgba(16, 185, 129, 0.18);
-      transition: transform 2.4s cubic-bezier(0.14, 0.86, 0.22, 1);
+      transition: transform 2.5s cubic-bezier(0.14, 0.86, 0.22, 1);
     }
 
     .wheel-inner {
@@ -954,7 +954,7 @@
       cursor: pointer;
     }
 
-    /* Mines / Plinko / Slots */
+    /* Mines */
     .mines-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -986,46 +986,96 @@
       border-color: var(--red);
     }
 
+    /* Plinko with 4 difficulties + medium speed ball */
+    .diff-pills {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .diff-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 7px 4px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .diff-btn.active {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
     .plinko-box {
       background: #080b18;
       border: 1px solid var(--border);
       border-radius: 15px;
       padding: 10px;
       margin: 10px 0;
+      position: relative;
     }
 
     .plinko-pegs {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 11px;
       align-items: center;
-      padding: 6px 0;
+      padding: 8px 0;
+      position: relative;
     }
 
     .plinko-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       justify-content: center;
+      position: relative;
     }
 
     .peg-dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #64748b;
+      transition: transform 0.14s, background 0.14s;
+    }
+
+    .peg-dot.on {
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      transform: scale(1.35);
+    }
+
+    .plinko-ball {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff, var(--cyan) 55%, var(--purple));
+      box-shadow: 0 0 14px var(--cyan);
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, 0);
+      transition: top 0.21s linear, left 0.21s ease-out;
+      z-index: 5;
+      display: none;
     }
 
     .plinko-slots {
       display: grid;
       gap: 4px;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
     .p-slot {
       background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 5px 2px;
+      padding: 6px 2px;
       text-align: center;
       font-size: 10px;
       font-weight: 900;
@@ -1034,24 +1084,159 @@
 
     .p-slot.hit {
       border-color: var(--cyan);
-      background: rgba(34, 211, 238, 0.25);
+      background: rgba(34, 211, 238, 0.28);
+      color: #fff;
+      transform: scale(1.04);
+    }
+
+    /* Reference-styled 6x5 Slots Grid */
+    .slots-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .slots-board-6x5 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      background: #080b18;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: 18px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
+    .slot-cell-6x5 {
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #2a3263, #11152c 72%);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      user-select: none;
+    }
+
+    .slot-cell-6x5.win-cell {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
+      background: radial-gradient(circle at 30% 30%, #3b2678, #141a38 75%);
+    }
+
+    .slots-bet-bar {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      gap: 8px;
+      background: #080b18;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 6px 8px;
+      margin-bottom: 10px;
+    }
+
+    .slots-step-btn {
+      height: 36px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .slots-bet-center {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 900;
       color: #fff;
     }
 
-    .slots-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin: 10px 0;
+    .slots-opts-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    .slot-reel {
-      background: #080b18;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px 6px;
+    .speed-bars {
+      display: inline-flex;
+      gap: 4px;
+      margin-top: 4px;
+      cursor: pointer;
+    }
+
+    .speed-seg {
+      width: 22px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.28);
+    }
+
+    .speed-seg.on {
+      background: var(--cyan);
+      box-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+    }
+
+    .slots-spin-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .slots-spin-circle {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      border: 2px solid rgba(34, 211, 238, 0.55);
+      background: radial-gradient(circle at 35% 30%, #8b5cf6, #5b21b6);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 22px rgba(124, 58, 237, 0.45);
+    }
+
+    .slots-bottom-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .slots-bonus-btn {
+      border: none;
+      border-radius: 15px;
+      padding: 11px 10px;
+      background: linear-gradient(135deg, #ea580c, #eab308);
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+      cursor: pointer;
       text-align: center;
-      font-size: 30px;
+    }
+
+    .slots-chance-btn {
+      border: none;
+      border-radius: 15px;
+      padding: 11px 10px;
+      background: linear-gradient(135deg, #0284c7, #10b981);
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .slots-chance-btn.active {
+      outline: 2px solid var(--cyan);
     }
 
     .info-line {
@@ -1304,7 +1489,7 @@
     </div>
   </div>
 
-  <!-- 2. GAMES (Rocket Continuous Loop + Mines, Plinko, Slots) -->
+  <!-- 2. GAMES -->
   <div id="sec-games" class="sec">
     <div class="row4" style="grid-template-columns:repeat(4,1fr);">
       <button class="wallet-mini" onclick="selectSubGame('rocket')">🚀 Ракета</button>
@@ -1371,33 +1556,71 @@
       </div>
     </div>
 
-    <!-- PLINKO -->
+    <!-- PLINKO (4 Difficulties + Medium Speed Ball) -->
     <div id="sub-plinko" class="card" style="display:none;">
-      <div class="card-title">🟡 Плинко (GRAM)</div>
+      <div class="card-title">🟡 Плинко · Режимы сложности</div>
+
+      <div class="diff-pills" id="plinkoDiffPills">
+        <button class="diff-btn active" data-diff="easy" onclick="setPlinkoDiff('easy')">Лёгкий</button>
+        <button class="diff-btn" data-diff="medium" onclick="setPlinkoDiff('medium')">Средний</button>
+        <button class="diff-btn" data-diff="hard" onclick="setPlinkoDiff('hard')">Тяжёлый</button>
+        <button class="diff-btn" data-diff="extreme" onclick="setPlinkoDiff('extreme')">Хард</button>
+      </div>
+
       <div class="fg">
         <label>Ставка (от 0.01 GRAM)</label>
         <input class="inp" id="plinkoBet" type="number" step="0.01" min="0.01" value="0.50" />
       </div>
+
       <div class="plinko-box">
-        <div class="plinko-pegs" id="plinkoPegs"></div>
+        <div class="plinko-pegs" id="plinkoPegs">
+          <div class="plinko-ball" id="plinkoBall"></div>
+        </div>
         <div class="plinko-slots" id="plinkoSlots"></div>
       </div>
+
       <button class="btn-purple" id="plinkoDropBtn" onclick="playPlinko()">Сбросить шар</button>
     </div>
 
-    <!-- SLOTS -->
-    <div id="sub-slots" class="card" style="display:none;">
-      <div class="card-title">🎰 Слоты (GRAM)</div>
-      <div class="fg">
-        <label>Ставка (от 0.01 GRAM)</label>
-        <input class="inp" id="slotsBet" type="number" step="0.01" min="0.01" value="0.50" />
+    <!-- SLOTS (6x5 Grid matching reference screenshot) -->
+    <div id="sub-slots" class="slots-panel" style="display:none;">
+      <div class="slots-board-6x5" id="slotsBoard6x5"></div>
+
+      <div class="slots-bet-bar">
+        <button class="slots-step-btn" onclick="stepSlotsBet(-0.10)">−</button>
+        <div class="slots-bet-center">◆ <span id="slotsBetVal">0.10</span> GRAM</div>
+        <button class="slots-step-btn" onclick="stepSlotsBet(0.10)">+</button>
       </div>
-      <div class="slots-row">
-        <div class="slot-reel" id="slot0">👑</div>
-        <div class="slot-reel" id="slot1">💎</div>
-        <div class="slot-reel" id="slot2">🚀</div>
+
+      <div class="slots-opts-row">
+        <div>
+          <div style="color:var(--muted);">Скорость</div>
+          <div class="speed-bars" onclick="cycleSlotsSpeed()">
+            <span class="speed-seg on" id="spdSeg1"></span>
+            <span class="speed-seg" id="spdSeg2"></span>
+            <span class="speed-seg" id="spdSeg3"></span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="color:var(--muted);">Автоспин</div>
+          <button class="wallet-mini" id="autoSpinToggleBtn" style="margin-top:3px;" onclick="toggleAutoSpin()">ВЫКЛ</button>
+        </div>
       </div>
-      <button class="btn-purple" id="slotsSpinBtn" onclick="playSlots()">Крутить слоты</button>
+
+      <div class="slots-spin-wrap">
+        <button class="slots-spin-circle" id="slotsSpinBtn" onclick="playSlots()">↻</button>
+      </div>
+
+      <div class="slots-bottom-2">
+        <button class="slots-bonus-btn" onclick="buySlotsBonus()">
+          <div>🎁 Купить бонус</div>
+          <div style="font-size:11px;margin-top:2px;">◆ <span id="slotsBonusCost">10.00</span></div>
+        </button>
+        <button class="slots-chance-btn" id="slotsDoubleChanceBtn" onclick="toggleDoubleChance()">
+          <div>⚡ Двойной шанс</div>
+          <div style="font-size:11px;margin-top:2px;">+ ◆ <span id="slotsChanceCost">0.03</span></div>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1647,7 +1870,7 @@
   const MIN_GRAM = 0.01;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_full_v3";
+  const SAVE_KEY = "mellstroy_gift_full_v4";
 
   const INITIAL_CASES = [
     {
@@ -1696,6 +1919,29 @@
     { name: "MaxPayne", bet: 0.40, target: 1.40 }
   ];
 
+  /* Plinko difficulty tables (8 rows -> 9 slots) */
+  const PLINKO_MODES = {
+    easy: {
+      mults: [1.8, 1.4, 1.1, 0.9, 0.8, 0.9, 1.1, 1.4, 1.8],
+      biasCenter: 0.58
+    },
+    medium: {
+      mults: [3.2, 1.8, 1.1, 0.7, 0.5, 0.7, 1.1, 1.8, 3.2],
+      biasCenter: 0.50
+    },
+    hard: {
+      mults: [7.0, 2.8, 1.3, 0.5, 0.25, 0.5, 1.3, 2.8, 7.0],
+      biasCenter: 0.44
+    },
+    extreme: {
+      mults: [16.0, 4.5, 1.5, 0.3, 0.1, 0.3, 1.5, 4.5, 16.0],
+      biasCenter: 0.38
+    }
+  };
+
+  /* 6x5 Slots symbols */
+  const SLOT_SYMS = ["🐸", "🚀", "🫐", "👑", "📅", "🍭", "🧱", "🐒", "🐈‍⬛", "💋"];
+
   const appState = {
     userId: null,
     username: "Игрок",
@@ -1729,10 +1975,21 @@
     minesMinesTotal: 3,
     minesGridData: [],
     minesOpened: [],
-    minesMultVal: 1.00
+    minesMultVal: 1.00,
+    /* Plinko */
+    plinkoDiff: "easy",
+    plinkoDropping: false,
+    /* Slots 6x5 */
+    slotsBet: 0.10,
+    slotsSpeedLevel: 1,
+    slotsAutoSpin: false,
+    slotsDoubleChance: false,
+    slotsSpinning: false,
+    slotsGrid: []
   };
 
   let tonConnectUI = null;
+  let autoSpinTimer = null;
 
   function fmt(v) {
     return (Number(v) || 0).toFixed(2);
@@ -1965,7 +2222,7 @@
       document.getElementById("caseOpenView").style.display = "none";
       renderCasesGrid();
     }
-    if (sec === "games") { renderRocketUI(); renderMinesUI(); renderPlinkoUI(); }
+    if (sec === "games") { renderRocketUI(); renderMinesUI(); renderPlinkoUI(); renderSlotsUI(); }
     if (sec === "upgrader") renderUpgraderUI();
     if (sec === "inventory") renderInventoryUI();
     if (sec === "admin") renderAdminUI();
@@ -1983,6 +2240,7 @@
     if (sub === "rocket") renderRocketUI();
     if (sub === "mines") renderMinesUI();
     if (sub === "plinko") renderPlinkoUI();
+    if (sub === "slots") renderSlotsUI();
   }
 
   function mediaHtml(img, fb = "🎁") {
@@ -2269,7 +2527,7 @@
     switchNav("upgrader");
   }
 
-  /* ROCKET (Continuous Online Loop + Live Players) */
+  /* ROCKET */
   function buildRocketRoundFeed() {
     const picked = [...ROCKET_BOT_POOL]
       .sort(() => Math.random() - 0.5)
@@ -2433,13 +2691,9 @@
       btnEl.disabled = false;
       btnEl.textContent = "Поставить на след. раунд";
       btnEl.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
-    } else if (appState.rocketPhase === "countdown") {
-      btnEl.disabled = false;
-      btnEl.textContent = "Сделать ставку";
-      btnEl.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
     } else {
       btnEl.disabled = false;
-      btnEl.textContent = "Поставить на след. раунд";
+      btnEl.textContent = "Сделать ставку";
       btnEl.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
     }
 
@@ -2485,14 +2739,8 @@
     }
 
     const bet = Math.round(Number(document.getElementById("rocketBet").value) * 100) / 100;
-    if (!bet || bet < MIN_GRAM) {
-      showToast("Ставка от 0.01 GRAM");
-      return;
-    }
-    if (bet > appState.balance) {
-      showToast("Недостаточно GRAM");
-      return;
-    }
+    if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
+    if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
 
     appState.balance = Math.round((appState.balance - bet) * 100) / 100;
     saveApp();
@@ -2517,7 +2765,7 @@
     renderRocketUI();
   }
 
-  /* UPGRADER */
+  /* UPGRADER (Exact pointer-to-sector angle synchronization) */
   function getAllTargets() {
     const out = [];
     for (const c of appState.cases) {
@@ -2566,8 +2814,8 @@
     document.getElementById("upgWheelChance").textContent = `${ch.toFixed(1)}%`;
     document.getElementById("upgWheelSub").textContent = appState.upgTarget ? appState.upgTarget.name : "Выберите цель";
 
-    const deg = Math.round((ch / 100) * 360);
-    document.getElementById("upgWheelRing").style.setProperty("--win-deg", `${deg}deg`);
+    const deg = (ch / 100) * 360;
+    document.getElementById("upgWheelRing").style.setProperty("--win-deg", `${deg.toFixed(2)}deg`);
   }
 
   function openUpgSourcePicker() {
@@ -2661,37 +2909,48 @@
       renderBalance();
     } else {
       const idx = appState.inventory.findIndex(x => x.uid === appState.upgSource.uid);
-      if (idx === -1) { showToast("NFT-подарок не найден в инвентаре"); appState.upgSource = null; renderUpgraderUI(); return; }
+      if (idx === -1) { showToast("NFT-подарок не найден"); appState.upgSource = null; renderUpgraderUI(); return; }
       appState.inventory.splice(idx, 1);
     }
 
     const chance = Number(appState.upgChance) || 35;
-    const won = Math.random() * 100 < chance;
-    const targetCopy = { ...appState.upgTarget };
+    const winDeg = (chance / 100) * 360;
 
+    // Выбираем целевую точку на диске (внутри зелёного [0..winDeg] или серого [winDeg..360])
+    const wantsWin = Math.random() * 100 < chance;
+    const targetSectorAngle = wantsWin
+      ? (Math.random() * Math.max(2, winDeg - 6) + 3)
+      : (winDeg + 3 + Math.random() * Math.max(2, 354 - winDeg));
+
+    // Колесо крутится по часовой стрелке на deltaAngle, чтобы targetSectorAngle оказался под верхним указателем (0 deg)
+    const currentMod = ((appState.upgAngle % 360) + 360) % 360;
+    const desiredMod = (360 - targetSectorAngle) % 360;
+    const stepDiff = (desiredMod - currentMod + 360) % 360;
+    const deltaAngle = 1080 + stepDiff;
+
+    appState.upgAngle += deltaAngle;
     appState.upgSpinning = true;
     document.getElementById("upgRunBtn").disabled = true;
-
-    const winDeg = (chance / 100) * 360;
-    const landDeg = won
-      ? Math.random() * Math.max(6, winDeg - 10) + 5
-      : winDeg + 10 + Math.random() * Math.max(6, 350 - winDeg);
-
-    appState.upgAngle += 1080 + landDeg;
     document.getElementById("upgWheelRing").style.transform = `rotate(${appState.upgAngle}deg)`;
 
+    const targetCopy = { ...appState.upgTarget };
+
     setTimeout(() => {
+      const finalMod = ((appState.upgAngle % 360) + 360) % 360;
+      const landedSectorAngle = (360 - finalMod) % 360;
+      const isActuallyWon = landedSectorAngle < winDeg;
+
       appState.upgSpinning = false;
       document.getElementById("upgRunBtn").disabled = false;
 
-      if (won) {
+      if (isActuallyWon) {
         appState.inventory.unshift({
           uid: "upg_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
           gift: targetCopy
         });
-        showToast(`Успех (${chance.toFixed(1)}%)! Получен ${targetCopy.name}`);
+        showToast(`Удача! Выигран ${targetCopy.name}`);
       } else {
-        showToast(`Неудача при ${chance.toFixed(1)}%`);
+        showToast(`Проигрыш! Стрелка в серой зоне`);
       }
 
       if (appState.upgSource && appState.upgSource.type === "nft") {
@@ -2699,10 +2958,10 @@
       }
       saveApp();
       renderUpgraderUI();
-    }, 2450);
+    }, 2550);
   }
 
-  /* Game 2: Mines */
+  /* MINES */
   function newMinesRound() {
     if (appState.minesActive) { showToast("Сначала забери или доиграй"); return; }
     const bet = Math.round(Number(document.getElementById("minesBet").value) * 100) / 100;
@@ -2758,59 +3017,230 @@
     }).join("");
   }
 
-  /* Game 3: Plinko */
-  const PLINKO_MULTS = [5.0, 2.0, 1.2, 0.6, 0.4, 0.6, 1.2, 2.0, 5.0];
+  /* PLINKO (4 Difficulties + Medium Speed Step-by-Step Ball) */
+  function setPlinkoDiff(diff) {
+    if (appState.plinkoDropping) return;
+    appState.plinkoDiff = diff;
+    document.querySelectorAll("#plinkoDiffPills .diff-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.diff === diff);
+    });
+    renderPlinkoUI(-1);
+  }
+
   function renderPlinkoUI(hitSlot = -1) {
-    let pegsHtml = "";
+    const mode = PLINKO_MODES[appState.plinkoDiff] || PLINKO_MODES.easy;
+    const pegsContainer = document.getElementById("plinkoPegs");
+    let pegsHtml = `<div class="plinko-ball" id="plinkoBall"></div>`;
     for (let r = 0; r < 8; r++) {
-      pegsHtml += `<div class="plinko-row">${Array.from({ length: r + 3 }, () => `<span class="peg-dot"></span>`).join("")}</div>`;
+      pegsHtml += `<div class="plinko-row" data-row="${r}">${Array.from({ length: r + 3 }, (_, c) => `<span class="peg-dot" data-peg="${r}-${c}"></span>`).join("")}</div>`;
     }
-    document.getElementById("plinkoPegs").innerHTML = pegsHtml;
+    pegsContainer.innerHTML = pegsHtml;
+
     const slotsEl = document.getElementById("plinkoSlots");
-    slotsEl.style.gridTemplateColumns = `repeat(${PLINKO_MULTS.length}, 1fr)`;
-    slotsEl.innerHTML = PLINKO_MULTS.map((m, idx) => `<div class="p-slot ${idx === hitSlot ? "hit" : ""}">${m}x</div>`).join("");
+    slotsEl.style.gridTemplateColumns = `repeat(${mode.mults.length}, 1fr)`;
+    slotsEl.innerHTML = mode.mults.map((m, idx) => `<div class="p-slot ${idx === hitSlot ? "hit" : ""}">${m}x</div>`).join("");
   }
 
   function playPlinko() {
+    if (appState.plinkoDropping) return;
     const bet = Math.round(Number(document.getElementById("plinkoBet").value) * 100) / 100;
     if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
     if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
+
     appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-    saveApp(); renderBalance();
+    saveApp();
+    renderBalance();
+
+    const mode = PLINKO_MODES[appState.plinkoDiff] || PLINKO_MODES.easy;
+    appState.plinkoDropping = true;
+    document.getElementById("plinkoDropBtn").disabled = true;
+    renderPlinkoUI(-1);
+
+    const ball = document.getElementById("plinkoBall");
+    const pegsBox = document.getElementById("plinkoPegs");
+    ball.style.display = "block";
+    ball.style.top = "2px";
+    ball.style.left = "50%";
+
     let pos = 0;
-    for (let i = 0; i < 8; i++) if (Math.random() < 0.5) pos++;
-    const idx = Math.min(PLINKO_MULTS.length - 1, Math.max(0, pos));
-    const mult = PLINKO_MULTS[idx];
-    const win = Math.round(bet * mult * 100) / 100;
-    renderPlinkoUI(idx);
-    appState.balance = Math.round((appState.balance + win) * 100) / 100;
-    saveApp(); renderBalance();
-    showToast(`Плинко ${mult}x: +${fmt(win)} GRAM`);
+    let step = 0;
+
+    // Средняя скорость падения: 220 мс на каждый ряд
+    const stepInterval = setInterval(() => {
+      document.querySelectorAll(".peg-dot.on").forEach(d => d.classList.remove("on"));
+
+      const goRight = Math.random() > mode.biasCenter;
+      if (goRight) pos++;
+
+      const rowEl = pegsBox.querySelector(`.plinko-row[data-row="${step}"]`);
+      if (rowEl) {
+        const dots = rowEl.querySelectorAll(".peg-dot");
+        const pegIdx = Math.min(dots.length - 1, Math.max(0, pos));
+        if (dots[pegIdx]) dots[pegIdx].classList.add("on");
+      }
+
+      const boxW = pegsBox.clientWidth || 300;
+      const offsetRatio = (pos - (step + 1) / 2) * 0.075;
+      const leftPx = Math.max(18, Math.min(boxW - 18, boxW * 0.5 + boxW * offsetRatio));
+      const topPx = 8 + (step + 1) * 18;
+
+      ball.style.left = `${leftPx}px`;
+      ball.style.top = `${topPx}px`;
+
+      step++;
+      if (step >= 8) {
+        clearInterval(stepInterval);
+        setTimeout(() => {
+          ball.style.display = "none";
+          appState.plinkoDropping = false;
+          document.getElementById("plinkoDropBtn").disabled = false;
+
+          const idx = Math.min(mode.mults.length - 1, Math.max(0, pos));
+          const mult = mode.mults[idx];
+          const win = Math.round(bet * mult * 100) / 100;
+
+          renderPlinkoUI(idx);
+          appState.balance = Math.round((appState.balance + win) * 100) / 100;
+          saveApp();
+          renderBalance();
+          showToast(`Плинко (${mult}x): +${fmt(win)} GRAM`);
+        }, 220);
+      }
+    }, 220);
   }
 
-  /* Game 4: Slots */
-  function playSlots() {
-    const bet = Math.round(Number(document.getElementById("slotsBet").value) * 100) / 100;
-    if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-    if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
-    appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-    saveApp(); renderBalance();
-    const syms = ["👑", "💎", "🚀", "🍀"];
-    const a = syms[Math.floor(Math.random() * syms.length)];
-    const b = syms[Math.floor(Math.random() * syms.length)];
-    const c = syms[Math.floor(Math.random() * syms.length)];
-    document.getElementById("slot0").textContent = a;
-    document.getElementById("slot1").textContent = b;
-    document.getElementById("slot2").textContent = c;
-    let mult = 0;
-    if (a === b && b === c) mult = a === "👑" ? 8 : 4;
-    else if (a === b || b === c || a === c) mult = 0.6;
-    const win = Math.round(bet * mult * 100) / 100;
+  /* SLOTS (6x5 Reference Grid) */
+  function initSlotsGrid() {
+    if (appState.slotsGrid.length !== 30) {
+      appState.slotsGrid = Array.from({ length: 30 }, () => SLOT_SYMS[Math.floor(Math.random() * SLOT_SYMS.length)]);
+    }
+  }
+
+  function renderSlotsUI(winIndices = []) {
+    initSlotsGrid();
+    document.getElementById("slotsBetVal").textContent = fmt(appState.slotsBet);
+    const totalCost = getSlotsRoundCost(false);
+    document.getElementById("slotsBonusCost").textContent = fmt(Math.max(0.01, appState.slotsBet * 20));
+    document.getElementById("slotsChanceCost").textContent = fmt(Math.max(0.01, appState.slotsBet * 0.25));
+
+    document.getElementById("slotsBoard6x5").innerHTML = appState.slotsGrid.map((sym, idx) => `
+      <div class="slot-cell-6x5 ${winIndices.includes(idx) ? "win-cell" : ""}">${sym}</div>
+    `).join("");
+
+    [1, 2, 3].forEach(n => {
+      document.getElementById("spdSeg" + n).classList.toggle("on", appState.slotsSpeedLevel >= n);
+    });
+
+    document.getElementById("autoSpinToggleBtn").textContent = appState.slotsAutoSpin ? "ВКЛ" : "ВЫКЛ";
+    document.getElementById("slotsDoubleChanceBtn").classList.toggle("active", appState.slotsDoubleChance);
+  }
+
+  function stepSlotsBet(delta) {
+    if (appState.slotsSpinning) return;
+    const next = Math.max(MIN_GRAM, Math.round((appState.slotsBet + delta) * 100) / 100);
+    appState.slotsBet = next;
+    renderSlotsUI();
+  }
+
+  function cycleSlotsSpeed() {
+    appState.slotsSpeedLevel = (appState.slotsSpeedLevel % 3) + 1;
+    renderSlotsUI();
+  }
+
+  function toggleAutoSpin() {
+    appState.slotsAutoSpin = !appState.slotsAutoSpin;
+    renderSlotsUI();
+    clearInterval(autoSpinTimer);
+    if (appState.slotsAutoSpin) {
+      playSlots();
+      const delay = appState.slotsSpeedLevel === 3 ? 950 : (appState.slotsSpeedLevel === 2 ? 1350 : 1850);
+      autoSpinTimer = setInterval(() => {
+        if (!appState.slotsAutoSpin) { clearInterval(autoSpinTimer); return; }
+        playSlots();
+      }, delay);
+    }
+  }
+
+  function toggleDoubleChance() {
+    appState.slotsDoubleChance = !appState.slotsDoubleChance;
+    renderSlotsUI();
+  }
+
+  function getSlotsRoundCost(isBonus) {
+    const base = appState.slotsBet;
+    if (isBonus) return Math.round(base * 20 * 100) / 100;
+    const extra = appState.slotsDoubleChance ? base * 0.25 : 0;
+    return Math.round((base + extra) * 100) / 100;
+  }
+
+  function playSlots(isBonus = false) {
+    if (appState.slotsSpinning) return;
+    const cost = getSlotsRoundCost(isBonus);
+    if (cost < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
+    if (cost > appState.balance) {
+      appState.slotsAutoSpin = false;
+      clearInterval(autoSpinTimer);
+      renderSlotsUI();
+      showToast("Недостаточно GRAM");
+      return;
+    }
+
+    appState.balance = Math.round((appState.balance - cost) * 100) / 100;
+    saveApp();
+    renderBalance();
+
+    appState.slotsSpinning = true;
+    document.getElementById("slotsSpinBtn").disabled = true;
+
+    const tickMs = appState.slotsSpeedLevel === 3 ? 65 : (appState.slotsSpeedLevel === 2 ? 100 : 140);
+    const steps = appState.slotsSpeedLevel === 3 ? 6 : 9;
+    let cur = 0;
+
+    const spinTimer = setInterval(() => {
+      appState.slotsGrid = Array.from({ length: 30 }, () => SLOT_SYMS[Math.floor(Math.random() * SLOT_SYMS.length)]);
+      renderSlotsUI([]);
+      cur++;
+      if (cur >= steps) {
+        clearInterval(spinTimer);
+        finishSlotsSpin(isBonus);
+      }
+    }, tickMs);
+  }
+
+  function finishSlotsSpin(isBonus) {
+    const counts = {};
+    appState.slotsGrid.forEach((sym, idx) => {
+      if (!counts[sym]) counts[sym] = [];
+      counts[sym].push(idx);
+    });
+
+    let totalMult = 0;
+    const winIndices = [];
+    for (const [sym, idxs] of Object.entries(counts)) {
+      if (idxs.length >= 6) {
+        const m = idxs.length >= 8 ? (isBonus ? 5.5 : 3.5) : (isBonus ? 2.6 : 1.6);
+        totalMult += m;
+        winIndices.push(...idxs);
+      }
+    }
+
+    const win = Math.round(appState.slotsBet * totalMult * 100) / 100;
     if (win > 0) {
       appState.balance = Math.round((appState.balance + win) * 100) / 100;
-      saveApp(); renderBalance();
-      showToast(`Слоты ${mult}x: +${fmt(win)} GRAM`);
-    } else { showToast("Мимо"); }
+      saveApp();
+      renderBalance();
+      showToast(`Слоты: +${fmt(win)} GRAM`);
+    } else {
+      showToast("Спин завершён");
+    }
+
+    appState.slotsSpinning = false;
+    document.getElementById("slotsSpinBtn").disabled = false;
+    renderSlotsUI(winIndices);
+  }
+
+  function buySlotsBonus() {
+    playSlots(true);
   }
 
   /* Boot */
@@ -2824,6 +3254,7 @@
   renderUpgraderUI();
   renderMinesUI();
   renderPlinkoUI();
+  renderSlotsUI();
 </script>
 </body>
 </html>
