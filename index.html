@@ -3,72 +3,125 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MellstroyGift — NFT Cases, Upgrade, Slots, Plinko & Mines</title>
+  <title>MellstroyGift — Neon NFT Ecosystem</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: #07080d;
-      --card: #111420;
-      --card-2: #171b2c;
-      --text: #f3f5ff;
-      --muted: #8e96b3;
-      --accent: #8b5cf6;
-      --accent-2: #22d3ee;
-      --ok: #22c55e;
+      --bg: #05060b;
+      --surface: rgba(14, 17, 30, 0.86);
+      --surface-2: rgba(23, 28, 48, 0.92);
+      --text: #f5f7ff;
+      --muted: #98a2c7;
+      --neon-purple: #9d4edd;
+      --neon-violet: #7b2cbf;
+      --neon-cyan: #00f5d4;
+      --neon-blue: #3a86ff;
+      --neon-pink: #ff2a85;
+      --ok: #10b981;
       --warn: #f59e0b;
       --err: #ef4444;
-      --border: rgba(255, 255, 255, 0.09);
+      --line: rgba(157, 78, 221, 0.28);
+      --line-soft: rgba(255, 255, 255, 0.08);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at 15% 5%, rgba(139, 92, 246, 0.24), transparent 42%),
-        radial-gradient(circle at 85% 15%, rgba(34, 211, 238, 0.16), transparent 40%),
-        var(--bg);
+      min-height: 100vh;
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      min-height: 100vh;
-      padding-bottom: 84px;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(157, 78, 221, 0.34), transparent 44%),
+        radial-gradient(circle at 88% 12%, rgba(0, 245, 212, 0.18), transparent 40%),
+        radial-gradient(circle at 50% 95%, rgba(58, 134, 255, 0.2), transparent 48%),
+        var(--bg);
+      padding-bottom: 92px;
+      overflow-x: hidden;
     }
 
-    .app { max-width: 560px; margin: 0 auto; padding: 14px; }
+    .app {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 14px;
+    }
 
+    /* Topbar */
     .topbar {
+      position: sticky;
+      top: 10px;
+      z-index: 30;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      background: rgba(17, 20, 32, 0.9);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: 16px;
       padding: 12px 14px;
-      position: sticky;
-      top: 10px;
-      z-index: 20;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      border-radius: 18px;
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--line);
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.55),
+        0 0 24px rgba(157, 78, 221, 0.18);
     }
 
-    .brand { display: flex; flex-direction: column; gap: 2px; }
-    .brand-title { font-weight: 800; font-size: 16px; letter-spacing: 0.2px; }
-    .sync-status { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); display: inline-block; }
-    .dot.ok { background: var(--ok); }
-    .dot.err { background: var(--err); }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: 0.4px;
+      background: linear-gradient(90deg, #ffffff 0%, #c77dff 55%, #00f5d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warn);
+      box-shadow: 0 0 8px var(--warn);
+      flex-shrink: 0;
+    }
+    .dot.ok { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
+    .dot.err { background: var(--err); box-shadow: 0 0 10px var(--err); }
 
     .wallet {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.26), rgba(34, 211, 238, 0.18));
-      border: 1px solid rgba(139, 92, 246, 0.48);
-      border-radius: 12px;
-      padding: 8px 12px;
-      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 13px;
+      font-weight: 800;
       font-size: 14px;
       white-space: nowrap;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.28), rgba(58, 134, 255, 0.22));
+      border: 1px solid rgba(0, 245, 212, 0.35);
+      box-shadow: 0 0 16px rgba(157, 78, 221, 0.25);
     }
 
+    /* Navigation Tabs */
     .tabs {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -77,87 +130,162 @@
     }
 
     .tab-btn {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: var(--surface);
+      border: 1px solid var(--line-soft);
       color: var(--muted);
-      border-radius: 12px;
+      border-radius: 13px;
       padding: 10px 4px;
       font-weight: 700;
       font-size: 11px;
       cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
     }
+
+    .tab-btn:active { transform: scale(0.97); }
 
     .tab-btn.active {
-      color: var(--text);
-      border-color: var(--accent);
-      box-shadow: 0 0 18px rgba(139, 92, 246, 0.28);
-      background: var(--card-2);
+      color: #fff;
+      background: linear-gradient(145deg, rgba(157, 78, 221, 0.32), rgba(58, 134, 255, 0.2));
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 18px rgba(157, 78, 221, 0.4), inset 0 0 10px rgba(0, 245, 212, 0.14);
     }
 
-    .panel { display: none; }
+    .panel {
+      display: none;
+      animation: fadeSlide 0.22s ease;
+    }
     .panel.active { display: block; }
 
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Neon Glows */
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
       padding: 14px;
       margin-bottom: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.38);
     }
 
-    .section-title { font-weight: 800; font-size: 15px; margin-bottom: 10px; }
-    .muted { color: var(--muted); font-size: 12px; }
-
-    .cases-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .case-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px;
+    .section-title {
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 10px;
       display: flex;
-      flex-direction: column;
+      align-items: center;
       justify-content: space-between;
       gap: 8px;
     }
 
+    .muted { color: var(--muted); font-size: 12px; }
+
+    /* Cases Grid */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 11px;
+    }
+
+    .case-card {
+      background: linear-gradient(180deg, rgba(24, 29, 52, 0.92) 0%, rgba(13, 16, 29, 0.96) 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 11px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 9px;
+      transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .case-card:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 22px rgba(157, 78, 221, 0.28);
+    }
+
+    .case-img-wrap {
+      position: relative;
+      border-radius: 13px;
+      overflow: hidden;
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
+    }
+
     .case-img {
       width: 100%;
-      height: 102px;
+      height: 108px;
       object-fit: cover;
-      border-radius: 12px;
-      background: var(--card-2);
+      display: block;
     }
 
     .case-title { font-weight: 800; font-size: 14px; }
     .case-meta { font-size: 12px; color: var(--muted); }
 
+    /* Buttons & Inputs */
     .btn {
       border: none;
-      border-radius: 11px;
-      padding: 9px 12px;
-      font-weight: 700;
+      border-radius: 12px;
+      padding: 10px 13px;
+      font-weight: 800;
       font-size: 13px;
       cursor: pointer;
       color: #fff;
-      background: linear-gradient(135deg, var(--accent), #6d28d9);
+      background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-blue) 100%);
+      box-shadow: 0 0 16px rgba(157, 78, 221, 0.35);
+      transition: transform 0.14s ease, filter 0.18s ease, box-shadow 0.18s ease;
     }
 
-    .btn.secondary { background: var(--card-2); border: 1px solid var(--border); color: var(--text); }
-    .btn.danger { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #fca5a5; }
+    .btn:hover { filter: brightness(1.08); box-shadow: 0 0 22px rgba(0, 245, 212, 0.32); }
+    .btn:active { transform: scale(0.97); }
+
+    .btn.secondary {
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .btn.danger {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      box-shadow: none;
+    }
+
     .btn.sm { padding: 6px 9px; font-size: 11px; border-radius: 9px; }
 
+    input, select {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
+      color: var(--text);
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-bottom: 8px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.2);
+    }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* Drop / Spinner Box */
     .roulette-box {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      text-align: center;
       margin-top: 12px;
+      border-radius: 18px;
+      padding: 14px;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.14), rgba(0, 245, 212, 0.08));
+      border: 1px solid var(--line);
+      text-align: center;
     }
 
     .drop-preview {
@@ -169,13 +297,15 @@
     }
 
     .drop-preview img {
-      width: 64px;
-      height: 64px;
-      border-radius: 12px;
+      width: 66px;
+      height: 66px;
+      border-radius: 14px;
       object-fit: cover;
-      border: 1px solid var(--border);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 16px rgba(0, 245, 212, 0.3);
     }
 
+    /* Lists */
     .inv-list, .admin-list { display: flex; flex-direction: column; gap: 8px; }
 
     .item-row {
@@ -183,36 +313,24 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
       padding: 10px;
     }
 
     .item-row img {
-      width: 46px;
-      height: 46px;
-      border-radius: 10px;
+      width: 48px;
+      height: 48px;
+      border-radius: 11px;
       object-fit: cover;
       flex-shrink: 0;
+      border: 1px solid var(--line);
     }
 
     .item-info { flex: 1; min-width: 0; }
     .item-name { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .item-sub { font-size: 11px; color: var(--muted); }
-
-    input, select {
-      width: 100%;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 10px;
-      padding: 9px 11px;
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
     /* Slots */
     .slots-reel {
@@ -221,97 +339,136 @@
       gap: 8px;
       margin: 10px 0;
     }
+
     .slot-cell {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      height: 78px;
+      height: 82px;
+      border-radius: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 34px;
+      box-shadow: inset 0 0 16px rgba(157, 78, 221, 0.22);
     }
 
     /* Plinko */
     .plinko-board {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px;
       margin-top: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
     }
-    .plinko-rows { display: flex; flex-direction: column; gap: 8px; align-items: center; padding: 6px 0; }
+
+    .plinko-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 0;
+    }
+
     .plinko-pin-row { display: flex; gap: 14px; justify-content: center; }
-    .pin { width: 7px; height: 7px; border-radius: 50%; background: rgba(243, 245, 255, 0.55); }
+    .pin {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0, 245, 212, 0.55);
+    }
+
     .plinko-buckets {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 4px;
       margin-top: 8px;
     }
+
     .bucket {
-      background: rgba(139, 92, 246, 0.16);
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      border-radius: 8px;
+      border-radius: 9px;
       padding: 6px 2px;
       text-align: center;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
+      background: rgba(157, 78, 221, 0.18);
+      border: 1px solid rgba(157, 78, 221, 0.4);
     }
+
     .bucket.hit {
-      background: rgba(34, 211, 238, 0.28);
-      border-color: var(--accent-2);
-      box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
+      background: rgba(0, 245, 212, 0.25);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 14px rgba(0, 245, 212, 0.45);
+      color: #fff;
     }
 
     /* Upgrade */
     .upgrade-meter {
       height: 12px;
       border-radius: 999px;
-      background: var(--card-2);
-      border: 1px solid var(--border);
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
       overflow: hidden;
       margin: 10px 0;
     }
+
     .upgrade-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
       transition: width 0.25s ease;
     }
 
     /* Mines */
-    .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+    .mines-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
     .mine-cell {
       aspect-ratio: 1;
-      border-radius: 11px;
-      border: 1px solid var(--border);
-      background: var(--card-2);
+      border-radius: 12px;
+      border: 1px solid var(--line-soft);
+      background: var(--surface-2);
       color: var(--text);
       font-weight: 800;
       font-size: 15px;
       cursor: pointer;
     }
-    .mine-cell.safe { background: rgba(34, 197, 94, 0.22); border-color: var(--ok); }
-    .mine-cell.bomb { background: rgba(239, 68, 68, 0.28); border-color: var(--err); }
 
+    .mine-cell.safe {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: var(--ok);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.28);
+    }
+
+    .mine-cell.bomb {
+      background: rgba(239, 68, 68, 0.28);
+      border-color: var(--err);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    }
+
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 18px;
       left: 50%;
       transform: translateX(-50%);
-      background: #181d30;
+      background: rgba(18, 22, 40, 0.96);
       color: #fff;
-      border: 1px solid var(--accent);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.28);
       padding: 10px 16px;
-      border-radius: 12px;
+      border-radius: 13px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease;
-      z-index: 50;
-      max-width: 90vw;
+      z-index: 60;
+      max-width: 92vw;
       text-align: center;
     }
     .toast.show { opacity: 1; }
@@ -350,7 +507,7 @@
       </div>
     </section>
 
-    <!-- GAMES: SLOTS, PLINKO, MINES -->
+    <!-- GAMES -->
     <section id="tab-games" class="panel">
       <div class="card">
         <div class="section-title">Слоты</div>
@@ -417,8 +574,8 @@
     <!-- INVENTORY -->
     <section id="tab-inventory" class="panel">
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <span class="section-title" style="margin:0;">Мои NFT-подарки</span>
+        <div class="section-title">
+          <span>Мои NFT-подарки</span>
           <button class="btn secondary sm" id="bonusStarsBtn">+500 ⭐ тест</button>
         </div>
         <div class="inv-list" id="inventoryList"></div>
@@ -458,6 +615,8 @@
     const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
     const STATE_ROW_ID = "mellstroy_gift_global_state";
+
+    const FALLBACK_IMG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80";
 
     const DEFAULT_STATE = {
       cases: [
@@ -523,6 +682,45 @@
       document.getElementById("tabsNav").style.gridTemplateColumns = "repeat(4, 1fr)";
     }
 
+    function normalizeState(rawState) {
+      const base = structuredClone(DEFAULT_STATE);
+      if (!rawState || !Array.isArray(rawState.cases) || !rawState.cases.length) {
+        return base;
+      }
+
+      const byId = new Map();
+      for (const c of base.cases) {
+        byId.set(c.id, { ...c, items: [...(c.items || [])] });
+      }
+
+      for (const rc of rawState.cases) {
+        if (!rc || !rc.id) continue;
+        const cleanImage = typeof rc.image === "string" && rc.image.startsWith("http")
+          ? rc.image
+          : (byId.get(rc.id)?.image || FALLBACK_IMG);
+        const cleanPrice = Number(rc.price) > 0 ? Number(rc.price) : (byId.get(rc.id)?.price || 100);
+        const cleanItems = Array.isArray(rc.items)
+          ? rc.items.map((it, idx) => ({
+              id: it.id || `nft_${rc.id}_${idx}`,
+              name: String(it.name || "NFT Gift"),
+              price: Math.max(1, Number(it.price || 50)),
+              weight: Math.max(1, Number(it.weight || 10)),
+              image: typeof it.image === "string" && it.image.startsWith("http") ? it.image : FALLBACK_IMG
+            }))
+          : (byId.get(rc.id)?.items || []);
+
+        byId.set(rc.id, {
+          id: String(rc.id),
+          title: String(rc.title || "Gift Case"),
+          price: cleanPrice,
+          image: cleanImage,
+          items: cleanItems
+        });
+      }
+
+      return { cases: Array.from(byId.values()) };
+    }
+
     let appData = loadLocalData();
     let balance = Number(localStorage.getItem("mg_balance") || "1000");
     let inventory = JSON.parse(localStorage.getItem("mg_inventory") || "[]");
@@ -554,9 +752,7 @@
       try {
         const raw = localStorage.getItem(LOCAL_KEY);
         if (!raw) return structuredClone(DEFAULT_STATE);
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed.cases) || !parsed.cases.length) return structuredClone(DEFAULT_STATE);
-        return parsed;
+        return normalizeState(JSON.parse(raw));
       } catch {
         return structuredClone(DEFAULT_STATE);
       }
@@ -580,8 +776,8 @@
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const rows = await res.json();
-        if (Array.isArray(rows) && rows.length && rows[0].data && Array.isArray(rows[0].data.cases)) {
-          appData = rows[0].data;
+        if (Array.isArray(rows) && rows.length && rows[0].data) {
+          appData = normalizeState(rows[0].data);
           saveLocalData();
           renderAll();
           setSyncState("ok", "Общая база подключена");
@@ -649,7 +845,7 @@
         id: won.id,
         name: won.name,
         price: Number(won.price || 50),
-        image: won.image || c.image
+        image: won.image || c.image || FALLBACK_IMG
       };
       inventory.unshift(dropEntry);
       saveLocalData();
@@ -658,10 +854,10 @@
       renderUpgrade();
 
       document.getElementById("dropPreview").innerHTML = `
-        <img src="${dropEntry.image}" alt="${dropEntry.name}" />
+        <img src="${dropEntry.image}" alt="${dropEntry.name}" onerror="this.src='${FALLBACK_IMG}'" />
         <div style="text-align:left;">
           <div style="font-weight:800;font-size:15px;">${dropEntry.name}</div>
-          <div style="font-size:12px;color:var(--accent-2);">+${dropEntry.price} ⭐ в инвентаре</div>
+          <div style="font-size:12px;color:var(--neon-cyan);">+${dropEntry.price} ⭐ в инвентаре</div>
         </div>
       `;
       showToast(`Выпал: ${dropEntry.name}`);
@@ -676,7 +872,9 @@
       grid.innerHTML = appData.cases.map((c) => `
         <div class="case-card">
           <div>
-            <img class="case-img" src="${c.image}" alt="${c.title}" />
+            <div class="case-img-wrap">
+              <img class="case-img" src="${c.image}" alt="${c.title}" onerror="this.src='${FALLBACK_IMG}'" />
+            </div>
             <div class="case-title" style="margin-top:8px;">${c.title}</div>
             <div class="case-meta">Предметов: ${(c.items || []).length} • ${c.price} ⭐</div>
           </div>
@@ -705,7 +903,7 @@
       }
       list.innerHTML = inventory.map((it) => `
         <div class="item-row">
-          <img src="${it.image}" alt="${it.name}" />
+          <img src="${it.image}" alt="${it.name}" onerror="this.src='${FALLBACK_IMG}'" />
           <div class="item-info">
             <div class="item-name">${it.name}</div>
             <div class="item-sub">Стоимость: ${it.price} ⭐</div>
@@ -908,7 +1106,7 @@
       }
       list.innerHTML = activeCase.items.map((g) => `
         <div class="item-row">
-          <img src="${g.image}" alt="${g.name}" />
+          <img src="${g.image}" alt="${g.name}" onerror="this.src='${FALLBACK_IMG}'" />
           <div class="item-info">
             <div class="item-name">${g.name}</div>
             <div class="item-sub">${g.price} ⭐ • вес ${g.weight}</div>
@@ -951,7 +1149,7 @@
       const name = document.getElementById("giftNameInput").value.trim();
       const price = Math.max(1, Number(document.getElementById("giftPriceInput").value || 100));
       const weight = Math.max(1, Number(document.getElementById("giftWeightInput").value || 10));
-      const image = document.getElementById("giftImgInput").value.trim() || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&q=80";
+      const image = document.getElementById("giftImgInput").value.trim() || FALLBACK_IMG;
 
       if (!name) {
         showToast("Введите название подарка");
