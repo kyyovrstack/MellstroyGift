@@ -1203,8 +1203,7 @@
   const MIN_AMOUNT = 0.01;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const BOT_TOKEN = "9102953454:AAFatVM4-90hOty1zFtgpP4iJvzbXxLYudU";
-  const STORAGE_KEY = "mellstroy_gift_gram_only_v11";
+  const STORAGE_KEY = "mellstroy_gift_gram_only_v12";
 
   const DEFAULT_CASES = [
     { id: "case-1", title: "Mell King", tag: "CASE", desc: "Нажми и добавь фото или подарки", price: 1.00, img: "", pool: [] },
@@ -1317,35 +1316,17 @@
     return addr.length > 13 ? addr.slice(0, 5) + "..." + addr.slice(-4) : addr;
   }
 
-  async function notifyAdminDirect(htmlText) {
-    if (!BOT_TOKEN || BOT_TOKEN.includes("ВСТАВЬ")) return;
-    try {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: ADMIN_ID,
-          text: htmlText,
-          parse_mode: "HTML"
-        })
-      });
-    } catch (e) {}
-  }
-
-  function sendPayloadToBot(payloadObj, adminFallbackHtml) {
+  function sendPayloadToBot(payloadObj) {
     const tg = window.Telegram && window.Telegram.WebApp;
-    const raw = JSON.stringify(payloadObj);
-    let sentViaSendData = false;
-    if (tg && typeof tg.sendData === "function" && tg.initData) {
-      try {
-        tg.sendData(raw);
-        sentViaSendData = true;
-      } catch (e) {}
+    if (!tg || typeof tg.sendData !== "function" || !tg.initData) {
+      return false;
     }
-    if (!sentViaSendData && adminFallbackHtml) {
-      notifyAdminDirect(adminFallbackHtml);
+    try {
+      tg.sendData(JSON.stringify(payloadObj));
+      return true;
+    } catch (e) {
+      return false;
     }
-    return sentViaSendData;
   }
 
   function renderHeaderAndWallet() {
@@ -1446,13 +1427,6 @@
       renderHeaderAndWallet();
       closeDepositModal();
 
-      const fallbackMsg =
-        `💰 <b>Новый депозит</b>\n` +
-        `Игрок: <code>${state.userId || "—"}</code> (${state.username || "игрок"})\n` +
-        `Сумма: <b>${fmt(amt)} GRAM</b>\n` +
-        `Откуда: <code>${verifiedFrom}</code>\n` +
-        `Куда: <code>${RECEIVER_WALLET}</code>`;
-
       sendPayloadToBot({
         action: "real_deposit",
         amount: amt,
@@ -1460,7 +1434,7 @@
         toWallet: RECEIVER_WALLET,
         userId: state.userId || null,
         boc: txResult && txResult.boc ? txResult.boc : ""
-      }, fallbackMsg);
+      });
 
       toast(`Баланс пополнен на +${fmt(amt)} GRAM`);
     } catch (e) {
@@ -1506,28 +1480,26 @@
       return;
     }
 
+    const tg = window.Telegram && window.Telegram.WebApp;
+    const canSend = Boolean(tg && typeof tg.sendData === "function" && tg.initData);
+    if (!canSend) {
+      toast("Открой мини-апп через кнопку бота, чтобы заявка ушла в бот");
+      return;
+    }
+
     state.balance = Math.round((state.balance - amt) * 100) / 100;
     saveState();
     renderHeaderAndWallet();
     closeWithdrawModal();
 
     const requestId = "wd_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-    const fallbackMsg =
-      `💸 <b>Заявка на вывод GRAM</b>\n` +
-      `ID заявки: <code>${requestId}</code>\n` +
-      `Игрок: <code>${state.userId || "—"}</code> (${state.username || "игрок"})\n` +
-      `Сумма: <b>${fmt(amt)} GRAM</b>\n` +
-      `Кошелёк: <code>${wallet}</code>`;
-
     sendPayloadToBot({
       action: "withdraw_gram",
       requestId,
       amountGram: amt,
       wallet,
       userId: state.userId || null
-    }, fallbackMsg);
-
-    toast(`Заявка на вывод ${fmt(amt)} GRAM отправлена`);
+    });
   }
 
   /* Navigation & Cases */
