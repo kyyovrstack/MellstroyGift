@@ -2559,7 +2559,7 @@
     `).join("");
   }
 
-  /* Inventory (NFT only) */
+  /* Inventory (NFT only + "В апгрейд" and "Продать") */
   function renderInventoryUI() {
     document.getElementById("invCount").textContent = `${appState.inventory.length} NFT`;
     const grid = document.getElementById("invGrid");
@@ -2577,10 +2577,31 @@
         <span class="item-tag-pill" style="margin-bottom:6px;">NFT</span>
         <div class="row2" style="margin-top:6px;">
           <button class="btn-purple" style="padding:7px;font-size:11px;" onclick="pickNftFromInvToUpgrader('${row.uid}')">В апгрейд</button>
-          <button class="btn-green" style="padding:7px;font-size:11px;" onclick="useNftAsUpgradeTarget('${row.uid}')">В цель</button>
+          <button class="btn-green" style="padding:7px;font-size:11px;" onclick="sellInventoryItem('${row.uid}')">Продать</button>
         </div>
       </div>
     `).join("");
+  }
+
+  function sellInventoryItem(uid) {
+    const idx = appState.inventory.findIndex(x => x.uid === uid);
+    if (idx === -1) return;
+    const [soldRow] = appState.inventory.splice(idx, 1);
+    const price = Math.max(0, Math.round((Number(soldRow.gift?.price) || 0) * 100) / 100);
+
+    if (appState.upgSource && appState.upgSource.type === "nft" && appState.upgSource.uid === uid) {
+      appState.upgSource = null;
+      syncAutoUpgradeTarget();
+    }
+
+    if (price > 0) {
+      appState.balance = Math.round((appState.balance + price) * 100) / 100;
+    }
+
+    saveApp();
+    renderBalance();
+    renderInventoryUI();
+    showToast(`Продано: ${soldRow.gift?.name || "NFT"} (+${fmt(price)} GRAM)`);
   }
 
   function pickNftFromInvToUpgrader(uid) {
@@ -2588,13 +2609,6 @@
     if (!item) return;
     appState.upgSource = { type: "nft", uid: item.uid, gift: item.gift };
     syncAutoUpgradeTarget();
-    switchNav("upgrader");
-  }
-
-  function useNftAsUpgradeTarget(uid) {
-    const item = appState.inventory.find(x => x.uid === uid);
-    if (!item) return;
-    appState.upgTarget = { ...item.gift, badge: "NFT" };
     switchNav("upgrader");
   }
 
