@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mellstroy Gift — Casino Mini App</title>
+  <title>Mellstroy Gift — GRAM Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
@@ -114,7 +114,7 @@
       font-weight: 900;
     }
 
-    .cur-switch {
+    .cur-badge {
       border: 1px solid rgba(168, 85, 247, 0.35);
       border-radius: 10px;
       padding: 5px 8px;
@@ -122,7 +122,6 @@
       color: #fff;
       font-size: 11px;
       font-weight: 800;
-      cursor: pointer;
     }
 
     .plus-sq {
@@ -216,7 +215,6 @@
       margin-top: 2px;
     }
 
-    /* Новый формат кейсов: сетка 2 колонки с мини-превью призов */
     .cases-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -232,7 +230,8 @@
       border-radius: 22px;
       padding: 12px;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-      transition: transform 0.14s ease, border-color 0.14s ease;
+      transition: transform 0.14s ease;
+      cursor: pointer;
     }
 
     .case-card-v2:active {
@@ -528,7 +527,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .spin-wheel-btn {
@@ -836,12 +835,12 @@
       <div class="row-gap">
         <div class="avatar-chip" id="topAvatar" onclick="switchTab('admin')">MG</div>
         <button class="icon-btn" onclick="switchTab('wallet')" title="Кошелёк">💳</button>
-        <button class="icon-btn" onclick="toast('Mellstroy Gift')" title="Инфо">?</button>
+        <button class="icon-btn" onclick="toast('Валюта приложения: GRAM')" title="Инфо">?</button>
       </div>
 
       <div class="bal-box">
         <span id="balValue">0.00</span>
-        <button class="cur-switch" id="curToggleBtn" onclick="toggleCurrency()">$ / GRAM</button>
+        <span class="cur-badge">GRAM</span>
         <button class="plus-sq" onclick="switchTab('wallet')">+</button>
       </div>
     </div>
@@ -849,7 +848,7 @@
     <div id="view-home">
       <div class="section-title">
         <span>⚡ Play Hub</span>
-        <span class="pill-tag" id="homeCurTag">Валюта: Доллары ($)</span>
+        <span class="pill-tag">Валюта: GRAM</span>
       </div>
 
       <div class="hub-grid">
@@ -885,7 +884,7 @@
     <div id="view-wallet" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">💎 Подключение TON Connect</div>
-        <p class="muted">Подключите криптокошелёк и подтвердите транзакцию на оплату депозита.</p>
+        <p class="muted">Подключите криптокошелёк и подтвердите транзакцию на пополнение в GRAM.</p>
 
         <div class="row-gap mt-8" style="justify-content:space-between;">
           <span class="muted" id="walletConnStatus">Кошелёк не подключён</span>
@@ -894,23 +893,14 @@
       </div>
 
       <div class="card">
-        <div class="section-title" style="margin-top:0;">💰 Пополнение баланса</div>
+        <div class="section-title" style="margin-top:0;">💰 Пополнение в GRAM</div>
 
-        <div class="grid-2 mt-8">
-          <div>
-            <label class="muted">Валюта депозита</label>
-            <select id="depCur" onchange="updateDepEquivalent()">
-              <option value="USD">Доллары ($)</option>
-              <option value="GRAM">GRAM</option>
-            </select>
-          </div>
-          <div>
-            <label class="muted">Сумма</label>
-            <input type="number" id="depAmt" step="0.1" min="0.1" value="10" oninput="updateDepEquivalent()" />
-          </div>
+        <div class="mt-8">
+          <label class="muted">Сумма (GRAM)</label>
+          <input type="number" id="depAmt" step="1" min="1" value="10" oninput="updateDepEquivalent()" />
         </div>
 
-        <div class="muted mt-8" id="depTonHint">К оплате через кошелёк: ≈ 2.000 TON</div>
+        <div class="muted mt-8" id="depTonHint">К оплате через кошелёк: ≈ 0.500 TON</div>
 
         <button class="primary-btn green mt-12" id="payNowBtn" onclick="startCryptoDeposit()">
           Пополнить
@@ -933,9 +923,9 @@
     <div id="view-admin" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">🛡️ ID пользователя</div>
-        <p class="muted">У всех игроков кроме <b>5200591975</b> баланс по умолчанию <b>0.00</b>.</p>
+        <p class="muted">Админ только ID <b>5200591975</b>. У всех остальных игроков баланс <b>0.00 GRAM</b>.</p>
         <div class="row-gap mt-8">
-          <input type="number" id="adminTestId" value="5200591975" />
+          <input type="number" id="adminTestId" value="1000001" />
           <button class="btn-sm" onclick="switchTestId()">Применить</button>
         </div>
       </div>
@@ -948,7 +938,7 @@
       <div id="adminBody" style="display:none;">
         <div class="card">
           <div class="section-title" style="margin-top:0;">🏦 Адрес приёма депозитов</div>
-          <label class="muted">TON-кошелёк, куда поступают оплаты</label>
+          <label class="muted">TON-кошелёк получателя (скрыт от игроков)</label>
           <input type="text" class="mt-8" id="adminTonAddress" />
           <button class="primary-btn mt-8" onclick="saveTonAddress()">Сохранить адрес TON</button>
         </div>
@@ -984,12 +974,8 @@
             <input type="text" id="newCaseTitle" placeholder="Название кейса" />
             <input type="text" id="newCaseIcon" placeholder="Эмодзи" value="🎁" />
           </div>
-          <div class="grid-2 mt-8">
-            <input type="number" id="newCaseCost" step="0.1" value="5" placeholder="Цена" />
-            <select id="newCaseCur">
-              <option value="USD">Доллары ($)</option>
-              <option value="GRAM">GRAM</option>
-            </select>
+          <div class="mt-8">
+            <input type="number" id="newCaseCost" step="1" value="15" placeholder="Цена в GRAM" />
           </div>
           <button class="primary-btn green mt-8" onclick="addNewCase()">Создать кейс</button>
         </div>
@@ -1002,14 +988,10 @@
 
         <div class="card">
           <div class="section-title" style="margin-top:0;">💰 Баланс админа (5200591975)</div>
-          <div class="grid-2 mt-8">
-            <input type="number" id="grantAmt" step="0.1" value="50" />
-            <select id="grantCur">
-              <option value="USD">Доллары ($)</option>
-              <option value="GRAM">GRAM</option>
-            </select>
+          <div class="row-gap mt-8">
+            <input type="number" id="grantAmt" step="1" value="100" />
+            <button class="primary-btn" style="width:auto; white-space:nowrap;" onclick="grantBalance()">Начислить GRAM</button>
           </div>
-          <button class="primary-btn mt-8" onclick="grantBalance()">Начислить админу</button>
         </div>
       </div>
     </div>
@@ -1024,7 +1006,7 @@
         </div>
         <div class="bal-box">
           <span id="caseModalBal">0.00</span>
-          <button class="cur-switch" onclick="toggleCurrency()">$ / GRAM</button>
+          <span class="cur-badge">GRAM</span>
         </div>
       </div>
 
@@ -1056,7 +1038,7 @@
         </div>
         <div class="bal-box">
           <span id="modalBalText">0.00</span>
-          <button class="cur-switch" onclick="toggleCurrency()">$ / GRAM</button>
+          <span class="cur-badge">GRAM</span>
         </div>
       </div>
 
@@ -1076,8 +1058,8 @@
           </div>
 
           <div class="bet-bar">
-            <span id="plCurBadge">$</span>
-            <input type="number" id="plinkoBet" step="0.1" min="0.1" value="1" />
+            <span>GRAM</span>
+            <input type="number" id="plinkoBet" step="0.5" min="0.5" value="1" />
           </div>
 
           <button class="primary-btn" onclick="dropPlinkoBall()">Сделать ставку</button>
@@ -1089,22 +1071,22 @@
           <div class="slots-board" id="slotsGrid"></div>
 
           <div class="slots-controls-row">
-            <button class="step-btn" onclick="stepSlotBet(-0.5)">−</button>
-            <div class="bet-readout" id="slotBetReadout">$ 1.00</div>
-            <button class="step-btn" onclick="stepSlotBet(0.5)">+</button>
+            <button class="step-btn" onclick="stepSlotBet(-1)">−</button>
+            <div class="bet-readout" id="slotBetReadout">1.00 GRAM</div>
+            <button class="step-btn" onclick="stepSlotBet(1)">+</button>
           </div>
 
           <div class="row-gap" style="justify-content:space-between;">
             <div>
               <div class="muted">Скорость</div>
               <div class="row-gap mt-8">
-                <button class="cur-switch" id="spd1" onclick="setSlotSpeed(1)">1x</button>
-                <button class="cur-switch" id="spd2" onclick="setSlotSpeed(2)">2x</button>
+                <button class="cur-badge" style="cursor:pointer;" id="spd1" onclick="setSlotSpeed(1)">1x</button>
+                <button class="cur-badge" style="cursor:pointer;" id="spd2" onclick="setSlotSpeed(2)">2x</button>
               </div>
             </div>
             <div style="text-align:right;">
               <div class="muted">Автоспин</div>
-              <button class="cur-switch mt-8" id="autoSpinBtn" onclick="toggleAutoSpin()">ВЫКЛ</button>
+              <button class="cur-badge mt-8" style="cursor:pointer;" id="autoSpinBtn" onclick="toggleAutoSpin()">ВЫКЛ</button>
             </div>
           </div>
 
@@ -1130,8 +1112,8 @@
         <div class="card">
           <div class="grid-2" style="margin-bottom:10px;">
             <div>
-              <label class="muted">Ставка</label>
-              <input type="number" id="minesBet" step="0.1" min="0.1" value="1" />
+              <label class="muted">Ставка (GRAM)</label>
+              <input type="number" id="minesBet" step="0.5" min="0.5" value="1" />
             </div>
             <div>
               <label class="muted">Количество мин</label>
@@ -1158,8 +1140,8 @@
         <div class="card">
           <div class="grid-2" style="margin-bottom:10px;">
             <div>
-              <label class="muted">Ставка</label>
-              <input type="number" id="crashBet" step="0.1" min="0.1" value="1" />
+              <label class="muted">Ставка (GRAM)</label>
+              <input type="number" id="crashBet" step="0.5" min="0.5" value="1" />
             </div>
             <div>
               <label class="muted">Автовывод (x)</label>
@@ -1195,8 +1177,9 @@
 
   <script>
     const ADMIN_ID = 5200591975;
+    const DEFAULT_PLAYER_ID = 1000001;
     const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-    const STORE_KEY = "mellstroy_gift_casino_v6";
+    const STORE_KEY = "mellstroy_gift_gram_v1";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1214,18 +1197,18 @@
           name: [u.first_name, u.last_name].filter(Boolean).join(" ") || u.username || (uid === ADMIN_ID ? "Админ" : "Игрок")
         };
       }
-      return { id: ADMIN_ID, name: "Админ (5200591975)" };
+      return { id: DEFAULT_PLAYER_ID, name: "Игрок" };
     }
 
     function initialState() {
       const user = detectUser();
       return {
-        currency: "USD",
         tonReceiver: DEFAULT_TON_RECEIVER,
         user,
         balances: {
-          [ADMIN_ID]: { USD: 150, GRAM: 300 },
-          ...(user.id !== ADMIN_ID ? { [user.id]: { USD: 0, GRAM: 0 } } : {})
+          [ADMIN_ID]: 300,
+          [DEFAULT_PLAYER_ID]: 0,
+          ...(user.id !== ADMIN_ID && user.id !== DEFAULT_PLAYER_ID ? { [user.id]: 0 } : {})
         },
         chances: { plinko: 42, slots: 36, mines: 72, crash: 45 },
         inventory: [],
@@ -1235,26 +1218,24 @@
             id: "c_epic",
             title: "Mellstroy Case",
             icon: "🎁",
-            cost: 3,
-            currency: "USD",
+            cost: 15,
             items: [
-              { id: "i_1", name: "Pepe Heart", icon: "🐸", value: 1.2, weight: 50 },
-              { id: "i_2", name: "Rocket Pass", icon: "🚀", value: 3.8, weight: 30 },
-              { id: "i_3", name: "Diamond Core", icon: "💎", value: 8.5, weight: 15 },
-              { id: "i_4", name: "Royal Crown", icon: "👑", value: 25.0, weight: 5 }
+              { id: "i_1", name: "Pepe Heart", icon: "🐸", value: 6, weight: 50 },
+              { id: "i_2", name: "Rocket Pass", icon: "🚀", value: 18, weight: 30 },
+              { id: "i_3", name: "Diamond Core", icon: "💎", value: 42, weight: 15 },
+              { id: "i_4", name: "Royal Crown", icon: "👑", value: 120, weight: 5 }
             ]
           },
           {
             id: "c_gram",
             title: "GRAM Vault",
             icon: "💎",
-            cost: 15,
-            currency: "GRAM",
+            cost: 30,
             items: [
-              { id: "i_5", name: "GRAM Shard", icon: "🔹", value: 6, weight: 50 },
-              { id: "i_6", name: "Neon Lollipop", icon: "🍭", value: 18, weight: 30 },
-              { id: "i_7", name: "Turbo Core", icon: "⚡", value: 45, weight: 15 },
-              { id: "i_8", name: "Grand Trophy", icon: "🏆", value: 120, weight: 5 }
+              { id: "i_5", name: "GRAM Shard", icon: "🔹", value: 12, weight: 50 },
+              { id: "i_6", name: "Neon Lollipop", icon: "🍭", value: 36, weight: 30 },
+              { id: "i_7", name: "Turbo Core", icon: "⚡", value: 90, weight: 15 },
+              { id: "i_8", name: "Grand Trophy", icon: "🏆", value: 250, weight: 5 }
             ]
           }
         ]
@@ -1268,12 +1249,13 @@
         const parsed = JSON.parse(raw);
         const base = initialState();
         const mergedBalances = {
-          [ADMIN_ID]: { USD: 150, GRAM: 300 },
+          [ADMIN_ID]: 300,
+          [DEFAULT_PLAYER_ID]: 0,
           ...(parsed.balances || {})
         };
         const curUid = (parsed.user && parsed.user.id) ? Number(parsed.user.id) : base.user.id;
-        if (!mergedBalances[curUid]) {
-          mergedBalances[curUid] = curUid === ADMIN_ID ? { USD: 150, GRAM: 300 } : { USD: 0, GRAM: 0 };
+        if (typeof mergedBalances[curUid] !== "number") {
+          mergedBalances[curUid] = curUid === ADMIN_ID ? 300 : 0;
         }
         return {
           ...base,
@@ -1350,17 +1332,15 @@
     }
 
     function updateDepEquivalent() {
-      const cur = document.getElementById("depCur").value;
       const amt = Math.max(0, Number(document.getElementById("depAmt").value || 0));
-      const tonEquivalent = cur === "USD" ? (amt / 5).toFixed(3) : (amt / 20).toFixed(3);
+      const tonEquivalent = (amt / 20).toFixed(3);
       document.getElementById("depTonHint").textContent =
         `К оплате через кошелёк: ≈ ${tonEquivalent} TON`;
     }
 
     async function startCryptoDeposit() {
-      const cur = document.getElementById("depCur").value;
       const amt = Number(document.getElementById("depAmt").value || 0);
-      if (amt <= 0 || isNaN(amt)) return toast("Введите сумму пополнения");
+      if (amt <= 0 || isNaN(amt)) return toast("Введите сумму пополнения в GRAM");
 
       const receiverAddress = (state.tonReceiver && state.tonReceiver.trim()) || DEFAULT_TON_RECEIVER;
 
@@ -1370,7 +1350,7 @@
         return;
       }
 
-      const tonAmount = cur === "USD" ? (amt / 5) : (amt / 20);
+      const tonAmount = amt / 20;
       const nanoTon = Math.max(1000000, Math.round(tonAmount * 1e9)).toString();
 
       try {
@@ -1384,11 +1364,9 @@
           ]
         });
 
-        const b = balOf();
-        b[cur] = Number(((b[cur] || 0) + amt).toFixed(2));
+        state.balances[state.user.id] = Number(((state.balances[state.user.id] || 0) + amt).toFixed(2));
         state.deposits.unshift({
           id: "dep_" + Date.now(),
-          currency: cur,
           amount: amt,
           ton: Number(tonAmount.toFixed(3)),
           status: "Оплачено"
@@ -1396,7 +1374,7 @@
         saveState();
         renderTop();
         renderWalletHistory();
-        toast(`Баланс пополнен на ${fmt(amt, cur)}`);
+        toast(`Баланс пополнен на ${fmt(amt)}`);
       } catch (err) {
         toast("Транзакция отменена или не подтверждена");
       }
@@ -1411,10 +1389,10 @@
       el.innerHTML = state.deposits.map(d => `
         <div class="live-bet-row mt-8">
           <div>
-            <b>+${fmt(d.amount, d.currency)}</b>
+            <b>+${fmt(d.amount)}</b>
             <div class="muted">≈ ${d.ton} TON</div>
           </div>
-          <span class="cur-switch">${esc(d.status)}</span>
+          <span class="cur-badge">${esc(d.status)}</span>
         </div>
       `).join("");
     }
@@ -1432,25 +1410,18 @@
     }
 
     function balOf(uid = state.user.id) {
-      if (!state.balances[uid]) {
-        state.balances[uid] = Number(uid) === ADMIN_ID ? { USD: 150, GRAM: 300 } : { USD: 0, GRAM: 0 };
+      if (typeof state.balances[uid] !== "number") {
+        state.balances[uid] = Number(uid) === ADMIN_ID ? 300 : 0;
       }
       return state.balances[uid];
     }
 
-    function fmt(amount, cur = state.currency) {
-      const n = Number(amount || 0).toFixed(2);
-      return cur === "USD" ? `$${n}` : `${n} GRAM`;
+    function setBalOf(uid, nextVal) {
+      state.balances[uid] = Number(Math.max(0, nextVal).toFixed(2));
     }
 
-    function toggleCurrency() {
-      state.currency = state.currency === "USD" ? "GRAM" : "USD";
-      saveState();
-      renderTop();
-      renderCases();
-      updateSlotBetReadout();
-      updateDepEquivalent();
-      document.getElementById("plCurBadge").textContent = state.currency === "USD" ? "$" : "GRAM";
+    function fmt(amount) {
+      return `${Number(amount || 0).toFixed(2)} GRAM`;
     }
 
     function switchTab(tab) {
@@ -1481,17 +1452,14 @@
     }
 
     function renderTop() {
-      const b = balOf();
-      const valStr = Number(b[state.currency] || 0).toFixed(2);
-      document.getElementById("topAvatar").textContent = (state.user.name || "MG").slice(0, 2).toUpperCase();
+      const valStr = balOf().toFixed(2);
+      document.getElementById("topAvatar").textContent = Number(state.user.id) === ADMIN_ID ? "AD" : "GR";
       document.getElementById("balValue").textContent = valStr;
       document.getElementById("modalBalText").textContent = valStr;
       document.getElementById("caseModalBal").textContent = valStr;
-      document.getElementById("homeCurTag").textContent =
-        state.currency === "USD" ? "Валюта: Доллары ($)" : "Валюта: GRAM";
     }
 
-    /* КЕЙСЫ (НОВЫЙ ФОРМАТ ВИТРИНЫ) */
+    /* КЕЙСЫ */
     function pickByWeight(items) {
       const list = (items || []).filter(i => Number(i.weight) > 0);
       if (!list.length) return items[0];
@@ -1522,7 +1490,7 @@
               <div class="case-title-v2">${esc(c.title)}</div>
               <div class="case-loot-strip">${previewIcons}</div>
             </div>
-            <button class="case-buy-v2" type="button">Открыть · ${fmt(c.cost, c.currency)}</button>
+            <button class="case-buy-v2" type="button">Открыть · ${fmt(c.cost)}</button>
           </div>
         `;
       }).join("");
@@ -1533,14 +1501,13 @@
       const c = state.cases.find(x => x.id === caseId);
       if (!c || !c.items || !c.items.length) return toast("В кейсе пусто");
 
-      const cur = c.currency || state.currency;
       const cost = Number(c.cost || 0);
-      const b = balOf();
-      if ((b[cur] || 0) < cost) return toast(`Недостаточно средств (${fmt(cost, cur)})`);
+      const curBal = balOf();
+      if (curBal < cost) return toast(`Недостаточно GRAM (${fmt(cost)})`);
 
       caseSpinning = true;
       lastDroppedUid = null;
-      b[cur] = Number((b[cur] - cost).toFixed(2));
+      setBalOf(state.user.id, curBal - cost);
 
       const winner = pickByWeight(c.items);
       const uid = "inv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
@@ -1549,8 +1516,7 @@
         uid,
         name: winner.name,
         icon: winner.icon || "🎁",
-        value: Number(winner.value || 0),
-        currency: cur
+        value: Number(winner.value || 0)
       });
 
       saveState();
@@ -1573,7 +1539,7 @@
           <div class="spinner-card" id="spCard_${i}">
             <div style="font-size:26px;">${item.icon || "🎁"}</div>
             <div style="font-size:11px; font-weight:800; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.name)}</div>
-            <div style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px;">${fmt(item.value, cur)}</div>
+            <div style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px;">${fmt(item.value)}</div>
           </div>
         `);
       }
@@ -1595,8 +1561,8 @@
         if (winEl) winEl.classList.add("winner-glow");
         document.getElementById("winItemEmoji").textContent = winner.icon || "🎁";
         document.getElementById("winItemTitle").textContent = winner.name;
-        document.getElementById("winItemPrice").textContent = `Цена: ${fmt(winner.value, cur)}`;
-        document.getElementById("sellDropBtn").textContent = `Продать за ${fmt(winner.value, cur)}`;
+        document.getElementById("winItemPrice").textContent = `Цена: ${fmt(winner.value)}`;
+        document.getElementById("sellDropBtn").textContent = `Продать за ${fmt(winner.value)}`;
         document.getElementById("caseSpinWinCard").style.display = "block";
         caseSpinning = false;
       }, 2950);
@@ -1607,12 +1573,11 @@
       const idx = state.inventory.findIndex(x => x.uid === lastDroppedUid);
       if (idx !== -1) {
         const item = state.inventory.splice(idx, 1)[0];
-        const b = balOf();
-        b[item.currency] = Number(((b[item.currency] || 0) + Number(item.value || 0)).toFixed(2));
+        setBalOf(state.user.id, balOf() + Number(item.value || 0));
         saveState();
         renderTop();
         renderInv();
-        toast(`Продано за ${fmt(item.value, item.currency)}`);
+        toast(`Продано за ${fmt(item.value)}`);
       }
       lastDroppedUid = null;
       closeCaseSpinModal();
@@ -1745,15 +1710,15 @@
     function dropPlinkoBall() {
       if (plinkoBusy) return;
       const bet = Number(document.getElementById("plinkoBet").value || 0);
-      const b = balOf();
+      const curBal = balOf();
       if (bet <= 0 || isNaN(bet)) return toast("Укажите ставку");
-      if ((b[state.currency] || 0) < bet) return toast("Недостаточно средств");
+      if (curBal < bet) return toast("Недостаточно GRAM");
 
       plinkoBusy = true;
       clearBanner();
       document.querySelectorAll(".plinko-mult").forEach(el => el.classList.remove("hit"));
 
-      b[state.currency] = Number((b[state.currency] - bet).toFixed(2));
+      setBalOf(state.user.id, curBal - bet);
       saveState();
       renderTop();
 
@@ -1806,7 +1771,7 @@
 
           const exactMult = mults[landedSlot];
           const winAmt = Number((bet * exactMult).toFixed(2));
-          b[state.currency] = Number(((b[state.currency] || 0) + winAmt).toFixed(2));
+          setBalOf(state.user.id, balOf() + winAmt);
           saveState();
           renderTop();
 
@@ -1865,9 +1830,7 @@
     }
 
     function updateSlotBetReadout() {
-      const sign = state.currency === "USD" ? "$" : "";
-      const suf = state.currency === "GRAM" ? " GRAM" : "";
-      document.getElementById("slotBetReadout").textContent = `${sign}${slotBet.toFixed(2)}${suf}`;
+      document.getElementById("slotBetReadout").textContent = `${slotBet.toFixed(2)} GRAM`;
     }
 
     function setSlotSpeed(s) {
@@ -1903,23 +1866,22 @@
 
     function buySlotBonus() {
       const bonusCost = Number((slotBet * 4).toFixed(2));
-      const b = balOf();
-      if ((b[state.currency] || 0) < bonusCost) return toast(`Нужно ${fmt(bonusCost)} для бонуса`);
+      if (balOf() < bonusCost) return toast(`Нужно ${fmt(bonusCost)} для бонуса`);
       spinSlots(bonusCost, true);
     }
 
     function spinSlots(customCost = null, forceWin = false) {
       if (slotsSpinning) return;
       const cost = customCost !== null ? customCost : slotBet;
-      const b = balOf();
-      if ((b[state.currency] || 0) < cost) {
+      const curBal = balOf();
+      if (curBal < cost) {
         stopAutoSpin();
-        return toast("Недостаточно средств");
+        return toast("Недостаточно GRAM");
       }
 
       slotsSpinning = true;
       clearBanner();
-      b[state.currency] = Number((b[state.currency] - cost).toFixed(2));
+      setBalOf(state.user.id, curBal - cost);
       saveState();
       renderTop();
 
@@ -1984,7 +1946,7 @@
         const mult = forceWin ? 5.0 : (isWin ? 2.4 : 0);
         const payout = Number((cost * mult).toFixed(2));
         if (payout > 0) {
-          b[state.currency] = Number(((b[state.currency] || 0) + payout).toFixed(2));
+          setBalOf(state.user.id, balOf() + payout);
           saveState();
           renderTop();
           setBanner("win", `Комбинация сыграла (${mult}x)! Выигрыш: +${fmt(payout)}`);
@@ -2037,12 +1999,12 @@
     function startMinesRound() {
       const bet = Number(document.getElementById("minesBet").value || 0);
       const mineCount = Number(document.getElementById("minesCountSelect").value || 3);
-      const b = balOf();
+      const curBal = balOf();
       if (bet <= 0 || isNaN(bet)) return toast("Введите сумму ставки");
-      if ((b[state.currency] || 0) < bet) return toast("Недостаточно средств");
+      if (curBal < bet) return toast("Недостаточно GRAM");
 
       clearBanner();
-      b[state.currency] = Number((b[state.currency] - bet).toFixed(2));
+      setBalOf(state.user.id, curBal - bet);
       saveState();
       renderTop();
 
@@ -2114,8 +2076,7 @@
       if (minesStep === 0) return toast("Откройте хотя бы одну клетку");
       const mult = MINES_MULTS[Math.min(minesStep - 1, MINES_MULTS.length - 1)];
       const payout = Number((minesBetAmt * mult).toFixed(2));
-      const b = balOf();
-      b[state.currency] = Number(((b[state.currency] || 0) + payout).toFixed(2));
+      setBalOf(state.user.id, balOf() + payout);
       saveState();
       renderTop();
 
@@ -2158,13 +2119,13 @@
       if (crashRunning) return;
       const bet = Number(document.getElementById("crashBet").value || 0);
       const target = Math.max(1.1, Number(document.getElementById("crashCashoutTarget").value || 1.8));
-      const b = balOf();
+      const curBal = balOf();
       if (bet <= 0 || isNaN(bet)) return toast("Введите ставку");
-      if ((b[state.currency] || 0) < bet) return toast("Недостаточно средств");
+      if (curBal < bet) return toast("Недостаточно GRAM");
 
       crashRunning = true;
       clearBanner();
-      b[state.currency] = Number((b[state.currency] - bet).toFixed(2));
+      setBalOf(state.user.id, curBal - bet);
       saveState();
       renderTop();
 
@@ -2191,7 +2152,7 @@
         if (curM >= target && willReachTarget) {
           clearInterval(timer);
           const win = Number((bet * target).toFixed(2));
-          b[state.currency] = Number(((b[state.currency] || 0) + win).toFixed(2));
+          setBalOf(state.user.id, balOf() + win);
           saveState();
           renderTop();
           multEl.style.color = "var(--green)";
@@ -2226,7 +2187,7 @@
             <span style="font-size:24px;">${it.icon || "🎁"}</span>
             <div>
               <b>${esc(it.name)}</b>
-              <div class="muted">${fmt(it.value, it.currency)}</div>
+              <div class="muted">${fmt(it.value)}</div>
             </div>
           </div>
           <button class="btn-sm green" onclick="sellInv(${idx})">Продать</button>
@@ -2238,12 +2199,11 @@
       const item = state.inventory[idx];
       if (!item) return;
       state.inventory.splice(idx, 1);
-      const b = balOf();
-      b[item.currency] = Number(((b[item.currency] || 0) + Number(item.value || 0)).toFixed(2));
+      setBalOf(state.user.id, balOf() + Number(item.value || 0));
       saveState();
       renderTop();
       renderInv();
-      toast(`Продано за ${fmt(item.value, item.currency)}`);
+      toast(`Продано за ${fmt(item.value)}`);
     }
 
     /* АДМИН-ПАНЕЛЬ (5200591975) */
@@ -2251,9 +2211,9 @@
       const id = Number(document.getElementById("adminTestId").value);
       if (!id) return toast("Введите числовой ID");
       state.user.id = id;
-      state.user.name = id === ADMIN_ID ? "Админ (5200591975)" : `Игрок #${id}`;
-      if (!state.balances[id]) {
-        state.balances[id] = id === ADMIN_ID ? { USD: 150, GRAM: 300 } : { USD: 0, GRAM: 0 };
+      state.user.name = id === ADMIN_ID ? "Админ" : "Игрок";
+      if (typeof state.balances[id] !== "number") {
+        state.balances[id] = id === ADMIN_ID ? 300 : 0;
       }
       saveState();
       renderTop();
@@ -2277,7 +2237,7 @@
 
       const sel = document.getElementById("editCaseSelect");
       const prev = sel.value;
-      sel.innerHTML = state.cases.map(c => `<option value="${c.id}">${esc(c.title)} (${fmt(c.cost, c.currency)})</option>`).join("");
+      sel.innerHTML = state.cases.map(c => `<option value="${c.id}">${esc(c.title)} (${fmt(c.cost)})</option>`).join("");
       if (prev && state.cases.some(c => c.id === prev)) sel.value = prev;
 
       renderAdminCaseForm();
@@ -2305,7 +2265,6 @@
       const title = document.getElementById("newCaseTitle").value.trim();
       const icon = document.getElementById("newCaseIcon").value.trim() || "🎁";
       const cost = Math.max(0, Number(document.getElementById("newCaseCost").value || 0));
-      const currency = document.getElementById("newCaseCur").value;
       if (!title) return toast("Введите название кейса");
 
       state.cases.push({
@@ -2313,7 +2272,6 @@
         title,
         icon,
         cost,
-        currency,
         items: [
           { id: "it_" + Date.now(), name: "Базовый приз", icon: "🔹", value: Number((cost * 0.5).toFixed(2)), weight: 70 },
           { id: "it_" + (Date.now() + 1), name: "Топ приз", icon: "🔥", value: Number((cost * 3).toFixed(2)), weight: 30 }
@@ -2343,8 +2301,8 @@
           </div>
           <div class="grid-2 mt-8">
             <div>
-              <label class="muted">Цена</label>
-              <input type="number" step="0.1" id="ival_${it.id}" value="${it.value}" />
+              <label class="muted">Цена (GRAM)</label>
+              <input type="number" step="0.5" id="ival_${it.id}" value="${it.value}" />
             </div>
             <div>
               <label class="muted">Вес (шанс)</label>
@@ -2365,8 +2323,8 @@
             <input type="text" id="ecTitle" value="${escAttr(c.title)}" />
           </div>
           <div>
-            <label class="muted">Цена кейса</label>
-            <input type="number" step="0.1" id="ecCost" value="${c.cost}" />
+            <label class="muted">Цена (GRAM)</label>
+            <input type="number" step="0.5" id="ecCost" value="${c.cost}" />
           </div>
         </div>
         <div class="row-gap mt-8">
@@ -2381,7 +2339,7 @@
             <input type="text" id="addItIcon" placeholder="Эмодзи" value="⚡" />
           </div>
           <div class="grid-2 mt-8">
-            <input type="number" step="0.1" id="addItVal" placeholder="Цена" value="4" />
+            <input type="number" step="0.5" id="addItVal" placeholder="Цена GRAM" value="10" />
             <input type="number" min="0" id="addItW" placeholder="Вес" value="20" />
           </div>
           <button class="btn-sm green mt-8" style="width:100%;" onclick="addItemToCase('${c.id}')">+ Добавить предмет</button>
@@ -2454,13 +2412,11 @@
     function grantBalance() {
       if (Number(state.user.id) !== ADMIN_ID) return toast("Доступно только админу");
       const amt = Number(document.getElementById("grantAmt").value || 0);
-      const cur = document.getElementById("grantCur").value;
       if (amt <= 0) return toast("Введите сумму");
-      const b = balOf(ADMIN_ID);
-      b[cur] = Number(((b[cur] || 0) + amt).toFixed(2));
+      setBalOf(ADMIN_ID, balOf(ADMIN_ID) + amt);
       saveState();
       renderTop();
-      toast(`Начислено админу: ${fmt(amt, cur)}`);
+      toast(`Начислено админу: ${fmt(amt)}`);
     }
 
     function clampNum(val, min, max, fallback) {
