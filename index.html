@@ -1369,7 +1369,9 @@
     const ADMIN_ID = 5200591975;
     const DEFAULT_PLAYER_ID = 1000001;
     const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-    const STORE_KEY = "mellstroy_gift_gram_v5";
+    const STORE_KEY = "mellstroy_gift_gram_v6";
+    const IDB_NAME = "mellstroy_gift_media_db";
+    const IDB_STORE = "images";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1412,30 +1414,97 @@
             id: "c_epic",
             title: "Mellstroy Case",
             icon: "🎁",
-            img: "",
+            imgKey: "",
             cost: 15,
             items: [
-              { id: "i_1", name: "Pepe Heart", icon: "🐸", img: "", value: 6, weight: 50 },
-              { id: "i_2", name: "Rocket Pass", icon: "🚀", img: "", value: 18, weight: 30 },
-              { id: "i_3", name: "Diamond Core", icon: "💎", img: "", value: 42, weight: 15 },
-              { id: "i_4", name: "Royal Crown", icon: "👑", img: "", value: 120, weight: 5 }
+              { id: "i_1", name: "Pepe Heart", icon: "🐸", imgKey: "", value: 6, weight: 50 },
+              { id: "i_2", name: "Rocket Pass", icon: "🚀", imgKey: "", value: 18, weight: 30 },
+              { id: "i_3", name: "Diamond Core", icon: "💎", imgKey: "", value: 42, weight: 15 },
+              { id: "i_4", name: "Royal Crown", icon: "👑", imgKey: "", value: 120, weight: 5 }
             ]
           },
           {
             id: "c_gram",
             title: "GRAM Vault",
             icon: "💎",
-            img: "",
+            imgKey: "",
             cost: 30,
             items: [
-              { id: "i_5", name: "GRAM Shard", icon: "🔹", img: "", value: 12, weight: 50 },
-              { id: "i_6", name: "Neon Lollipop", icon: "🍭", img: "", value: 36, weight: 30 },
-              { id: "i_7", name: "Turbo Core", icon: "⚡", img: "", value: 90, weight: 15 },
-              { id: "i_8", name: "Grand Trophy", icon: "🏆", img: "", value: 250, weight: 5 }
+              { id: "i_5", name: "GRAM Shard", icon: "🔹", imgKey: "", value: 12, weight: 50 },
+              { id: "i_6", name: "Neon Lollipop", icon: "🍭", imgKey: "", value: 36, weight: 30 },
+              { id: "i_7", name: "Turbo Core", icon: "⚡", imgKey: "", value: 90, weight: 15 },
+              { id: "i_8", name: "Grand Trophy", icon: "🏆", imgKey: "", value: 250, weight: 5 }
             ]
           }
         ]
       };
+    }
+
+    /* INDEXEDDB ДЛЯ ПОСТОЯННОГО ХРАНЕНИЯ ФОТО БЕЗ ЛИМИТА 5 МБ */
+    const mediaCache = {};
+    let idbInstance = null;
+
+    function openMediaDb() {
+      return new Promise((resolve, reject) => {
+        if (idbInstance) return resolve(idbInstance);
+        if (!window.indexedDB) return reject(new Error("no_idb"));
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(IDB_STORE)) {
+            db.createObjectStore(IDB_STORE);
+          }
+        };
+        req.onsuccess = () => {
+          idbInstance = req.result;
+          resolve(idbInstance);
+        };
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function saveMediaToDb(dataUrl) {
+      if (!dataUrl) return "";
+      const key = "img_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+      mediaCache[key] = dataUrl;
+      try {
+        const db = await openMediaDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          tx.objectStore(IDB_STORE).put(dataUrl, key);
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (_) {}
+      return key;
+    }
+
+    async function loadAllMediaFromDb() {
+      try {
+        const db = await openMediaDb();
+        await new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, "readonly");
+          const store = tx.objectStore(IDB_STORE);
+          const keysReq = store.getAllKeys();
+          const valsReq = store.getAll();
+          tx.oncomplete = () => {
+            const keys = keysReq.result || [];
+            const vals = valsReq.result || [];
+            for (let i = 0; i < keys.length; i++) {
+              mediaCache[String(keys[i])] = vals[i];
+            }
+            resolve();
+          };
+          tx.onerror = () => resolve();
+        });
+      } catch (_) {}
+    }
+
+    function getImgSrc(entry) {
+      if (!entry) return "";
+      if (entry.imgKey && mediaCache[entry.imgKey]) return mediaCache[entry.imgKey];
+      if (entry.img) return entry.img;
+      return "";
     }
 
     function loadState() {
@@ -1476,7 +1545,7 @@
     let addItemPickedImg = "";
     const editItemPickedImgs = {};
 
-    function readGalleryImageAsDataUrl(file, maxSide = 200) {
+    function readGalleryImageAsDataUrl(file, maxSide = 260) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith("image/")) {
           return reject(new Error("not_image"));
@@ -1499,7 +1568,7 @@
             canvas.height = h;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.65));
+            resolve(canvas.toDataURL("image/jpeg", 0.72));
           };
           img.onerror = reject;
           img.src = reader.result;
@@ -1510,9 +1579,10 @@
     }
 
     function renderVisualHtml(entry, mode = "list") {
-      if (entry && entry.img) {
+      const src = getImgSrc(entry);
+      if (src) {
         const cls = mode === "spin" ? "item-thumb-img spin-lg" : (mode === "win" ? "item-thumb-img win-xl" : "item-thumb-img");
-        return `<img src="${entry.img}" class="${cls}" alt="" />`;
+        return `<img src="${src}" class="${cls}" alt="" />`;
       }
       const px = mode === "spin" ? 38 : (mode === "win" ? 56 : 30);
       return `<span style="font-size:${px}px; line-height:1;">${entry && entry.icon ? entry.icon : "🎁"}</span>`;
@@ -1663,23 +1733,18 @@
 
     function saveState() {
       try {
-        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+        const compactState = {
+          ...state,
+          cases: (state.cases || []).map(c => ({
+            ...c,
+            img: "",
+            items: (c.items || []).map(it => ({ ...it, img: "" }))
+          })),
+          inventory: (state.inventory || []).map(inv => ({ ...inv, img: "" }))
+        };
+        localStorage.setItem(STORE_KEY, JSON.stringify(compactState));
         return true;
       } catch (e) {
-        try {
-          const lightState = {
-            ...state,
-            cases: (state.cases || []).map(c => ({
-              ...c,
-              img: "",
-              items: (c.items || []).map(it => ({ ...it, img: "" }))
-            })),
-            inventory: (state.inventory || []).map(inv => ({ ...inv, img: "" }))
-          };
-          localStorage.setItem(STORE_KEY, JSON.stringify(lightState));
-          state.cases = lightState.cases;
-          state.inventory = lightState.inventory;
-        } catch (_) {}
         return false;
       }
     }
@@ -1767,12 +1832,14 @@
         return;
       }
       wrap.innerHTML = state.cases.map(c => {
-        const heroHtml = c.img
-          ? `<img src="${c.img}" class="case-hero-img" alt="" />`
+        const cSrc = getImgSrc(c);
+        const heroHtml = cSrc
+          ? `<img src="${cSrc}" class="case-hero-img" alt="" />`
           : `<span class="case-hero-icon">${c.icon || "🎁"}</span>`;
 
         const previewIcons = (c.items || []).slice(0, 4).map(it => {
-          const inner = it.img ? `<img src="${it.img}" alt="" />` : (it.icon || "🎁");
+          const itSrc = getImgSrc(it);
+          const inner = itSrc ? `<img src="${itSrc}" alt="" />` : (it.icon || "🎁");
           return `<span class="case-loot-dot">${inner}</span>`;
         }).join("");
 
@@ -1799,8 +1866,9 @@
       document.getElementById("caseContentsTitle").textContent = "Содержимое кейса";
       document.getElementById("caseContentsName").textContent = c.title;
       document.getElementById("caseContentsMeta").textContent = `Цена открытия: ${fmt(c.cost)} · Предметов: ${(c.items || []).length}`;
-      document.getElementById("caseContentsHeroWrap").innerHTML = c.img
-        ? `<img src="${c.img}" class="case-hero-img" style="width:62px; height:62px;" alt="" />`
+      const cSrc = getImgSrc(c);
+      document.getElementById("caseContentsHeroWrap").innerHTML = cSrc
+        ? `<img src="${cSrc}" class="case-hero-img" style="width:62px; height:62px;" alt="" />`
         : `<div style="font-size:40px;">${c.icon || "🎁"}</div>`;
 
       const items = c.items || [];
@@ -1859,7 +1927,8 @@
         uid,
         name: winner.name,
         icon: winner.icon || "🎁",
-        img: winner.img || "",
+        imgKey: winner.imgKey || "",
+        img: "",
         value: Number(winner.value || 0)
       });
 
@@ -2467,29 +2536,29 @@
       }
     }
 
-    /* CRASH LIVE (100 ИГРОКОВ И НЕПРЕРЫВНЫЙ ЦИКЛ) */
+    /* CRASH LIVE (100 РАЗНЫХ НИКОВ С _ И РАЗНЫМИ СИМВОЛАМИ) */
     const CRASH_BOT_NAMES = [
-      "night_wolf", "gram_king", "pepe_lord", "turbo_fox", "alex_777", "nova_star", "dasha_k", "max_pro",
-      "mellow_x", "crypt_vibe", "leo_fast", "savage_01", "vika_glow", "den_kzn", "gold_rush", "zver_99",
-      "kiki_boom", "storm_ua", "artem_v", "lisa_play", "ton_hunter", "blaze_in", "roma_win", "sky_drift",
-      "nina_top", "shadow_m", "lucky_cat", "dimon_r", "echo_x", "kira_sweet", "vlad_k", "frost_bite",
-      "mila_sun", "oleg_7", "dark_horse", "sonya_b", "tim_flow", "vera_star", "goga_m", "flash_run",
-      "polina_v", "nik_pro", "delta_9", "anya_mix", "slava_t", "titan_x", "yana_rose", "kirill_d",
-      "phantom_k", "eva_lux", "sergey_m", "drift_king", "karina_p", "rocky_1", "marina_z", "viper_x",
-      "egor_k", "alina_v", "zenit_9", "pasha_r", "stella_m", "raptor_x", "diana_l", "bobby_g",
-      "masha_t", "ivan_77", "cobra_v", "liza_k", "anton_m", "spark_x", "sofia_r", "denis_p",
-      "valeria_n", "taras_k", "frost_x", "ksusha_m", "ilyas_r", "maya_star", "roman_d", "nasty_v",
-      "bek_01", "ira_glow", "rustam_k", "milana_t", "gleb_x", "daria_m", "vadim_r", "ellie_p",
-      "timur_7", "veronika_k", "sasha_b", "kristina_v", "marat_x", "uliana_m", "denchik_r", "elena_star",
-      "arthur_k", "polly_v", "misha_9", "tamara_x"
+      "night_wolf", "gram.king", "pepe-lord", "turbo_fox_99", "alex.777", "nova_star_x", "dasha-k", "max_pro_1",
+      "mellow.x", "crypt_vibe_42", "leo-fast", "savage_01_r", "vika.glow", "den_kzn_7", "gold-rush", "zver_99_m",
+      "kiki.boom", "storm_ua_2", "artem-v", "lisa_play_x", "ton.hunter", "blaze_in_8", "roma-win", "sky_drift_5",
+      "nina.top", "shadow_m_3", "lucky-cat", "dimon_r_88", "echo.x", "kira_sweet_1", "vlad-k", "frost_bite_9",
+      "mila.sun", "oleg_7_pro", "dark-horse", "sonya_b_4", "tim.flow", "vera_star_6", "goga-m", "flash_run_2",
+      "polina.v", "nik_pro_77", "delta-9", "anya_mix_5", "slava.t", "titan_x_12", "yana-rose", "kirill_d_8",
+      "phantom.k", "eva_lux_3", "sergey-m", "drift_king_6", "karina.p", "rocky_1_v", "marina-z", "viper_x_9",
+      "egor.k", "alina_v_21", "zenit-9", "pasha_r_4", "stella.m", "raptor_x_7", "diana-l", "bobby_g_11",
+      "masha.t", "ivan_77_k", "cobra-v", "liza_k_6", "anton.m", "spark_x_33", "sofia-r", "denis_p_2",
+      "valeria.n", "taras_k_81", "frost-x", "ksusha_m_5", "ilyas.r", "maya_star_9", "roman-d", "nasty_v_14",
+      "bek.01", "ira_glow_7", "rustam-k", "milana_t_3", "gleb.x", "daria_m_64", "vadim-r", "ellie_p_8",
+      "timur.7", "veronika_k_2", "sasha-b", "kristina_v_9", "marat.x", "uliana_m_17", "denchik-r", "elena_star_4",
+      "arthur.k", "polly_v_55", "misha-9", "tamara_x_6"
     ];
 
-    let crashPhase = "flying"; // "flying" | "crashed"
+    let crashPhase = "flying";
     let crashRoundNum = 1;
     let crashCurM = 1.0;
     let crashTargetPoint = 2.1;
     let crashLiveBets = [];
-    let crashMyBet = null; // { amount, targetMult, cashedOut, payout }
+    let crashMyBet = null;
 
     function generateCrashTargetPoint() {
       const winChance = Number(state.chances.crash || 45) / 100;
@@ -2509,7 +2578,6 @@
       crashTargetPoint = generateCrashTargetPoint();
       crashMyBet = null;
 
-      // Формируем список из 100 игроков и выбираем 24-45 активных ставок на текущий раунд
       const activeCount = 24 + Math.floor(Math.random() * 22);
       const shuffled = [...CRASH_BOT_NAMES].sort(() => Math.random() - 0.5).slice(0, activeCount);
 
@@ -2534,7 +2602,6 @@
         return toast("Дождитесь старта следующего Live-раунда");
       }
 
-      // Если игрок уже в раунде и ещё не забрал — забираем по текущему множителю
       if (crashMyBet && !crashMyBet.cashedOut) {
         const payout = Number((crashMyBet.amount * crashCurM).toFixed(2));
         crashMyBet.cashedOut = true;
@@ -2589,7 +2656,6 @@
         const step = crashCurM < 2 ? 0.03 : (crashCurM < 5 ? 0.06 : 0.11);
         crashCurM = Number((crashCurM + step).toFixed(2));
 
-        // Боты забирают свои ставки при достижении своего cashAt
         for (const b of crashLiveBets) {
           if (!b.isMe && !b.cashedOut && crashCurM >= b.cashAt && crashCurM < crashTargetPoint) {
             b.cashedOut = true;
@@ -2597,7 +2663,6 @@
           }
         }
 
-        // Автовывод игрока
         if (crashMyBet && !crashMyBet.cashedOut && crashMyBet.targetMult >= 1.05 && crashCurM >= crashMyBet.targetMult && crashCurM < crashTargetPoint) {
           const payout = Number((crashMyBet.amount * crashMyBet.targetMult).toFixed(2));
           crashMyBet.cashedOut = true;
@@ -2613,7 +2678,6 @@
           setBanner("win", `Автовывод сработал на ${crashMyBet.targetMult.toFixed(2)}x: +${fmt(payout)}`);
         }
 
-        // Проверка краша
         if (crashCurM >= crashTargetPoint) {
           crashCurM = crashTargetPoint;
           crashPhase = "crashed";
@@ -2738,7 +2802,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        newCasePickedImg = await readGalleryImageAsDataUrl(f, 200);
+        newCasePickedImg = await readGalleryImageAsDataUrl(f, 260);
         document.getElementById("newCaseImgPreview").src = newCasePickedImg;
         document.getElementById("newCaseImgPreviewWrap").style.display = "flex";
       } catch {
@@ -2757,7 +2821,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        editCasePickedImg = await readGalleryImageAsDataUrl(f, 200);
+        editCasePickedImg = await readGalleryImageAsDataUrl(f, 260);
         const prev = document.getElementById("editCaseImgPreview");
         if (prev) {
           prev.src = editCasePickedImg;
@@ -2773,14 +2837,17 @@
       const inp = document.getElementById("ecImgFile");
       if (inp) inp.value = "";
       const prev = document.getElementById("editCaseImgPreview");
-      if (prev) prev.style.display = "none";
+      if (prev) {
+        prev.src = "";
+        prev.style.display = "none";
+      }
     }
 
     async function onAddItemImgSelected(ev) {
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        addItemPickedImg = await readGalleryImageAsDataUrl(f, 200);
+        addItemPickedImg = await readGalleryImageAsDataUrl(f, 260);
         const prev = document.getElementById("addItemImgPreview");
         if (prev) {
           prev.src = addItemPickedImg;
@@ -2795,7 +2862,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        editItemPickedImgs[iid] = await readGalleryImageAsDataUrl(f, 200);
+        editItemPickedImgs[iid] = await readGalleryImageAsDataUrl(f, 260);
         const prev = document.getElementById("iprev_" + iid);
         if (prev) {
           prev.src = editItemPickedImgs[iid];
@@ -2847,22 +2914,25 @@
       toast("Шансы игр сохранены");
     }
 
-    function addNewCase() {
+    async function addNewCase() {
       if (!isAdminUser()) return;
       const title = document.getElementById("newCaseTitle").value.trim();
       const icon = document.getElementById("newCaseIcon").value.trim() || "🎁";
       const cost = Math.max(0, Number(document.getElementById("newCaseCost").value || 0));
       if (!title) return toast("Введите название кейса");
 
+      const imgKey = newCasePickedImg ? await saveMediaToDb(newCasePickedImg) : "";
+
       state.cases.push({
         id: "c_" + Date.now(),
         title,
         icon,
-        img: newCasePickedImg || "",
+        imgKey,
+        img: "",
         cost,
         items: [
-          { id: "it_" + Date.now(), name: "Базовый приз", icon: "🔹", img: "", value: Number((cost * 0.5).toFixed(2)), weight: 70 },
-          { id: "it_" + (Date.now() + 1), name: "Топ приз", icon: "🔥", img: "", value: Number((cost * 3).toFixed(2)), weight: 30 }
+          { id: "it_" + Date.now(), name: "Базовый приз", icon: "🔹", imgKey: "", img: "", value: Number((cost * 0.5).toFixed(2)), weight: 70 },
+          { id: "it_" + (Date.now() + 1), name: "Топ приз", icon: "🔥", imgKey: "", img: "", value: Number((cost * 3).toFixed(2)), weight: 30 }
         ]
       });
       document.getElementById("newCaseTitle").value = "";
@@ -2882,10 +2952,10 @@
         return;
       }
 
-      const activeCaseImg = editCasePickedImg || c.img || "";
+      const activeCaseImg = editCasePickedImg || getImgSrc(c) || "";
 
       const itemsHtml = (c.items || []).map(it => {
-        const curItImg = editItemPickedImgs[it.id] || it.img || "";
+        const curItImg = editItemPickedImgs[it.id] || getImgSrc(it) || "";
         return `
           <div class="card mt-8" style="background:var(--bg); padding:10px;">
             <div class="row-gap" style="margin-bottom:8px;">
@@ -2968,17 +3038,22 @@
       `;
     }
 
-    function saveCaseEdit(cid) {
+    async function saveCaseEdit(cid) {
       if (!isAdminUser()) return;
       const c = state.cases.find(x => x.id === cid);
       if (!c) return;
       c.title = document.getElementById("ecTitle").value.trim() || c.title;
       c.cost = Math.max(0, Number(document.getElementById("ecCost").value || 0));
+
+      const prevEl = document.getElementById("editCaseImgPreview");
       if (editCasePickedImg) {
-        c.img = editCasePickedImg;
-      } else if (!document.getElementById("editCaseImgPreview").src || document.getElementById("editCaseImgPreview").style.display === "none") {
+        c.imgKey = await saveMediaToDb(editCasePickedImg);
+        c.img = "";
+      } else if (!prevEl || prevEl.style.display === "none" || !prevEl.getAttribute("src")) {
+        c.imgKey = "";
         c.img = "";
       }
+
       editCasePickedImg = "";
       saveState();
       renderCases();
@@ -2996,7 +3071,7 @@
       toast("Кейс удалён");
     }
 
-    function addItemToCase(cid) {
+    async function addItemToCase(cid) {
       if (!isAdminUser()) return;
       const c = state.cases.find(x => x.id === cid);
       if (!c) return;
@@ -3005,11 +3080,15 @@
       const value = Math.max(0, Number(document.getElementById("addItVal").value || 0));
       const weight = Math.max(0, Number(document.getElementById("addItW").value || 0));
       if (!name) return toast("Введите название предмета");
+
+      const imgKey = addItemPickedImg ? await saveMediaToDb(addItemPickedImg) : "";
+
       c.items.push({
         id: "it_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
         name,
         icon,
-        img: addItemPickedImg || "",
+        imgKey,
+        img: "",
         value,
         weight
       });
@@ -3020,7 +3099,7 @@
       toast("Предмет добавлен");
     }
 
-    function saveItemEdit(cid, iid) {
+    async function saveItemEdit(cid, iid) {
       if (!isAdminUser()) return;
       const c = state.cases.find(x => x.id === cid);
       const it = c && c.items.find(x => x.id === iid);
@@ -3030,7 +3109,8 @@
       it.value = Math.max(0, Number(document.getElementById("ival_" + iid).value || 0));
       it.weight = Math.max(0, Number(document.getElementById("iw_" + iid).value || 0));
       if (editItemPickedImgs[iid]) {
-        it.img = editItemPickedImgs[iid];
+        it.imgKey = await saveMediaToDb(editItemPickedImgs[iid]);
+        it.img = "";
         delete editItemPickedImgs[iid];
       }
       saveState();
@@ -3083,7 +3163,14 @@
     updateDepEquivalent();
     initTonConnect();
 
-    // Запуск непрерывного Live-цикла ракеты сразу при загрузке приложения
+    loadAllMediaFromDb().then(() => {
+      renderCases();
+      renderInv();
+      if (isAdminUser() && document.getElementById("view-admin").style.display === "block") {
+        renderAdminCaseForm();
+      }
+    });
+
     startNewCrashLiveRound();
     setInterval(tickCrashLive, 120);
   </script>
