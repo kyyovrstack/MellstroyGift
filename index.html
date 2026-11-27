@@ -234,27 +234,52 @@
       padding: 12px;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
       transition: transform 0.14s ease;
-      cursor: pointer;
-    }
-
-    .case-card-v2:active {
-      transform: scale(0.98);
     }
 
     .case-stage-v2 {
       background: radial-gradient(circle at 50% 35%, rgba(236, 72, 153, 0.24), rgba(8, 6, 20, 0.78) 75%);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px;
-      padding: 12px 8px;
+      padding: 10px 8px;
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .case-stage-v2:active {
+      transform: scale(0.98);
     }
 
     .case-hero-icon {
       font-size: 36px;
       line-height: 1.1;
-      display: block;
+      display: inline-block;
       filter: drop-shadow(0 6px 14px rgba(168, 85, 247, 0.5));
+    }
+
+    .case-hero-img {
+      width: 68px;
+      height: 68px;
+      object-fit: cover;
+      border-radius: 14px;
+      display: inline-block;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 6px 14px rgba(168, 85, 247, 0.45);
+    }
+
+    .item-thumb-img {
+      width: 36px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 9px;
+      display: inline-block;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .item-thumb-img.lg {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
     }
 
     .case-title-v2 {
@@ -282,6 +307,30 @@
       display: grid;
       place-items: center;
       font-size: 14px;
+      overflow: hidden;
+    }
+
+    .case-loot-dot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .case-actions-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px;
+    }
+
+    .case-inspect-btn {
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      border-radius: 13px;
+      padding: 9px 9px;
+      background: rgba(255, 255, 255, 0.07);
+      color: #e9d5ff;
+      font-weight: 800;
+      font-size: 11px;
+      cursor: pointer;
     }
 
     .case-buy-v2 {
@@ -340,6 +389,18 @@
       box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
     }
 
+    .content-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
     .seg-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -387,6 +448,11 @@
       font-size: 14px;
       font-weight: 700;
       outline: none;
+    }
+
+    input[type="file"] {
+      padding: 7px 10px;
+      font-size: 12px;
     }
 
     .bet-bar input {
@@ -962,19 +1028,31 @@
         </div>
 
         <div class="card">
-          <div class="section-title" style="margin-top:0;">➕ Новый кейс</div>
+          <div class="section-title" style="margin-top:0;">➕ Новый кейс (фото из галереи)</div>
           <div class="grid-2">
             <input type="text" id="newCaseTitle" placeholder="Название кейса" />
-            <input type="text" id="newCaseIcon" placeholder="Эмодзи" value="🎁" />
+            <input type="text" id="newCaseIcon" placeholder="Эмодзи (запасной)" value="🎁" />
           </div>
-          <div class="mt-8">
-            <input type="number" id="newCaseCost" step="1" value="15" placeholder="Цена в GRAM" />
+          <div class="grid-2 mt-8">
+            <div>
+              <label class="muted">Цена (GRAM)</label>
+              <input type="number" id="newCaseCost" step="1" value="15" />
+            </div>
+            <div>
+              <label class="muted">Фото кейса из галереи</label>
+              <input type="file" id="newCaseImgFile" accept="image/*" onchange="onNewCaseImgSelected(event)" />
+            </div>
           </div>
-          <button class="primary-btn green mt-8" onclick="addNewCase()">Создать кейс</button>
+          <div class="row-gap mt-8" id="newCaseImgPreviewWrap" style="display:none;">
+            <img id="newCaseImgPreview" class="item-thumb-img lg" alt="" />
+            <span class="muted">Фото выбрано</span>
+            <button class="btn-sm red" type="button" onclick="clearNewCaseImg()">Убрать</button>
+          </div>
+          <button class="primary-btn green mt-12" onclick="addNewCase()">Создать кейс</button>
         </div>
 
         <div class="card">
-          <div class="section-title" style="margin-top:0;">🛠️ Редактор кейсов и весов</div>
+          <div class="section-title" style="margin-top:0;">🛠️ Редактор кейсов и содержимого</div>
           <select id="editCaseSelect" onchange="renderAdminCaseForm()"></select>
           <div id="editCaseForm" class="mt-12"></div>
         </div>
@@ -990,6 +1068,37 @@
     </div>
   </div>
 
+  <!-- МОДАЛКА СОСТАВА КЕЙСА -->
+  <div class="modal-wrap" id="caseContentsModal">
+    <div class="modal-inner">
+      <div class="modal-top">
+        <div class="row-gap">
+          <button class="icon-btn" onclick="closeCaseContentsModal()">✕</button>
+          <b id="caseContentsTitle" style="font-size:16px;">Содержимое кейса</b>
+        </div>
+        <div class="bal-box">
+          <span id="contentsModalBal">0.00</span>
+          <span class="cur-badge">GRAM</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row-gap" style="margin-bottom:12px;">
+          <div id="caseContentsHeroWrap"></div>
+          <div>
+            <div style="font-weight:900; font-size:15px;" id="caseContentsName"></div>
+            <div class="muted" id="caseContentsMeta"></div>
+          </div>
+        </div>
+
+        <div id="caseContentsList"></div>
+
+        <button class="primary-btn mt-12" id="openFromContentsBtn">Открыть кейс</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА ПРОКРУТА КЕЙСА (2.7 сек) -->
   <div class="modal-wrap" id="caseSpinModal">
     <div class="modal-inner">
       <div class="modal-top">
@@ -1010,7 +1119,7 @@
         </div>
 
         <div id="caseSpinWinCard" style="display:none; text-align:center; padding-top:6px;">
-          <div id="winItemEmoji" style="font-size:40px;"></div>
+          <div id="winItemVisual" style="display:flex; justify-content:center; margin-bottom:4px;"></div>
           <div id="winItemTitle" style="font-size:17px; font-weight:900; margin-top:4px;"></div>
           <div id="winItemPrice" style="color:var(--gold); font-weight:800; margin-top:2px;"></div>
           <div class="grid-2 mt-12">
@@ -1022,6 +1131,7 @@
     </div>
   </div>
 
+  <!-- МОДАЛКА ИГР -->
   <div class="modal-wrap" id="gameModal">
     <div class="modal-inner">
       <div class="modal-top">
@@ -1172,7 +1282,7 @@
     const ADMIN_ID = 5200591975;
     const DEFAULT_PLAYER_ID = 1000001;
     const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-    const STORE_KEY = "mellstroy_gift_gram_v2";
+    const STORE_KEY = "mellstroy_gift_gram_v3";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1215,24 +1325,26 @@
             id: "c_epic",
             title: "Mellstroy Case",
             icon: "🎁",
+            img: "",
             cost: 15,
             items: [
-              { id: "i_1", name: "Pepe Heart", icon: "🐸", value: 6, weight: 50 },
-              { id: "i_2", name: "Rocket Pass", icon: "🚀", value: 18, weight: 30 },
-              { id: "i_3", name: "Diamond Core", icon: "💎", value: 42, weight: 15 },
-              { id: "i_4", name: "Royal Crown", icon: "👑", value: 120, weight: 5 }
+              { id: "i_1", name: "Pepe Heart", icon: "🐸", img: "", value: 6, weight: 50 },
+              { id: "i_2", name: "Rocket Pass", icon: "🚀", img: "", value: 18, weight: 30 },
+              { id: "i_3", name: "Diamond Core", icon: "💎", img: "", value: 42, weight: 15 },
+              { id: "i_4", name: "Royal Crown", icon: "👑", img: "", value: 120, weight: 5 }
             ]
           },
           {
             id: "c_gram",
             title: "GRAM Vault",
             icon: "💎",
+            img: "",
             cost: 30,
             items: [
-              { id: "i_5", name: "GRAM Shard", icon: "🔹", value: 12, weight: 50 },
-              { id: "i_6", name: "Neon Lollipop", icon: "🍭", value: 36, weight: 30 },
-              { id: "i_7", name: "Turbo Core", icon: "⚡", value: 90, weight: 15 },
-              { id: "i_8", name: "Grand Trophy", icon: "🏆", value: 250, weight: 5 }
+              { id: "i_5", name: "GRAM Shard", icon: "🔹", img: "", value: 12, weight: 50 },
+              { id: "i_6", name: "Neon Lollipop", icon: "🍭", img: "", value: 36, weight: 30 },
+              { id: "i_7", name: "Turbo Core", icon: "⚡", img: "", value: 90, weight: 15 },
+              { id: "i_8", name: "Grand Trophy", icon: "🏆", img: "", value: 250, weight: 5 }
             ]
           }
         ]
@@ -1270,6 +1382,52 @@
     let state = loadState();
     let caseSpinning = false;
     let lastDroppedUid = null;
+
+    /* ХРАНИЛИЩЕ ВЫБРАННЫХ ФОТО ИЗ ГАЛЕРЕИ */
+    let newCasePickedImg = "";
+    let editCasePickedImg = "";
+    let addItemPickedImg = "";
+    const editItemPickedImgs = {};
+
+    function readGalleryImageAsDataUrl(file, maxSide = 360) {
+      return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith("image/")) {
+          return reject(new Error("not_image"));
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let w = img.width;
+            let h = img.height;
+            if (w > h && w > maxSide) {
+              h = Math.round((h * maxSide) / w);
+              w = maxSide;
+            } else if (h >= w && h > maxSide) {
+              w = Math.round((w * maxSide) / h);
+              h = maxSide;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.82));
+          };
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderVisualHtml(entry, sizeClass = "") {
+      if (entry && entry.img) {
+        return `<img src="${entry.img}" class="item-thumb-img ${sizeClass}" alt="" />`;
+      }
+      return `<span style="font-size:${sizeClass === "lg" ? "34px" : "24px"}; line-height:1;">${entry && entry.icon ? entry.icon : "🎁"}</span>`;
+    }
 
     function applyAdminVisibility() {
       const adminOk = isAdminUser();
@@ -1415,7 +1573,11 @@
     }
 
     function saveState() {
-      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+      } catch (e) {
+        toast("Недостаточно места в памяти браузера для фото");
+      }
     }
 
     function toast(msg) {
@@ -1477,9 +1639,11 @@
       document.getElementById("balValue").textContent = valStr;
       document.getElementById("modalBalText").textContent = valStr;
       document.getElementById("caseModalBal").textContent = valStr;
+      const cBal = document.getElementById("contentsModalBal");
+      if (cBal) cBal.textContent = valStr;
     }
 
-    /* КЕЙСЫ */
+    /* КЕЙСЫ И СОДЕРЖИМОЕ */
     function pickByWeight(items) {
       const list = (items || []).filter(i => Number(i.weight) > 0);
       if (!list.length) return items[0];
@@ -1499,21 +1663,76 @@
         return;
       }
       wrap.innerHTML = state.cases.map(c => {
-        const previewIcons = (c.items || []).slice(0, 4).map(it =>
-          `<span class="case-loot-dot">${it.icon || "🎁"}</span>`
-        ).join("");
+        const heroHtml = c.img
+          ? `<img src="${c.img}" class="case-hero-img" alt="" />`
+          : `<span class="case-hero-icon">${c.icon || "🎁"}</span>`;
+
+        const previewIcons = (c.items || []).slice(0, 4).map(it => {
+          const inner = it.img ? `<img src="${it.img}" alt="" />` : (it.icon || "🎁");
+          return `<span class="case-loot-dot">${inner}</span>`;
+        }).join("");
 
         return `
-          <div class="case-card-v2" onclick="openCaseSpin('${c.id}')">
-            <div class="case-stage-v2">
-              <span class="case-hero-icon">${c.icon || "🎁"}</span>
+          <div class="case-card-v2">
+            <div class="case-stage-v2" onclick="openCaseContents('${c.id}')">
+              ${heroHtml}
               <div class="case-title-v2">${esc(c.title)}</div>
               <div class="case-loot-strip">${previewIcons}</div>
             </div>
-            <button class="case-buy-v2" type="button">Открыть · ${fmt(c.cost)}</button>
+            <div class="case-actions-row">
+              <button class="case-inspect-btn" type="button" onclick="openCaseContents('${c.id}')">Состав</button>
+              <button class="case-buy-v2" type="button" onclick="openCaseSpin('${c.id}')">${fmt(c.cost)}</button>
+            </div>
           </div>
         `;
       }).join("");
+    }
+
+    function openCaseContents(caseId) {
+      const c = state.cases.find(x => x.id === caseId);
+      if (!c) return;
+      renderTop();
+      document.getElementById("caseContentsTitle").textContent = "Содержимое кейса";
+      document.getElementById("caseContentsName").textContent = c.title;
+      document.getElementById("caseContentsMeta").textContent = `Цена открытия: ${fmt(c.cost)} · Предметов: ${(c.items || []).length}`;
+      document.getElementById("caseContentsHeroWrap").innerHTML = c.img
+        ? `<img src="${c.img}" class="item-thumb-img lg" alt="" />`
+        : `<div style="font-size:36px;">${c.icon || "🎁"}</div>`;
+
+      const items = c.items || [];
+      const totalW = items.reduce((s, x) => s + Math.max(0, Number(x.weight || 0)), 0);
+
+      document.getElementById("caseContentsList").innerHTML = items.length
+        ? items.map(it => {
+            const w = Math.max(0, Number(it.weight || 0));
+            const pct = totalW > 0 ? ((w / totalW) * 100).toFixed(1) : "0.0";
+            return `
+              <div class="content-item-row">
+                <div class="row-gap">
+                  ${renderVisualHtml(it, "")}
+                  <div>
+                    <b>${esc(it.name)}</b>
+                    <div class="muted">Шанс: ${pct}%</div>
+                  </div>
+                </div>
+                <span style="color:var(--gold); font-weight:900; font-size:13px;">${fmt(it.value)}</span>
+              </div>
+            `;
+          }).join("")
+        : `<div class="muted">В кейсе пока нет предметов</div>`;
+
+      const openBtn = document.getElementById("openFromContentsBtn");
+      openBtn.textContent = `Открыть за ${fmt(c.cost)}`;
+      openBtn.onclick = () => {
+        closeCaseContentsModal();
+        openCaseSpin(c.id);
+      };
+
+      document.getElementById("caseContentsModal").classList.add("open");
+    }
+
+    function closeCaseContentsModal() {
+      document.getElementById("caseContentsModal").classList.remove("open");
     }
 
     function openCaseSpin(caseId) {
@@ -1536,6 +1755,7 @@
         uid,
         name: winner.name,
         icon: winner.icon || "🎁",
+        img: winner.img || "",
         value: Number(winner.value || 0)
       });
 
@@ -1550,14 +1770,14 @@
       track.style.transition = "none";
       track.style.transform = "translateX(0px)";
 
-      const totalCards = 32;
-      const winIndex = 26;
+      const totalCards = 36;
+      const winIndex = 30;
       const cardsHtml = [];
       for (let i = 0; i < totalCards; i++) {
         const item = i === winIndex ? winner : c.items[Math.floor(Math.random() * c.items.length)];
         cardsHtml.push(`
           <div class="spinner-card" id="spCard_${i}">
-            <div style="font-size:26px;">${item.icon || "🎁"}</div>
+            <div style="height:40px; display:grid; place-items:center;">${renderVisualHtml(item, "")}</div>
             <div style="font-size:11px; font-weight:800; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.name)}</div>
             <div style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px;">${fmt(item.value)}</div>
           </div>
@@ -1569,9 +1789,9 @@
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const cardStep = 104;
-          const offsetInside = Math.floor(Math.random() * 24) - 12;
+          const offsetInside = Math.floor(Math.random() * 20) - 10;
           const targetX = -(winIndex * cardStep + 48 + offsetInside);
-          track.style.transition = "transform 2.9s cubic-bezier(0.1, 0.86, 0.18, 1)";
+          track.style.transition = "transform 2.7s cubic-bezier(0.05, 0.92, 0.14, 1)";
           track.style.transform = `translateX(${targetX}px)`;
         });
       });
@@ -1579,13 +1799,13 @@
       setTimeout(() => {
         const winEl = document.getElementById("spCard_" + winIndex);
         if (winEl) winEl.classList.add("winner-glow");
-        document.getElementById("winItemEmoji").textContent = winner.icon || "🎁";
+        document.getElementById("winItemVisual").innerHTML = renderVisualHtml(winner, "lg");
         document.getElementById("winItemTitle").textContent = winner.name;
         document.getElementById("winItemPrice").textContent = `Цена: ${fmt(winner.value)}`;
         document.getElementById("sellDropBtn").textContent = `Продать за ${fmt(winner.value)}`;
         document.getElementById("caseSpinWinCard").style.display = "block";
         caseSpinning = false;
-      }, 2950);
+      }, 2740);
     }
 
     function sellLastDrop() {
@@ -2204,7 +2424,7 @@
       wrap.innerHTML = state.inventory.map((it, idx) => `
         <div class="live-bet-row mt-8">
           <div class="row-gap">
-            <span style="font-size:24px;">${it.icon || "🎁"}</span>
+            ${renderVisualHtml(it, "")}
             <div>
               <b>${esc(it.name)}</b>
               <div class="muted">${fmt(it.value)}</div>
@@ -2227,6 +2447,78 @@
     }
 
     /* АДМИН-ПАНЕЛЬ (ТОЛЬКО 5200591975) */
+    async function onNewCaseImgSelected(ev) {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      try {
+        newCasePickedImg = await readGalleryImageAsDataUrl(f, 360);
+        document.getElementById("newCaseImgPreview").src = newCasePickedImg;
+        document.getElementById("newCaseImgPreviewWrap").style.display = "flex";
+      } catch {
+        toast("Выберите корректное изображение");
+      }
+    }
+
+    function clearNewCaseImg() {
+      newCasePickedImg = "";
+      const inp = document.getElementById("newCaseImgFile");
+      if (inp) inp.value = "";
+      document.getElementById("newCaseImgPreviewWrap").style.display = "none";
+    }
+
+    async function onEditCaseImgSelected(ev) {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      try {
+        editCasePickedImg = await readGalleryImageAsDataUrl(f, 360);
+        const prev = document.getElementById("editCaseImgPreview");
+        if (prev) {
+          prev.src = editCasePickedImg;
+          prev.style.display = "inline-block";
+        }
+      } catch {
+        toast("Выберите корректное изображение");
+      }
+    }
+
+    function clearEditCaseImg() {
+      editCasePickedImg = "";
+      const inp = document.getElementById("ecImgFile");
+      if (inp) inp.value = "";
+      const prev = document.getElementById("editCaseImgPreview");
+      if (prev) prev.style.display = "none";
+    }
+
+    async function onAddItemImgSelected(ev) {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      try {
+        addItemPickedImg = await readGalleryImageAsDataUrl(f, 300);
+        const prev = document.getElementById("addItemImgPreview");
+        if (prev) {
+          prev.src = addItemPickedImg;
+          prev.style.display = "inline-block";
+        }
+      } catch {
+        toast("Выберите корректное изображение");
+      }
+    }
+
+    async function onEditItemImgSelected(iid, ev) {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      try {
+        editItemPickedImgs[iid] = await readGalleryImageAsDataUrl(f, 300);
+        const prev = document.getElementById("iprev_" + iid);
+        if (prev) {
+          prev.src = editItemPickedImgs[iid];
+          prev.style.display = "inline-block";
+        }
+      } catch {
+        toast("Выберите корректное изображение");
+      }
+    }
+
     function renderAdmin() {
       const ok = isAdminUser();
       document.getElementById("adminBody").style.display = ok ? "block" : "none";
@@ -2243,6 +2535,8 @@
       sel.innerHTML = state.cases.map(c => `<option value="${c.id}">${esc(c.title)} (${fmt(c.cost)})</option>`).join("");
       if (prev && state.cases.some(c => c.id === prev)) sel.value = prev;
 
+      editCasePickedImg = "";
+      addItemPickedImg = "";
       renderAdminCaseForm();
     }
 
@@ -2277,13 +2571,15 @@
         id: "c_" + Date.now(),
         title,
         icon,
+        img: newCasePickedImg || "",
         cost,
         items: [
-          { id: "it_" + Date.now(), name: "Базовый приз", icon: "🔹", value: Number((cost * 0.5).toFixed(2)), weight: 70 },
-          { id: "it_" + (Date.now() + 1), name: "Топ приз", icon: "🔥", value: Number((cost * 3).toFixed(2)), weight: 30 }
+          { id: "it_" + Date.now(), name: "Базовый приз", icon: "🔹", img: "", value: Number((cost * 0.5).toFixed(2)), weight: 70 },
+          { id: "it_" + (Date.now() + 1), name: "Топ приз", icon: "🔥", img: "", value: Number((cost * 3).toFixed(2)), weight: 30 }
         ]
       });
       document.getElementById("newCaseTitle").value = "";
+      clearNewCaseImg();
       saveState();
       renderCases();
       renderAdmin();
@@ -2299,28 +2595,40 @@
         return;
       }
 
-      const itemsHtml = (c.items || []).map(it => `
-        <div class="card mt-8" style="background:var(--bg); padding:10px;">
-          <div class="grid-2">
-            <input type="text" id="iname_${it.id}" value="${escAttr(it.name)}" />
-            <input type="text" id="iicon_${it.id}" value="${escAttr(it.icon || "🎁")}" />
-          </div>
-          <div class="grid-2 mt-8">
-            <div>
-              <label class="muted">Цена (GRAM)</label>
-              <input type="number" step="0.5" id="ival_${it.id}" value="${it.value}" />
+      const activeCaseImg = editCasePickedImg || c.img || "";
+
+      const itemsHtml = (c.items || []).map(it => {
+        const curItImg = editItemPickedImgs[it.id] || it.img || "";
+        return `
+          <div class="card mt-8" style="background:var(--bg); padding:10px;">
+            <div class="row-gap" style="margin-bottom:8px;">
+              <img id="iprev_${it.id}" src="${curItImg}" class="item-thumb-img lg" style="display:${curItImg ? "inline-block" : "none"};" alt="" />
+              <div style="flex:1;">
+                <label class="muted">Фото предмета из галереи</label>
+                <input type="file" accept="image/*" onchange="onEditItemImgSelected('${it.id}', event)" />
+              </div>
             </div>
-            <div>
-              <label class="muted">Вес (шанс)</label>
-              <input type="number" min="0" id="iw_${it.id}" value="${it.weight}" />
+            <div class="grid-2">
+              <input type="text" id="iname_${it.id}" value="${escAttr(it.name)}" />
+              <input type="text" id="iicon_${it.id}" value="${escAttr(it.icon || "🎁")}" />
+            </div>
+            <div class="grid-2 mt-8">
+              <div>
+                <label class="muted">Цена (GRAM)</label>
+                <input type="number" step="0.5" id="ival_${it.id}" value="${it.value}" />
+              </div>
+              <div>
+                <label class="muted">Вес (шанс)</label>
+                <input type="number" min="0" id="iw_${it.id}" value="${it.weight}" />
+              </div>
+            </div>
+            <div class="row-gap mt-8">
+              <button class="btn-sm green" onclick="saveItemEdit('${c.id}', '${it.id}')">Сохранить</button>
+              <button class="btn-sm red" onclick="removeItemEdit('${c.id}', '${it.id}')">Удалить</button>
             </div>
           </div>
-          <div class="row-gap mt-8">
-            <button class="btn-sm green" onclick="saveItemEdit('${c.id}', '${it.id}')">Сохранить</button>
-            <button class="btn-sm red" onclick="removeItemEdit('${c.id}', '${it.id}')">Удалить</button>
-          </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
 
       form.innerHTML = `
         <div class="grid-2">
@@ -2334,12 +2642,20 @@
           </div>
         </div>
         <div class="row-gap mt-8">
+          <img id="editCaseImgPreview" src="${activeCaseImg}" class="item-thumb-img lg" style="display:${activeCaseImg ? "inline-block" : "none"};" alt="" />
+          <div style="flex:1;">
+            <label class="muted">Фото кейса из галереи</label>
+            <input type="file" id="ecImgFile" accept="image/*" onchange="onEditCaseImgSelected(event)" />
+          </div>
+          <button class="btn-sm red" type="button" onclick="clearEditCaseImg()">Сброс</button>
+        </div>
+        <div class="row-gap mt-8">
           <button class="btn-sm" onclick="saveCaseEdit('${c.id}')">Сохранить кейс</button>
           <button class="btn-sm red" onclick="deleteCaseEdit('${c.id}')">Удалить кейс</button>
         </div>
 
         <div class="mt-12">
-          <b>Добавить предмет в кейс</b>
+          <b>Добавить предмет в кейс (с фото из галереи)</b>
           <div class="grid-2 mt-8">
             <input type="text" id="addItName" placeholder="Название предмета" />
             <input type="text" id="addItIcon" placeholder="Эмодзи" value="⚡" />
@@ -2348,11 +2664,18 @@
             <input type="number" step="0.5" id="addItVal" placeholder="Цена GRAM" value="10" />
             <input type="number" min="0" id="addItW" placeholder="Вес" value="20" />
           </div>
+          <div class="row-gap mt-8">
+            <img id="addItemImgPreview" src="" class="item-thumb-img lg" style="display:none;" alt="" />
+            <div style="flex:1;">
+              <label class="muted">Фото предмета</label>
+              <input type="file" id="addItImgFile" accept="image/*" onchange="onAddItemImgSelected(event)" />
+            </div>
+          </div>
           <button class="btn-sm green mt-8" style="width:100%;" onclick="addItemToCase('${c.id}')">+ Добавить предмет</button>
         </div>
 
         <div class="mt-12">
-          <b>Предметы кейса</b>
+          <b>Предметы кейса (${(c.items || []).length})</b>
           ${itemsHtml}
         </div>
       `;
@@ -2364,6 +2687,12 @@
       if (!c) return;
       c.title = document.getElementById("ecTitle").value.trim() || c.title;
       c.cost = Math.max(0, Number(document.getElementById("ecCost").value || 0));
+      if (editCasePickedImg) {
+        c.img = editCasePickedImg;
+      } else if (!document.getElementById("editCaseImgPreview").src || document.getElementById("editCaseImgPreview").style.display === "none") {
+        c.img = "";
+      }
+      editCasePickedImg = "";
       saveState();
       renderCases();
       renderAdmin();
@@ -2373,6 +2702,7 @@
     function deleteCaseEdit(cid) {
       if (!isAdminUser()) return;
       state.cases = state.cases.filter(x => x.id !== cid);
+      editCasePickedImg = "";
       saveState();
       renderCases();
       renderAdmin();
@@ -2388,7 +2718,15 @@
       const value = Math.max(0, Number(document.getElementById("addItVal").value || 0));
       const weight = Math.max(0, Number(document.getElementById("addItW").value || 0));
       if (!name) return toast("Введите название предмета");
-      c.items.push({ id: "it_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5), name, icon, value, weight });
+      c.items.push({
+        id: "it_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
+        name,
+        icon,
+        img: addItemPickedImg || "",
+        value,
+        weight
+      });
+      addItemPickedImg = "";
       saveState();
       renderCases();
       renderAdminCaseForm();
@@ -2404,6 +2742,10 @@
       it.icon = document.getElementById("iicon_" + iid).value.trim() || "🎁";
       it.value = Math.max(0, Number(document.getElementById("ival_" + iid).value || 0));
       it.weight = Math.max(0, Number(document.getElementById("iw_" + iid).value || 0));
+      if (editItemPickedImgs[iid]) {
+        it.img = editItemPickedImgs[iid];
+        delete editItemPickedImgs[iid];
+      }
       saveState();
       renderCases();
       toast("Предмет обновлён");
@@ -2414,6 +2756,7 @@
       const c = state.cases.find(x => x.id === cid);
       if (!c) return;
       c.items = c.items.filter(x => x.id !== iid);
+      delete editItemPickedImgs[iid];
       saveState();
       renderCases();
       renderAdminCaseForm();
