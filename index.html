@@ -183,6 +183,18 @@
       transition: transform 0.14s ease;
     }
 
+    .game-tile::after {
+      content: "";
+      position: absolute;
+      width: 84px;
+      height: 84px;
+      right: -18px;
+      top: -18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.36), transparent 70%);
+      pointer-events: none;
+    }
+
     .game-tile:active {
       transform: scale(0.97);
     }
@@ -378,7 +390,6 @@
       transform: scale(0.98);
     }
 
-    /* Plinko */
     .plinko-stage {
       position: relative;
       background: radial-gradient(circle at 50% 18%, rgba(168, 85, 247, 0.4), #130e2b 76%);
@@ -418,7 +429,6 @@
       box-shadow: 0 0 12px rgba(16, 185, 129, 0.75);
     }
 
-    /* Плавная прокрутка слотов 5x5 */
     .slots-board {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -543,7 +553,6 @@
       cursor: pointer;
     }
 
-    /* Mines 5x5 */
     .mines-mults {
       display: flex;
       gap: 6px;
@@ -623,7 +632,6 @@
       opacity: 0.45;
     }
 
-    /* Crash */
     .crash-sky {
       position: relative;
       height: 190px;
@@ -659,7 +667,6 @@
       margin-bottom: 8px;
     }
 
-    /* Нижнее меню */
     .bottom-nav {
       position: fixed;
       left: 0;
@@ -810,7 +817,6 @@
       </div>
     </div>
 
-    <!-- ГЛАВНАЯ -->
     <div id="view-home">
       <div class="section-title">
         <span>⚡ Play Hub</span>
@@ -848,13 +854,10 @@
       <div id="casesList"></div>
     </div>
 
-    <!-- КОШЕЛЁК + TON CONNECT -->
     <div id="view-wallet" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">💎 Подключение TON Connect</div>
-        <p class="muted">Подключите криптокошелёк TON, чтобы отправлять транзакции на пополнение в <b>Долларах ($)</b> или <b>GRAM</b>.</p>
-
-        <div class="mt-8" id="tonConnectMount"></div>
+        <p class="muted">Подключите TON-кошелёк и подтвердите перевод в приложении кошелька для зачисления баланса.</p>
 
         <div class="row-gap mt-8" style="justify-content:space-between;">
           <span class="muted" id="walletConnStatus">Кошелёк не подключён</span>
@@ -879,7 +882,8 @@
           </div>
         </div>
 
-        <div class="muted mt-8" id="depTonHint">К оплате через кошелёк: ≈ 2.00 TON</div>
+        <div class="muted mt-8" id="depTonHint">К оплате через кошелёк: ≈ 0.500 TON (10.00 GRAM)</div>
+        <div class="muted mt-8" id="depReceiverHint">Получатель: не задан (укажите в Админке)</div>
 
         <button class="primary-btn green mt-12" id="payNowBtn" onclick="startCryptoDeposit()">
           Пополнить
@@ -892,7 +896,6 @@
       </div>
     </div>
 
-    <!-- ИНВЕНТАРЬ -->
     <div id="view-inv" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">🎒 Инвентарь</div>
@@ -900,11 +903,10 @@
       </div>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ (5200591975) -->
     <div id="view-admin" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">🛡️ ID пользователя</div>
-        <p class="muted">Автоопределение из Telegram + переключатель для теста (Админ ID: <b>5200591975</b>).</p>
+        <p class="muted">У всех игроков кроме <b>5200591975</b> баланс по умолчанию <b>0.00</b>.</p>
         <div class="row-gap mt-8">
           <input type="number" id="adminTestId" value="5200591975" />
           <button class="btn-sm" onclick="switchTestId()">Применить</button>
@@ -918,9 +920,9 @@
 
       <div id="adminBody" style="display:none;">
         <div class="card">
-          <div class="section-title" style="margin-top:0;">🏦 Настройки приёма TON</div>
-          <label class="muted">TON-адрес получателя депозитов</label>
-          <input type="text" class="mt-8" id="adminTonAddress" />
+          <div class="section-title" style="margin-top:0;">🏦 TON-кошелёк получателя</div>
+          <label class="muted">Введите ваш TON-адрес (EQ... или UQ...)</label>
+          <input type="text" class="mt-8" id="adminTonAddress" placeholder="UQ..." />
           <button class="primary-btn mt-8" onclick="saveTonAddress()">Сохранить адрес TON</button>
         </div>
 
@@ -972,7 +974,7 @@
         </div>
 
         <div class="card">
-          <div class="section-title" style="margin-top:0;">💰 Выдача баланса</div>
+          <div class="section-title" style="margin-top:0;">💰 Баланс админа (5200591975)</div>
           <div class="grid-2 mt-8">
             <input type="number" id="grantAmt" step="0.1" value="50" />
             <select id="grantCur">
@@ -980,13 +982,12 @@
               <option value="GRAM">GRAM</option>
             </select>
           </div>
-          <button class="primary-btn mt-8" onclick="grantBalance()">Начислить</button>
+          <button class="primary-btn mt-8" onclick="grantBalance()">Начислить админу</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- МОДАЛКА КРУТКИ КЕЙСА -->
   <div class="modal-wrap" id="caseSpinModal">
     <div class="modal-inner">
       <div class="modal-top">
@@ -1019,7 +1020,6 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ИГР -->
   <div class="modal-wrap" id="gameModal">
     <div class="modal-inner">
       <div class="modal-top">
@@ -1035,7 +1035,6 @@
 
       <div id="gameBanner" class="status-banner"></div>
 
-      <!-- PLINKO -->
       <div id="scene-plinko" style="display:none;">
         <div class="plinko-stage">
           <canvas id="plinkoCanvas" width="420" height="310"></canvas>
@@ -1058,7 +1057,6 @@
         </div>
       </div>
 
-      <!-- СЛОТЫ 5x5 С ПЛАВНОЙ ПРОКРУТКОЙ -->
       <div id="scene-slots" style="display:none;">
         <div class="card">
           <div class="slots-board" id="slotsGrid"></div>
@@ -1098,7 +1096,6 @@
         </div>
       </div>
 
-      <!-- MINES 5x5 -->
       <div id="scene-mines" style="display:none;">
         <div class="mines-mults" id="minesMultsBar"></div>
         <div class="mines-grid" id="minesBoard"></div>
@@ -1124,7 +1121,6 @@
         </div>
       </div>
 
-      <!-- CRASH -->
       <div id="scene-crash" style="display:none;">
         <div class="crash-sky">
           <div class="rocket-sprite" id="crashRocket">🚀</div>
@@ -1149,7 +1145,6 @@
     </div>
   </div>
 
-  <!-- Нижнее меню -->
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
       <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
@@ -1173,7 +1168,7 @@
 
   <script>
     const ADMIN_ID = 5200591975;
-    const STORE_KEY = "mellstroy_gift_casino_v4";
+    const STORE_KEY = "mellstroy_gift_casino_v5";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1185,9 +1180,10 @@
     function detectUser() {
       const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
       if (u && u.id) {
+        const uid = Number(u.id);
         return {
-          id: Number(u.id),
-          name: [u.first_name, u.last_name].filter(Boolean).join(" ") || u.username || "Игрок"
+          id: uid,
+          name: [u.first_name, u.last_name].filter(Boolean).join(" ") || u.username || (uid === ADMIN_ID ? "Админ" : "Игрок")
         };
       }
       return { id: ADMIN_ID, name: "Админ (5200591975)" };
@@ -1197,11 +1193,11 @@
       const user = detectUser();
       return {
         currency: "USD",
-        tonReceiver: "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJK9",
+        tonReceiver: "",
         user,
         balances: {
-          [user.id]: { USD: 50, GRAM: 100 },
-          [ADMIN_ID]: { USD: 150, GRAM: 300 }
+          [ADMIN_ID]: { USD: 150, GRAM: 300 },
+          ...(user.id !== ADMIN_ID ? { [user.id]: { USD: 0, GRAM: 0 } } : {})
         },
         chances: { plinko: 42, slots: 36, mines: 72, crash: 45 },
         inventory: [],
@@ -1243,9 +1239,18 @@
         if (!raw) return initialState();
         const parsed = JSON.parse(raw);
         const base = initialState();
+        const mergedBalances = {
+          [ADMIN_ID]: { USD: 150, GRAM: 300 },
+          ...(parsed.balances || {})
+        };
+        const curUid = (parsed.user && parsed.user.id) ? Number(parsed.user.id) : base.user.id;
+        if (!mergedBalances[curUid]) {
+          mergedBalances[curUid] = curUid === ADMIN_ID ? { USD: 150, GRAM: 300 } : { USD: 0, GRAM: 0 };
+        }
         return {
           ...base,
           ...parsed,
+          balances: mergedBalances,
           chances: { ...base.chances, ...(parsed.chances || {}) },
           user: parsed.user || base.user
         };
@@ -1258,7 +1263,7 @@
     let caseSpinning = false;
     let lastDroppedUid = null;
 
-    /* TON CONNECT ИНИЦИАЛИЗАЦИЯ */
+    /* TON CONNECT */
     let tonConnectUI = null;
     let connectedWalletAddress = null;
 
@@ -1286,6 +1291,7 @@
     function renderWalletConnection() {
       const statusEl = document.getElementById("walletConnStatus");
       const btnEl = document.getElementById("walletConnBtn");
+      const recEl = document.getElementById("depReceiverHint");
       if (!statusEl || !btnEl) return;
 
       if (connectedWalletAddress) {
@@ -1295,6 +1301,12 @@
       } else {
         statusEl.textContent = "Кошелёк не подключён";
         btnEl.textContent = "Подключить TON";
+      }
+
+      if (recEl) {
+        recEl.textContent = state.tonReceiver
+          ? `Кошелёк получателя: ${state.tonReceiver.slice(0, 8)}...${state.tonReceiver.slice(-6)}`
+          : "Кошелёк получателя не указан — задайте адрес TON в разделе «Админ»";
       }
     }
 
@@ -1308,19 +1320,11 @@
           }
           return;
         } catch (e) {
-          toast("Откройте ссылку в защищённом контексте HTTPS для TON Connect");
+          toast("Откройте мини-апп по HTTPS в Telegram для TON Connect");
           return;
         }
       }
-      // Резервный локальный тест подключения кошелька при открытии по file://
-      if (connectedWalletAddress) {
-        connectedWalletAddress = null;
-        toast("Кошелёк отключён");
-      } else {
-        connectedWalletAddress = "EQBvW8Z5huBkMJYdnfAEM5JqTNkuWX3diqYENkWsIL0XggGG";
-        toast("Тестовый TON-кошелёк подключён");
-      }
-      renderWalletConnection();
+      toast("TON Connect UI не загружен — проверьте доступ к интернету");
     }
 
     function updateDepEquivalent() {
@@ -1336,35 +1340,29 @@
       const amt = Number(document.getElementById("depAmt").value || 0);
       if (amt <= 0 || isNaN(amt)) return toast("Введите сумму пополнения");
 
-      if (!connectedWalletAddress) {
+      if (!state.tonReceiver || !state.tonReceiver.trim()) {
+        return toast("Сначала укажите TON-адрес получателя в разделе «Админ»");
+      }
+
+      if (!tonConnectUI || !connectedWalletAddress) {
+        toast("Сначала подключите TON-кошелёк");
         await toggleTonWallet();
-        if (!connectedWalletAddress) return;
+        return;
       }
 
       const tonAmount = cur === "USD" ? (amt / 5) : (amt / 20);
       const nanoTon = Math.max(1000000, Math.round(tonAmount * 1e9)).toString();
-      const txPayload = {
-        validUntil: Math.floor(Date.now() / 1000) + 300,
-        messages: [
-          {
-            address: state.tonReceiver,
-            amount: nanoTon
-          }
-        ]
-      };
 
       try {
-        if (tonConnectUI && tonConnectUI.connected) {
-          await tonConnectUI.sendTransaction(txPayload);
-        } else {
-          // Открытие глубокой ссылки кошелька TON с суммой транзакции
-          const tonDeepLink = `https://app.tonkeeper.com/transfer/${encodeURIComponent(state.tonReceiver)}?amount=${nanoTon}&text=${encodeURIComponent(`Deposit ${amt} ${cur}`)}`;
-          if (tg && tg.openLink) {
-            tg.openLink(tonDeepLink);
-          } else {
-            window.open(tonDeepLink, "_blank");
-          }
-        }
+        await tonConnectUI.sendTransaction({
+          validUntil: Math.floor(Date.now() / 1000) + 300,
+          messages: [
+            {
+              address: state.tonReceiver.trim(),
+              amount: nanoTon
+            }
+          ]
+        });
 
         const b = balOf();
         b[cur] = Number(((b[cur] || 0) + amt).toFixed(2));
@@ -1373,14 +1371,14 @@
           currency: cur,
           amount: amt,
           ton: Number(tonAmount.toFixed(3)),
-          status: "Оплачено через TON"
+          status: "Зачислено"
         });
         saveState();
         renderTop();
         renderWalletHistory();
         toast(`Пополнено на ${fmt(amt, cur)}`);
       } catch (err) {
-        toast("Транзакция отменена или не подтверждена");
+        toast("Транзакция отменена или не подтверждена в кошельке");
       }
     }
 
@@ -1410,11 +1408,13 @@
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove("show"), 2400);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2500);
     }
 
     function balOf(uid = state.user.id) {
-      if (!state.balances[uid]) state.balances[uid] = { USD: 0, GRAM: 0 };
+      if (!state.balances[uid]) {
+        state.balances[uid] = Number(uid) === ADMIN_ID ? { USD: 150, GRAM: 300 } : { USD: 0, GRAM: 0 };
+      }
       return state.balances[uid];
     }
 
@@ -1648,7 +1648,7 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* ================= PLINKO: ПЛАВНЫЙ СПУСК ДО КОНЦА И ТОЧНЫЙ МНОЖИТЕЛЬ ================= */
+    /* PLINKO */
     let plinkoDiff = "medium";
     let plinkoBusy = false;
 
@@ -1750,7 +1750,6 @@
       const mults = PLINKO_MULTS[plinkoDiff];
       const wantGood = Math.random() < (Number(state.chances.plinko || 42) / 100);
 
-      // Выбираем целевой слот 0..8
       const targetSlot = wantGood
         ? [0, 1, 2, 3, 5, 6, 7, 8][Math.floor(Math.random() * 8)]
         : (Math.random() < 0.65 ? 4 : (Math.random() < 0.5 ? 3 : 5));
@@ -1759,7 +1758,6 @@
       const finalY = geom.slotY;
       const startX = geom.w / 2;
 
-      // Формируем контрольные точки строго до центра целевого слота внизу
       const waypoints = [{ x: startX, y: 12 }];
       for (let r = 0; r < geom.rows; r++) {
         const t = (r + 1) / geom.rows;
@@ -1774,7 +1772,6 @@
 
       let segIndex = 0;
       let segProgress = 0;
-      // Чуть более плавная и медленная скорость спуска
       const stepSpeed = 0.075;
 
       function animateDrop() {
@@ -1787,7 +1784,6 @@
         if (segIndex >= waypoints.length - 1) {
           drawPlinkoFrame({ x: finalX, y: finalY });
 
-          // Вычисляем индекс слота по фактической конечной координате X шарика
           const clampedX = Math.max(geom.totalPadding / 2, Math.min(geom.w - geom.totalPadding / 2 - 1, finalX));
           const landedSlot = Math.max(
             0,
@@ -1828,7 +1824,7 @@
       requestAnimationFrame(animateDrop);
     }
 
-    /* ================= СЛОТЫ 5x5: ПЛАВНАЯ ПРОКРУТКА БАРАБАНОВ ================= */
+    /* СЛОТЫ 5x5 */
     let slotBet = 1;
     let slotSpeed = 1;
     let autoSpinOn = false;
@@ -1964,7 +1960,6 @@
       setTimeout(() => {
         wheel.classList.remove("spinning");
 
-        // Нормализуем полосу до финального символа без скачков
         for (let col = 0; col < 5; col++) {
           const stripEl = document.getElementById("reelStrip_" + col);
           stripEl.style.transition = "none";
@@ -1993,7 +1988,7 @@
       }, maxDuration);
     }
 
-    /* ================= MINES 5x5 ================= */
+    /* MINES 5x5 */
     let minesActive = false;
     let minesBetAmt = 0;
     let minesLayout = [];
@@ -2138,7 +2133,7 @@
       }
     }
 
-    /* ================= CRASH ================= */
+    /* CRASH */
     let crashRunning = false;
 
     function resetCrashDisplay() {
@@ -2246,7 +2241,9 @@
       if (!id) return toast("Введите числовой ID");
       state.user.id = id;
       state.user.name = id === ADMIN_ID ? "Админ (5200591975)" : `Игрок #${id}`;
-      balOf(id);
+      if (!state.balances[id]) {
+        state.balances[id] = id === ADMIN_ID ? { USD: 150, GRAM: 300 } : { USD: 0, GRAM: 0 };
+      }
       saveState();
       renderTop();
       renderAdmin();
@@ -2277,9 +2274,9 @@
 
     function saveTonAddress() {
       const addr = document.getElementById("adminTonAddress").value.trim();
-      if (!addr) return toast("Введите адрес TON");
       state.tonReceiver = addr;
       saveState();
+      renderWalletConnection();
       toast("TON-адрес сохранён");
     }
 
@@ -2445,14 +2442,15 @@
     }
 
     function grantBalance() {
+      if (Number(state.user.id) !== ADMIN_ID) return toast("Доступно только админу");
       const amt = Number(document.getElementById("grantAmt").value || 0);
       const cur = document.getElementById("grantCur").value;
       if (amt <= 0) return toast("Введите сумму");
-      const b = balOf(state.user.id);
+      const b = balOf(ADMIN_ID);
       b[cur] = Number(((b[cur] || 0) + amt).toFixed(2));
       saveState();
       renderTop();
-      toast(`Начислено ${fmt(amt, cur)}`);
+      toast(`Начислено админу: ${fmt(amt, cur)}`);
     }
 
     function clampNum(val, min, max, fallback) {
@@ -2474,6 +2472,7 @@
     renderInv();
     renderPlinkoMults();
     drawPlinkoFrame(null);
+    updateDepEquivalent();
     initTonConnect();
   </script>
 </body>
