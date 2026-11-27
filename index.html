@@ -83,8 +83,11 @@
       font-weight: 900;
       font-size: 13px;
       box-shadow: 0 0 16px rgba(168, 85, 247, 0.45);
-      cursor: pointer;
       flex-shrink: 0;
+    }
+
+    .avatar-chip.is-admin {
+      cursor: pointer;
     }
 
     .icon-btn {
@@ -711,8 +714,12 @@
       max-width: 480px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 4px;
+    }
+
+    .bottom-nav-inner.has-admin {
+      grid-template-columns: repeat(4, 1fr);
     }
 
     .nav-item {
@@ -833,7 +840,7 @@
   <div class="app">
     <div class="top-bar">
       <div class="row-gap">
-        <div class="avatar-chip" id="topAvatar" onclick="switchTab('admin')">MG</div>
+        <div class="avatar-chip" id="topAvatar" onclick="onAvatarClick()">GR</div>
         <button class="icon-btn" onclick="switchTab('wallet')" title="Кошелёк">💳</button>
         <button class="icon-btn" onclick="toast('Валюта приложения: GRAM')" title="Инфо">?</button>
       </div>
@@ -921,20 +928,6 @@
     </div>
 
     <div id="view-admin" style="display:none;">
-      <div class="card">
-        <div class="section-title" style="margin-top:0;">🛡️ ID пользователя</div>
-        <p class="muted">Админ только ID <b>5200591975</b>. У всех остальных игроков баланс <b>0.00 GRAM</b>.</p>
-        <div class="row-gap mt-8">
-          <input type="number" id="adminTestId" value="1000001" />
-          <button class="btn-sm" onclick="switchTestId()">Применить</button>
-        </div>
-      </div>
-
-      <div id="adminDenied" class="card" style="display:none;">
-        <b>Доступ закрыт</b>
-        <p class="muted mt-8">Только для ID <b>5200591975</b>. Текущий ID: <span id="curIdSpan"></span>.</p>
-      </div>
-
       <div id="adminBody" style="display:none;">
         <div class="card">
           <div class="section-title" style="margin-top:0;">🏦 Адрес приёма депозитов</div>
@@ -1155,7 +1148,7 @@
   </div>
 
   <nav class="bottom-nav">
-    <div class="bottom-nav-inner">
+    <div class="bottom-nav-inner" id="bottomNavInner">
       <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
         <span>🏠</span>
         <span>Главная</span>
@@ -1168,7 +1161,7 @@
         <span>💳</span>
         <span>Кошелёк</span>
       </button>
-      <button class="nav-item" id="nav-admin" onclick="switchTab('admin')">
+      <button class="nav-item" id="nav-admin" style="display:none;" onclick="switchTab('admin')">
         <span>⚙️</span>
         <span>Админ</span>
       </button>
@@ -1179,7 +1172,7 @@
     const ADMIN_ID = 5200591975;
     const DEFAULT_PLAYER_ID = 1000001;
     const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-    const STORE_KEY = "mellstroy_gift_gram_v1";
+    const STORE_KEY = "mellstroy_gift_gram_v2";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1198,6 +1191,10 @@
         };
       }
       return { id: DEFAULT_PLAYER_ID, name: "Игрок" };
+    }
+
+    function isAdminUser() {
+      return Number(state.user.id) === ADMIN_ID;
     }
 
     function initialState() {
@@ -1243,6 +1240,7 @@
     }
 
     function loadState() {
+      const freshUser = detectUser();
       try {
         const raw = localStorage.getItem(STORE_KEY);
         if (!raw) return initialState();
@@ -1253,9 +1251,8 @@
           [DEFAULT_PLAYER_ID]: 0,
           ...(parsed.balances || {})
         };
-        const curUid = (parsed.user && parsed.user.id) ? Number(parsed.user.id) : base.user.id;
-        if (typeof mergedBalances[curUid] !== "number") {
-          mergedBalances[curUid] = curUid === ADMIN_ID ? 300 : 0;
+        if (typeof mergedBalances[freshUser.id] !== "number") {
+          mergedBalances[freshUser.id] = freshUser.id === ADMIN_ID ? 300 : 0;
         }
         return {
           ...base,
@@ -1263,7 +1260,7 @@
           tonReceiver: (parsed.tonReceiver && parsed.tonReceiver.trim()) ? parsed.tonReceiver.trim() : DEFAULT_TON_RECEIVER,
           balances: mergedBalances,
           chances: { ...base.chances, ...(parsed.chances || {}) },
-          user: parsed.user || base.user
+          user: freshUser
         };
       } catch {
         return initialState();
@@ -1273,6 +1270,26 @@
     let state = loadState();
     let caseSpinning = false;
     let lastDroppedUid = null;
+
+    function applyAdminVisibility() {
+      const adminOk = isAdminUser();
+      const adminNav = document.getElementById("nav-admin");
+      const navInner = document.getElementById("bottomNavInner");
+      const avatar = document.getElementById("topAvatar");
+
+      adminNav.style.display = adminOk ? "flex" : "none";
+      navInner.classList.toggle("has-admin", adminOk);
+      avatar.textContent = adminOk ? "AD" : "GR";
+      avatar.classList.toggle("is-admin", adminOk);
+
+      if (!adminOk && document.getElementById("view-admin").style.display === "block") {
+        switchTab("home");
+      }
+    }
+
+    function onAvatarClick() {
+      if (isAdminUser()) switchTab("admin");
+    }
 
     /* TON CONNECT */
     let tonConnectUI = null;
@@ -1425,10 +1442,14 @@
     }
 
     function switchTab(tab) {
+      if (tab === "admin" && !isAdminUser()) {
+        return;
+      }
       stopAutoSpin();
       ["home", "inv", "wallet", "admin"].forEach(t => {
         document.getElementById("view-" + t).style.display = t === tab ? "block" : "none";
-        document.getElementById("nav-" + t).classList.toggle("active", t === tab);
+        const navEl = document.getElementById("nav-" + t);
+        if (navEl) navEl.classList.toggle("active", t === tab);
       });
       if (tab === "admin") renderAdmin();
       if (tab === "wallet") {
@@ -1453,7 +1474,6 @@
 
     function renderTop() {
       const valStr = balOf().toFixed(2);
-      document.getElementById("topAvatar").textContent = Number(state.user.id) === ADMIN_ID ? "AD" : "GR";
       document.getElementById("balValue").textContent = valStr;
       document.getElementById("modalBalText").textContent = valStr;
       document.getElementById("caseModalBal").textContent = valStr;
@@ -1475,7 +1495,7 @@
     function renderCases() {
       const wrap = document.getElementById("casesList");
       if (!state.cases.length) {
-        wrap.innerHTML = `<div class="card muted" style="grid-column:1/-1;">Кейсов пока нет. Добавьте их в разделе «Админ».</div>`;
+        wrap.innerHTML = `<div class="card muted" style="grid-column:1/-1;">Кейсов пока нет.</div>`;
         return;
       }
       wrap.innerHTML = state.cases.map(c => {
@@ -2206,27 +2226,10 @@
       toast(`Продано за ${fmt(item.value)}`);
     }
 
-    /* АДМИН-ПАНЕЛЬ (5200591975) */
-    function switchTestId() {
-      const id = Number(document.getElementById("adminTestId").value);
-      if (!id) return toast("Введите числовой ID");
-      state.user.id = id;
-      state.user.name = id === ADMIN_ID ? "Админ" : "Игрок";
-      if (typeof state.balances[id] !== "number") {
-        state.balances[id] = id === ADMIN_ID ? 300 : 0;
-      }
-      saveState();
-      renderTop();
-      renderAdmin();
-      toast(`ID изменён на ${id}`);
-    }
-
+    /* АДМИН-ПАНЕЛЬ (ТОЛЬКО 5200591975) */
     function renderAdmin() {
-      document.getElementById("adminTestId").value = state.user.id;
-      const ok = Number(state.user.id) === ADMIN_ID;
-      document.getElementById("adminDenied").style.display = ok ? "none" : "block";
+      const ok = isAdminUser();
       document.getElementById("adminBody").style.display = ok ? "block" : "none";
-      document.getElementById("curIdSpan").textContent = state.user.id;
       if (!ok) return;
 
       document.getElementById("adminTonAddress").value = state.tonReceiver || DEFAULT_TON_RECEIVER;
@@ -2244,6 +2247,7 @@
     }
 
     function saveTonAddress() {
+      if (!isAdminUser()) return;
       const addr = document.getElementById("adminTonAddress").value.trim();
       state.tonReceiver = addr || DEFAULT_TON_RECEIVER;
       saveState();
@@ -2251,6 +2255,7 @@
     }
 
     function saveGameChances() {
+      if (!isAdminUser()) return;
       state.chances = {
         plinko: clampNum(document.getElementById("chPlinko").value, 1, 95, 42),
         slots: clampNum(document.getElementById("chSlots").value, 1, 95, 36),
@@ -2262,6 +2267,7 @@
     }
 
     function addNewCase() {
+      if (!isAdminUser()) return;
       const title = document.getElementById("newCaseTitle").value.trim();
       const icon = document.getElementById("newCaseIcon").value.trim() || "🎁";
       const cost = Math.max(0, Number(document.getElementById("newCaseCost").value || 0));
@@ -2353,6 +2359,7 @@
     }
 
     function saveCaseEdit(cid) {
+      if (!isAdminUser()) return;
       const c = state.cases.find(x => x.id === cid);
       if (!c) return;
       c.title = document.getElementById("ecTitle").value.trim() || c.title;
@@ -2364,6 +2371,7 @@
     }
 
     function deleteCaseEdit(cid) {
+      if (!isAdminUser()) return;
       state.cases = state.cases.filter(x => x.id !== cid);
       saveState();
       renderCases();
@@ -2372,6 +2380,7 @@
     }
 
     function addItemToCase(cid) {
+      if (!isAdminUser()) return;
       const c = state.cases.find(x => x.id === cid);
       if (!c) return;
       const name = document.getElementById("addItName").value.trim();
@@ -2387,6 +2396,7 @@
     }
 
     function saveItemEdit(cid, iid) {
+      if (!isAdminUser()) return;
       const c = state.cases.find(x => x.id === cid);
       const it = c && c.items.find(x => x.id === iid);
       if (!it) return;
@@ -2400,6 +2410,7 @@
     }
 
     function removeItemEdit(cid, iid) {
+      if (!isAdminUser()) return;
       const c = state.cases.find(x => x.id === cid);
       if (!c) return;
       c.items = c.items.filter(x => x.id !== iid);
@@ -2410,7 +2421,7 @@
     }
 
     function grantBalance() {
-      if (Number(state.user.id) !== ADMIN_ID) return toast("Доступно только админу");
+      if (!isAdminUser()) return;
       const amt = Number(document.getElementById("grantAmt").value || 0);
       if (amt <= 0) return toast("Введите сумму");
       setBalOf(ADMIN_ID, balOf(ADMIN_ID) + amt);
@@ -2433,6 +2444,7 @@
       return esc(s).replace(/'/g, "&#39;");
     }
 
+    applyAdminVisibility();
     renderTop();
     renderCases();
     renderInv();
