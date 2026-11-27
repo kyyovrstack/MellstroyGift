@@ -1872,25 +1872,19 @@
         : `<div style="font-size:40px;">${c.icon || "🎁"}</div>`;
 
       const items = c.items || [];
-      const totalW = items.reduce((s, x) => s + Math.max(0, Number(x.weight || 0)), 0);
 
       document.getElementById("caseContentsList").innerHTML = items.length
-        ? items.map(it => {
-            const w = Math.max(0, Number(it.weight || 0));
-            const pct = totalW > 0 ? ((w / totalW) * 100).toFixed(1) : "0.0";
-            return `
-              <div class="content-item-row">
-                <div class="row-gap">
-                  ${renderVisualHtml(it, "list")}
-                  <div>
-                    <b>${esc(it.name)}</b>
-                    <div class="muted">Шанс: ${pct}%</div>
-                  </div>
+        ? items.map(it => `
+            <div class="content-item-row">
+              <div class="row-gap">
+                ${renderVisualHtml(it, "list")}
+                <div>
+                  <b>${esc(it.name)}</b>
                 </div>
-                <span style="color:var(--gold); font-weight:900; font-size:13px;">${fmt(it.value)}</span>
               </div>
-            `;
-          }).join("")
+              <span style="color:var(--gold); font-weight:900; font-size:13px;">${fmt(it.value)}</span>
+            </div>
+          `).join("")
         : `<div class="muted">В кейсе пока нет предметов</div>`;
 
       const openBtn = document.getElementById("openFromContentsBtn");
