@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MellstroyGift</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" defer></script>
   <style>
     :root {
       --bg: #05060f;
@@ -34,12 +33,11 @@
 
     body {
       background:
-        radial-gradient(circle at 15% -5%, rgba(168, 85, 247, 0.28), transparent 44%),
-        radial-gradient(circle at 88% 5%, rgba(34, 211, 238, 0.16), transparent 42%),
+        radial-gradient(circle at 15% -5%, rgba(168, 85, 247, 0.25), transparent 44%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding-bottom: 92px;
+      padding-bottom: 88px;
       overflow-x: hidden;
     }
 
@@ -53,20 +51,20 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 10px;
     }
 
     .back-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: var(--surface-2);
       border: 1px solid var(--border);
       color: #fff;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
-      padding: 7px 12px;
+      padding: 7px 11px;
       border-radius: 12px;
       cursor: pointer;
     }
@@ -74,13 +72,14 @@
     .brand-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: rgba(168, 85, 247, 0.2);
       border: 1px solid rgba(168, 85, 247, 0.45);
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 12px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 900;
+      white-space: nowrap;
     }
 
     .top-actions {
@@ -98,6 +97,7 @@
       padding: 7px 10px;
       border-radius: 12px;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .dep-mini {
@@ -106,9 +106,10 @@
       color: #fff;
       font-size: 11px;
       font-weight: 900;
-      padding: 7px 10px;
+      padding: 7px 11px;
       border-radius: 12px;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .bal-header {
@@ -269,7 +270,6 @@
       font-size: 20px;
       flex-shrink: 0;
       overflow: hidden;
-      position: relative;
     }
 
     .live-card img {
@@ -667,7 +667,6 @@
       cursor: pointer;
     }
 
-    /* Rocket Screen */
     .rocket-arena {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -697,12 +696,9 @@
     }
 
     .rocket-screen {
-      height: 210px;
+      height: 200px;
       border-radius: 18px;
-      background:
-        radial-gradient(circle at 25% 80%, rgba(168, 85, 247, 0.24), transparent 50%),
-        radial-gradient(circle at 80% 25%, rgba(34, 211, 238, 0.16), transparent 48%),
-        #070914;
+      background: #070914;
       border: 1px solid rgba(168, 85, 247, 0.32);
       position: relative;
       overflow: hidden;
@@ -710,18 +706,6 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 10px;
-    }
-
-    .rocket-curve {
-      position: absolute;
-      left: 10%;
-      bottom: 18%;
-      width: 72%;
-      height: 55%;
-      border-bottom: 4px solid rgba(168, 85, 247, 0.55);
-      border-radius: 0 0 0 80px;
-      transform: rotate(-18deg);
-      pointer-events: none;
     }
 
     .rocket-flight-obj {
@@ -732,7 +716,7 @@
     }
 
     .rocket-emoji-big {
-      font-size: 56px;
+      font-size: 54px;
     }
 
     .rocket-live-mult {
@@ -746,16 +730,14 @@
     }
 
     .countdown-ring {
-      width: 118px;
-      height: 118px;
+      width: 112px;
+      height: 112px;
       border-radius: 50%;
-      border: 4px solid rgba(255, 255, 255, 0.12);
-      border-top-color: var(--cyan);
-      border-right-color: var(--purple);
+      border: 4px solid var(--cyan);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
+      font-size: 32px;
       font-weight: 900;
       color: #fff;
       background: #0c1022;
@@ -810,8 +792,8 @@
     }
 
     .r-bet-ava {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 11px;
       background: linear-gradient(135deg, var(--violet), var(--cyan));
       color: #060914;
@@ -848,7 +830,6 @@
       flex-shrink: 0;
     }
 
-    /* Upgrader Wheel */
     .upg-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -858,8 +839,8 @@
     }
 
     .wheel-stage {
-      width: 236px;
-      height: 236px;
+      width: 230px;
+      height: 230px;
       margin: 8px auto 14px;
       position: relative;
       display: flex;
@@ -900,7 +881,7 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background: radial-gradient(circle, #171c38, #090c1c);
+      background: #0c1022;
       border: 1px solid rgba(168, 85, 247, 0.35);
       display: flex;
       flex-direction: column;
@@ -925,7 +906,7 @@
       padding: 11px 8px;
       text-align: center;
       cursor: pointer;
-      min-height: 112px;
+      min-height: 110px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -981,7 +962,6 @@
       cursor: pointer;
     }
 
-    /* Cards & Forms */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1066,7 +1046,6 @@
       cursor: pointer;
     }
 
-    /* Mines */
     .mines-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -1098,7 +1077,6 @@
       border-color: var(--red);
     }
 
-    /* Plinko */
     .diff-pills {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1165,7 +1143,7 @@
       width: 15px;
       height: 15px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #fff, var(--cyan) 55%, var(--purple));
+      background: var(--cyan);
       top: 0;
       left: 50%;
       transform: translate(-50%, 0);
@@ -1195,10 +1173,8 @@
       border-color: var(--cyan);
       background: rgba(34, 211, 238, 0.28);
       color: #fff;
-      transform: scale(1.04);
     }
 
-    /* Slots 6x5 */
     .slots-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1221,7 +1197,7 @@
     .slot-cell-6x5 {
       aspect-ratio: 1 / 1;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #2a3263, #11152c 72%);
+      background: #171c38;
       border: 1px solid rgba(148, 163, 184, 0.22);
       display: flex;
       align-items: center;
@@ -1232,7 +1208,7 @@
 
     .slot-cell-6x5.win-cell {
       border-color: var(--cyan);
-      background: radial-gradient(circle at 30% 30%, #3b2678, #141a38 75%);
+      background: #2b1d5e;
     }
 
     .slots-bet-bar {
@@ -1304,7 +1280,7 @@
       height: 66px;
       border-radius: 50%;
       border: 2px solid rgba(34, 211, 238, 0.55);
-      background: radial-gradient(circle at 35% 30%, #8b5cf6, #5b21b6);
+      background: #6d28d9;
       color: #fff;
       font-size: 24px;
       font-weight: 900;
@@ -1356,7 +1332,6 @@
       margin-bottom: 10px;
     }
 
-    /* Bottom Nav */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -1390,7 +1365,6 @@
       color: #fff;
     }
 
-    /* Modals */
     .modal-bg {
       position: fixed;
       inset: 0;
@@ -1455,19 +1429,20 @@
 <div class="app">
   <!-- Top Bar -->
   <div class="top-bar" id="topBarMain">
-    <div class="brand-pill">🎁 MellstroyGift · NFT</div>
+    <div class="brand-pill">🎁 MellstroyGift</div>
     <div class="top-actions">
       <button class="dep-mini" onclick="openDepositModal()">+ Депозит</button>
-      <button class="wallet-mini" id="walletBtn" onclick="onWalletBtn()">Кошелёк</button>
+      <button class="wallet-mini" id="walletBtn" onclick="openWalletModal()">Кошелёк</button>
+      <button class="wallet-mini" onclick="syncCasesNow(true)">↻</button>
     </div>
   </div>
 
   <div class="top-bar" id="topBarBack" style="display:none;">
     <button class="back-btn" onclick="goBackToCases()">← Назад</button>
-    <div class="brand-pill">🎁 MellstroyGift · NFT</div>
+    <div class="brand-pill">🎁 MellstroyGift</div>
     <div class="top-actions">
       <button class="dep-mini" onclick="openDepositModal()">+ Депозит</button>
-      <button class="wallet-mini" id="walletBtnBack" onclick="onWalletBtn()">Кошелёк</button>
+      <button class="wallet-mini" id="walletBtnBack" onclick="openWalletModal()">Кошелёк</button>
     </div>
   </div>
 
@@ -1483,7 +1458,7 @@
             <span class="bal-num" id="balNum">0.00</span>
             <span class="bal-unit">GRAM</span>
           </div>
-          <button class="btn-topup-inline" onclick="openDepositModal()">+ Пополнить</button>
+          <button class="btn-topup-inline" onclick="openDepositModal()">+ Депозит</button>
         </div>
       </div>
     </div>
@@ -1611,12 +1586,11 @@
     <!-- ROCKET -->
     <div id="sub-rocket" class="rocket-arena">
       <div class="rocket-hud-top">
-        <span class="ping-pill"><span class="live-dot"></span>📶 24ms · LIVE</span>
+        <span class="ping-pill"><span class="live-dot"></span>📶 LIVE</span>
         <span class="ping-pill" style="color:var(--cyan);" id="rocketStatusBadge">🚀 В полёте</span>
       </div>
 
       <div class="rocket-screen" id="rocketScreen">
-        <div class="rocket-curve" id="rocketCurve"></div>
         <div class="countdown-ring" id="rocketCountdown" style="display:none;">2</div>
         <div class="rocket-flight-obj" id="rocketFlightBox">
           <div class="rocket-emoji-big" id="rocketShip">🚀</div>
@@ -1799,10 +1773,11 @@
   <!-- 5. ADMIN (ID 5200591975) -->
   <div id="sec-admin" class="sec">
     <div class="card">
-      <div class="card-title">🗄️ Синхронизация каталога для игроков</div>
-      <div class="info-line" style="margin-bottom:0;">
-        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Кэш + Supabase</b></span>
+      <div class="card-title">🗄️ База кейсов для игроков</div>
+      <div class="info-line" style="margin-bottom:8px;">
+        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Готово</b></span>
       </div>
+      <button class="btn-purple" onclick="syncCasesNow(true)">Синхронизировать с сервером</button>
     </div>
 
     <div class="card">
@@ -1864,6 +1839,34 @@
   </div>
 </div>
 
+<!-- Wallet & Deposit Modal -->
+<div class="modal-bg" id="walletModal">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <b>👛 Кошелёк и депозит</b>
+      <button class="wallet-mini" onclick="closeModal('walletModal')">✕</button>
+    </div>
+    <div class="fg">
+      <label>Адрес кошелька (UQ... / EQ...)</label>
+      <input class="inp" id="walletAddrInp" placeholder="Вставь адрес кошелька" />
+    </div>
+    <div class="fg">
+      <label>Сумма депозита (от 0.01 GRAM)</label>
+      <input class="inp" id="walletDepAmtInp" type="number" step="0.01" min="0.01" value="0.01" />
+    </div>
+    <div class="row4">
+      <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 0.01)">0.01</button>
+      <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 0.1)">0.1</button>
+      <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 1)">1</button>
+      <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 5)">5</button>
+    </div>
+    <div class="row2">
+      <button class="wallet-mini" style="padding:10px;" onclick="saveWalletAddress()">Сохранить адрес</button>
+      <button class="dep-mini" style="padding:10px;" onclick="confirmDepositFromModal()">+ Депозит</button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Gift In Case Modal -->
 <div class="modal-bg" id="editGiftModal">
   <div class="modal-card">
@@ -1897,7 +1900,7 @@
     </div>
     <div class="fg">
       <label>Фото подарка (ссылка или новый файл)</label>
-      <input class="inp" id="modalGiftImgUrl" placeholder="https://... (оставь пустым для сохранения текущего)" style="margin-bottom:6px;" />
+      <input class="inp" id="modalGiftImgUrl" placeholder="https://..." style="margin-bottom:6px;" />
       <input class="inp" id="modalGiftImgFile" type="file" accept="image/*" />
     </div>
     <button class="btn-purple" onclick="saveEditedGiftInCase()">Сохранить подарок</button>
@@ -1911,7 +1914,6 @@
       <b>Ставка: NFT или GRAM</b>
       <button class="wallet-mini" onclick="closeModal('upgSrcModal')">✕</button>
     </div>
-
     <div class="fg">
       <label>Вариант 1: Сумма в GRAM (от 0.01)</label>
       <div class="row2">
@@ -1919,39 +1921,9 @@
         <button class="btn-green" onclick="chooseGramAsSource()">Выбрать GRAM</button>
       </div>
     </div>
-
     <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;" />
-
     <div style="font-size:12px;font-weight:800;color:var(--cyan);margin-bottom:7px;">Вариант 2: NFT-подарок из инвентаря</div>
     <div id="upgNftPickList"></div>
-  </div>
-</div>
-
-<!-- Deposit Modal (Instant, no delay) -->
-<div class="modal-bg" id="depModal">
-  <div class="modal-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <b>💳 Депозит (от 0.01 GRAM)</b>
-      <button class="wallet-mini" onclick="closeModal('depModal')">✕</button>
-    </div>
-    <div class="fg">
-      <label>Кошелёк отправителя (или подключи TON)</label>
-      <div class="row2">
-        <input class="inp" id="depWalletInp" placeholder="UQ... или подключи кошелёк" />
-        <button class="wallet-mini" onclick="connectWalletInstant()">Подключить</button>
-      </div>
-    </div>
-    <div class="fg">
-      <label>Сумма (минимум 0.01)</label>
-      <input class="inp" id="depAmtInp" type="number" step="0.01" min="0.01" value="0.01" />
-    </div>
-    <div class="row4">
-      <button class="wallet-mini" onclick="setInp('depAmtInp', 0.01)">0.01</button>
-      <button class="wallet-mini" onclick="setInp('depAmtInp', 0.1)">0.1</button>
-      <button class="wallet-mini" onclick="setInp('depAmtInp', 1)">1</button>
-      <button class="wallet-mini" onclick="setInp('depAmtInp', 5)">5</button>
-    </div>
-    <button class="btn-purple" id="depConfirmBtn" onclick="confirmDeposit()">Пополнить мгновенно</button>
   </div>
 </div>
 
@@ -2019,9 +1991,8 @@
   const MIN_GRAM = 0.01;
   const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-  const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_nft_all_v8";
-  const CATALOG_INSTANT_STR_KEY = "mellstroy_gift_catalog_str_v8";
+  const SAVE_KEY = "mellstroy_gift_fast_v9";
+  const CATALOG_KEY = "mellstroy_gift_catalog_v9";
   const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
@@ -2103,7 +2074,6 @@
     walletAddr: "",
     spinningCase: false,
     lastUpdatedAt: 0,
-    /* Rocket */
     rocketPhase: "countdown",
     rocketCountdownSec: 2,
     rocketBet: 0,
@@ -2115,23 +2085,19 @@
     rocketLoopTimer: null,
     rocketHistory: [6.91, 3.98, 2.20, 1.17, 33.7, 2.17],
     rocketLiveFeed: [],
-    /* Upgrader */
     upgSource: null,
     upgTarget: null,
     upgChance: 50.0,
     upgSpinning: false,
     upgAngle: 0,
-    /* Mines */
     minesActive: false,
     minesBetVal: 0,
     minesMinesTotal: 3,
     minesGridData: [],
     minesOpened: [],
     minesMultVal: 1.00,
-    /* Plinko */
     plinkoDiff: "easy",
     plinkoDropping: false,
-    /* Slots 6x5 */
     slotsBet: 0.10,
     slotsSpeedLevel: 1,
     slotsAutoSpin: false,
@@ -2140,10 +2106,8 @@
     slotsGrid: []
   };
 
-  let tonConnectUI = null;
   let autoSpinTimer = null;
   let caseSpinTimer = null;
-  let pushTimer = null;
 
   function fmt(v) {
     return (Number(v) || 0).toFixed(2);
@@ -2154,14 +2118,7 @@
   }
 
   function enforceZeroBalanceForPlayers() {
-    if (!isAdminUser()) {
-      appState.balance = 0.00;
-    }
-  }
-
-  function setDbBadge(text) {
-    const el = document.getElementById("dbStatusText");
-    if (el) el.textContent = text;
+    if (!isAdminUser()) appState.balance = 0.00;
   }
 
   function showToast(msg) {
@@ -2186,8 +2143,8 @@
 
   function pickImgField(obj) {
     if (!obj || typeof obj !== "object") return "";
-    const candidates = [obj.img, obj.image, obj.photo, obj.url, obj.imgUrl, obj.imageUrl, obj.cover];
-    for (const v of candidates) {
+    const list = [obj.img, obj.image, obj.photo, obj.url, obj.imgUrl, obj.imageUrl, obj.cover];
+    for (const v of list) {
       if (typeof v === "string" && v.trim()) return v.trim();
     }
     return "";
@@ -2195,8 +2152,8 @@
 
   function pickPoolField(c) {
     if (!c || typeof c !== "object") return [];
-    const candidates = [c.pool, c.items, c.gifts, c.nfts, c.drop];
-    for (const arr of candidates) {
+    const list = [c.pool, c.items, c.gifts, c.nfts, c.drop];
+    for (const arr of list) {
       if (Array.isArray(arr)) return arr;
     }
     return [];
@@ -2228,54 +2185,52 @@
     });
   }
 
-  function saveApp() {
+  function saveLocal() {
     enforceZeroBalanceForPlayers();
     try {
-      const profileKey = `${SAVE_KEY}_u_${appState.userId || "guest"}`;
-      localStorage.setItem(profileKey, JSON.stringify({
+      localStorage.setItem(`${SAVE_KEY}_u_${appState.userId || "guest"}`, JSON.stringify({
         balance: isAdminUser() ? appState.balance : 0,
-        inventory: appState.inventory
+        inventory: appState.inventory,
+        walletAddr: appState.walletAddr
       }));
-      localStorage.setItem(CATALOG_INSTANT_STR_KEY, JSON.stringify({
+      localStorage.setItem(CATALOG_KEY, JSON.stringify({
         cases: appState.cases,
         updatedAt: appState.lastUpdatedAt
       }));
     } catch (e) {}
   }
 
-  function loadApp() {
-    let loadedCases = normalizeCases(JSON.parse(JSON.stringify(INITIAL_CASES)));
-    let loadedTs = 0;
+  function loadLocal() {
+    let cases = normalizeCases(JSON.parse(JSON.stringify(INITIAL_CASES)));
+    let updatedAt = 0;
 
     try {
-      const rawStr = localStorage.getItem(CATALOG_INSTANT_STR_KEY);
-      if (rawStr) {
-        const catRaw = JSON.parse(rawStr);
-        if (catRaw && Array.isArray(catRaw.cases) && catRaw.cases.length) {
-          loadedCases = normalizeCases(catRaw.cases);
-          loadedTs = Number(catRaw.updatedAt) || 0;
-        }
+      const catRaw = JSON.parse(localStorage.getItem(CATALOG_KEY));
+      if (catRaw && Array.isArray(catRaw.cases) && catRaw.cases.length) {
+        cases = normalizeCases(catRaw.cases);
+        updatedAt = Number(catRaw.updatedAt) || 0;
       }
     } catch (e) {}
 
-    appState.cases = loadedCases;
-    appState.lastUpdatedAt = loadedTs;
+    appState.cases = cases;
+    appState.lastUpdatedAt = updatedAt;
     appState.balance = 0.00;
     appState.inventory = [];
+    appState.walletAddr = "";
 
     try {
-      const profileKey = `${SAVE_KEY}_u_${appState.userId || "guest"}`;
-      const raw = JSON.parse(localStorage.getItem(profileKey));
+      const raw = JSON.parse(localStorage.getItem(`${SAVE_KEY}_u_${appState.userId || "guest"}`));
       if (raw) {
         appState.balance = isAdminUser() ? (Number(raw.balance) || 0) : 0.00;
         appState.inventory = Array.isArray(raw.inventory) ? raw.inventory : [];
+        appState.walletAddr = String(raw.walletAddr || "");
       }
     } catch (e) {}
 
     enforceZeroBalanceForPlayers();
   }
 
-  async function pushCatalogToSupabase() {
+  async function pushCasesToSupabase() {
     if (!isAdminUser()) return;
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/app_state?on_conflict=id`, {
@@ -2294,22 +2249,21 @@
           }
         }])
       });
-      if (res.ok) setDbBadge("Онлайн (Supabase)");
+      const el = document.getElementById("dbStatusText");
+      if (el) el.textContent = res.ok ? "Сохранено в Supabase" : "Ошибка сервера";
     } catch (e) {
-      setDbBadge("Кэш (офлайн)");
+      const el = document.getElementById("dbStatusText");
+      if (el) el.textContent = "Нет сети";
     }
   }
 
-  function autoSaveCatalog() {
+  function saveCatalog() {
     appState.lastUpdatedAt = Date.now();
-    saveApp();
-    clearTimeout(pushTimer);
-    pushTimer = setTimeout(() => {
-      pushCatalogToSupabase();
-    }, 50);
+    saveLocal();
+    if (isAdminUser()) pushCasesToSupabase();
   }
 
-  async function fetchCatalogFromSupabase() {
+  async function syncCasesNow(notify = false) {
     try {
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data,updated_at`;
       const res = await fetch(url, {
@@ -2319,9 +2273,15 @@
           Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
         }
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        if (notify) showToast("Не удалось обновить кейсы");
+        return;
+      }
       const rows = await res.json();
-      if (!Array.isArray(rows) || !rows.length) return;
+      if (!Array.isArray(rows) || !rows.length) {
+        if (notify) showToast("Кейсы актуальны");
+        return;
+      }
 
       const row = rows[0];
       const payload = (row && typeof row.data === "object" && row.data !== null) ? row.data : row;
@@ -2331,29 +2291,28 @@
       if (!remoteCases.length) return;
 
       if (isAdminUser() && appState.lastUpdatedAt > remoteTs + 200) {
-        await pushCatalogToSupabase();
+        await pushCasesToSupabase();
+        if (notify) showToast("Кейсы отправлены игрокам");
         return;
       }
 
       const changed = JSON.stringify(remoteCases) !== JSON.stringify(appState.cases);
       appState.cases = remoteCases;
-      if (remoteTs > appState.lastUpdatedAt) {
-        appState.lastUpdatedAt = remoteTs;
-      }
-      saveApp();
+      if (remoteTs > appState.lastUpdatedAt) appState.lastUpdatedAt = remoteTs;
+      saveLocal();
 
       if (changed) {
         renderCasesGrid();
         renderLiveNftStrip();
-        if (appState.openedCaseId && !appState.spinningCase) {
-          renderOpenCase();
-        }
+        if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
       }
-      if (isAdminUser()) {
-        renderAdminUI();
-      }
-      setDbBadge("Онлайн (Supabase)");
-    } catch (e) {}
+      if (isAdminUser()) renderAdminUI();
+      const el = document.getElementById("dbStatusText");
+      if (el) el.textContent = "Синхронизировано с Supabase";
+      if (notify) showToast(changed ? "Кейсы обновлены" : "Кейсы актуальны");
+    } catch (e) {
+      if (notify) showToast("Ошибка сети при обновлении");
+    }
   }
 
   function initTG() {
@@ -2365,7 +2324,7 @@
         uid = Number(u.id);
         appState.username = u.username ? "@" + u.username : (u.first_name || "Игрок");
       }
-      try { tg.ready(); tg.expand(); } catch (e) {}
+      try { tg.ready(); } catch (e) {}
     }
     if (!uid) {
       const q = new URLSearchParams(window.location.search);
@@ -2389,153 +2348,82 @@
     }
   }
 
-  function getTonUI() {
-    if (tonConnectUI) return tonConnectUI;
-    try {
-      if (window.TON_CONNECT_UI && window.TON_CONNECT_UI.TonConnectUI) {
-        tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({ manifestUrl: MANIFEST_URL });
-        tonConnectUI.onStatusChange(w => {
-          appState.walletAddr = (w && w.account && w.account.address) ? w.account.address : "";
-          updateWalletButton();
-        });
-      }
-    } catch (e) {}
-    return tonConnectUI;
-  }
-
-  function getWallet() {
-    const tc = getTonUI();
-    const live = tc && tc.wallet && tc.wallet.account && tc.wallet.account.address;
-    if (live) appState.walletAddr = live;
-    return appState.walletAddr || "";
-  }
-
-  function updateWalletButton() {
-    const w = getWallet();
+  function updateWalletLabel() {
+    const w = appState.walletAddr;
     const txt = w ? (w.slice(0, 5) + "..." + w.slice(-4)) : "Кошелёк";
-    const b1 = document.getElementById("walletBtn");
-    const b2 = document.getElementById("walletBtnBack");
-    if (b1) b1.textContent = txt;
-    if (b2) b2.textContent = txt;
+    document.getElementById("walletBtn").textContent = txt;
+    document.getElementById("walletBtnBack").textContent = txt;
   }
 
-  function connectWalletInstant() {
-    const tc = getTonUI();
-    if (!tc) {
-      showToast("Кошелёк TON готов к ручному вводу");
-      return;
-    }
-    try {
-      tc.openModal();
-    } catch (e) {
-      showToast("Модалка кошелька открыта");
-    }
+  function openWalletModal() {
+    document.getElementById("walletAddrInp").value = appState.walletAddr || "";
+    document.getElementById("walletDepAmtInp").value = "0.01";
+    openModal("walletModal");
   }
 
-  function onWalletBtn() {
-    const tc = getTonUI();
-    if (getWallet() && tc) {
-      try {
-        tc.disconnect();
-        appState.walletAddr = "";
-        updateWalletButton();
-        showToast("Кошелёк отключён");
-        return;
-      } catch (e) {}
-    }
-    openDepositModal();
-    connectWalletInstant();
+  function openDepositModal() {
+    openWalletModal();
   }
 
-  function renderBalance() {
-    enforceZeroBalanceForPlayers();
-    if (!isAdminUser()) return;
-    document.getElementById("balNum").textContent = fmt(appState.balance);
-  }
-
-  function renderLiveNftStrip() {
-    const allNfts = getAllTargets();
-    const cards = allNfts.length
-      ? allNfts.slice(0, 6)
-      : AUTO_NFT_TEMPLATES.map((t, i) => ({ name: t.name, price: (i + 1) * 12, icon: t.icon, badge: "NFT" }));
-
-    document.getElementById("liveNftStrip").innerHTML = `
-      <div class="live-label"><span class="live-dot"></span>NFT Live</div>
-      ${cards.map(g => `
-        <div class="live-card" title="${g.name} · ${fmt(g.price)} GRAM">
-          ${g.img ? `<img src="${g.img}" alt="" />` : `<span>${g.icon || "💎"}</span><span class="live-nft-tag">NFT</span>`}
-        </div>
-      `).join("")}
-    `;
+  function saveWalletAddress() {
+    const addr = document.getElementById("walletAddrInp").value.trim();
+    appState.walletAddr = addr;
+    saveLocal();
+    updateWalletLabel();
+    showToast(addr ? "Кошелёк сохранён" : "Адрес очищен");
   }
 
   function sendBotData(obj) {
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg && typeof tg.sendData === "function" && tg.initData) {
-      try { tg.sendData(JSON.stringify(obj)); return true; } catch (e) {}
+      try { tg.sendData(JSON.stringify(obj)); } catch (e) {}
     }
-    return false;
   }
 
-  /* Visual Balance (Admin only) */
+  function confirmDepositFromModal() {
+    const addr = document.getElementById("walletAddrInp").value.trim() || appState.walletAddr;
+    const amt = Math.round(Number(document.getElementById("walletDepAmtInp").value) * 100) / 100;
+    if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
+    if (addr) appState.walletAddr = addr;
+
+    if (isAdminUser()) {
+      appState.balance = Math.round((appState.balance + amt) * 100) / 100;
+      document.getElementById("balNum").textContent = fmt(appState.balance);
+    } else {
+      appState.balance = 0.00;
+    }
+    saveLocal();
+    updateWalletLabel();
+    updateCaseButtonText();
+    closeModal("walletModal");
+
+    sendBotData({
+      action: "real_deposit",
+      amount: amt,
+      fromWallet: appState.walletAddr,
+      toWallet: RECEIVER_WALLET,
+      userId: appState.userId
+    });
+    showToast(`Депозит +${fmt(amt)} GRAM засчитан`);
+  }
+
   function openVisModal() { if (isAdminUser()) openModal("visModal"); }
   function addVisualBal(amount) {
     if (!isAdminUser()) return;
     const v = Math.round(Number(amount) * 100) / 100;
     if (!v || v < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     appState.balance = Math.round((appState.balance + v) * 100) / 100;
-    saveApp();
-    renderBalance();
+    saveLocal();
+    document.getElementById("balNum").textContent = fmt(appState.balance);
     updateCaseButtonText();
     closeModal("visModal");
-    showToast(`Визуально добавлено +${fmt(v)} GRAM`);
-  }
-
-  /* Deposit & Withdraw (Instant modal open) */
-  function openDepositModal() {
-    document.getElementById("depWalletInp").value = getWallet() || "";
-    document.getElementById("depAmtInp").value = "0.01";
-    openModal("depModal");
-  }
-
-  function confirmDeposit() {
-    const w = document.getElementById("depWalletInp").value.trim() || getWallet();
-    const amt = Math.round(Number(document.getElementById("depAmtInp").value) * 100) / 100;
-    if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
-
-    if (isAdminUser()) {
-      appState.balance = Math.round((appState.balance + amt) * 100) / 100;
-      renderBalance();
-    } else {
-      appState.balance = 0.00;
-    }
-    saveApp();
-    updateCaseButtonText();
-    closeModal("depModal");
-
-    const tc = getTonUI();
-    if (tc && tc.wallet && tc.wallet.account && tc.wallet.account.address) {
-      tc.sendTransaction({
-        validUntil: Math.floor(Date.now() / 1000) + 300,
-        from: tc.wallet.account.address,
-        messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
-      }).catch(() => {});
-    }
-
-    sendBotData({
-      action: "real_deposit",
-      amount: amt,
-      fromWallet: w,
-      toWallet: RECEIVER_WALLET,
-      userId: appState.userId
-    });
-    showToast(`Пополнено на +${fmt(amt)} GRAM`);
+    showToast(`Добавлено +${fmt(v)} GRAM`);
   }
 
   function openWithdrawModal() {
     if (!isAdminUser()) return;
-    document.getElementById("wdWalletInp").value = getWallet() || "";
-    document.getElementById("wdAmtInp").value = appState.balance >= MIN_GRAM ? Math.min(appState.balance, 0.01).toFixed(2) : "0.01";
+    document.getElementById("wdWalletInp").value = appState.walletAddr || "";
+    document.getElementById("wdAmtInp").value = "0.01";
     openModal("wdModal");
   }
 
@@ -2547,8 +2435,8 @@
     if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     if (amt > appState.balance) { showToast("Недостаточно GRAM"); return; }
     appState.balance = Math.round((appState.balance - amt) * 100) / 100;
-    saveApp();
-    renderBalance();
+    saveLocal();
+    document.getElementById("balNum").textContent = fmt(appState.balance);
     closeModal("wdModal");
     sendBotData({
       action: "withdraw_gram",
@@ -2560,7 +2448,6 @@
     showToast("Заявка на вывод отправлена");
   }
 
-  /* Navigation */
   function switchNav(sec) {
     if (sec === "admin" && !isAdminUser()) return;
     document.querySelectorAll(".sec").forEach(el => el.classList.remove("active"));
@@ -2607,7 +2494,7 @@
   }
 
   function mediaHtml(img, fb = "💎") {
-    return img ? `<img src="${img}" alt="" loading="eager" />` : `<span>${fb}</span>`;
+    return img ? `<img src="${img}" alt="" />` : `<span>${fb}</span>`;
   }
 
   function readImgFile(inp) {
@@ -2641,10 +2528,33 @@
       uid: "inv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
       gift: { ...gift, badge: "NFT" }
     });
-    saveApp();
+    saveLocal();
   }
 
-  /* Cases */
+  function getAllTargets() {
+    const out = [];
+    for (const c of appState.cases) {
+      for (const g of (c.pool || [])) out.push({ ...g, badge: "NFT" });
+    }
+    return out;
+  }
+
+  function renderLiveNftStrip() {
+    const allNfts = getAllTargets();
+    const cards = allNfts.length
+      ? allNfts.slice(0, 6)
+      : AUTO_NFT_TEMPLATES.map((t, i) => ({ name: t.name, price: (i + 1) * 12, icon: t.icon, badge: "NFT" }));
+
+    document.getElementById("liveNftStrip").innerHTML = `
+      <div class="live-label"><span class="live-dot"></span>NFT Live</div>
+      ${cards.map(g => `
+        <div class="live-card" title="${g.name} · ${fmt(g.price)} GRAM">
+          ${g.img ? `<img src="${g.img}" alt="" />` : `<span>${g.icon || "💎"}</span><span class="live-nft-tag">NFT</span>`}
+        </div>
+      `).join("")}
+    `;
+  }
+
   function renderCasesGrid() {
     document.getElementById("casesGrid").innerHTML = appState.cases.map(c => `
       <div class="case-tile" onclick="openCaseById('${c.id}')">
@@ -2821,7 +2731,7 @@
       if (fileData) g.img = fileData;
       else if (url) g.img = url;
       appState.editingGiftId = null;
-      autoSaveCatalog();
+      saveCatalog();
       closeModal("editGiftModal");
       renderOpenCase();
       renderLiveNftStrip();
@@ -2840,7 +2750,7 @@
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c) return;
     c.pool = (c.pool || []).filter(item => item.id !== giftId);
-    autoSaveCatalog();
+    saveCatalog();
     renderOpenCase();
     renderLiveNftStrip();
     showToast("Подарок удалён из кейса");
@@ -2910,7 +2820,6 @@
     }, CASE_SPIN_DURATION_MS);
   }
 
-  /* Admin Case & Gift Actions */
   async function saveEditedCase() {
     if (!isAdminUser()) return;
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
@@ -2925,7 +2834,7 @@
     c.title = title; c.price = price; c.tag = tag;
     if (file || url) c.img = file || url;
     document.getElementById("edCaseImgFile").value = "";
-    autoSaveCatalog();
+    saveCatalog();
     renderOpenCase(); renderCasesGrid();
     showToast("Кейс сохранён");
   }
@@ -2946,7 +2855,7 @@
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
-    autoSaveCatalog();
+    saveCatalog();
     renderOpenCase(); renderLiveNftStrip();
     showToast(`NFT «${name}» добавлен`);
   }
@@ -2964,7 +2873,7 @@
     document.getElementById("newCaseTitle").value = "";
     document.getElementById("newCaseImgUrl").value = "";
     document.getElementById("newCaseImgFile").value = "";
-    autoSaveCatalog();
+    saveCatalog();
     renderCasesGrid(); renderAdminUI();
     showToast(`Кейс «${title}» создан`);
   }
@@ -2984,7 +2893,7 @@
     document.getElementById("admGiftName").value = "";
     document.getElementById("admGiftImgUrl").value = "";
     document.getElementById("admGiftImgFile").value = "";
-    autoSaveCatalog();
+    saveCatalog();
     renderAdminUI(); renderLiveNftStrip();
     showToast(`NFT добавлен в «${c.title}»`);
   }
@@ -2993,7 +2902,7 @@
     if (!isAdminUser()) return;
     if (appState.cases.length <= 1) { showToast("Нужен хотя бы 1 кейс"); return; }
     appState.cases = appState.cases.filter(x => x.id !== cid);
-    autoSaveCatalog();
+    saveCatalog();
     renderCasesGrid(); renderAdminUI();
     showToast("Кейс удалён");
   }
@@ -3008,7 +2917,6 @@
     `).join("");
   }
 
-  /* Inventory */
   function renderInventoryUI() {
     document.getElementById("invCount").textContent = `${appState.inventory.length} NFT`;
     const grid = document.getElementById("invGrid");
@@ -3045,14 +2953,14 @@
 
     if (isAdminUser() && price > 0) {
       appState.balance = Math.round((appState.balance + price) * 100) / 100;
+      document.getElementById("balNum").textContent = fmt(appState.balance);
     } else {
       appState.balance = 0.00;
     }
 
-    saveApp();
-    renderBalance();
+    saveLocal();
     renderInventoryUI();
-    showToast(`Продано: ${soldRow.gift?.name || "NFT"}${isAdminUser() ? ` (+${fmt(price)} GRAM)` : ""}`);
+    showToast(`Продано: ${soldRow.gift?.name || "NFT"}`);
   }
 
   function pickNftFromInvToUpgrader(uid) {
@@ -3068,18 +2976,15 @@
     const picked = [...ROCKET_BOT_POOL]
       .sort(() => Math.random() - 0.5)
       .slice(0, 4)
-      .map(p => {
-        const mult = Number((p.target + (Math.random() * 0.6 - 0.3)).toFixed(2));
-        return {
-          name: p.name,
-          bet: p.bet,
-          targetMult: Math.max(1.15, mult),
-          cashedOut: false,
-          out: 0,
-          nftIcon: p.nftIcon,
-          isPlayer: false
-        };
-      });
+      .map(p => ({
+        name: p.name,
+        bet: p.bet,
+        targetMult: Math.max(1.15, Number((p.target + (Math.random() * 0.6 - 0.3)).toFixed(2))),
+        cashedOut: false,
+        out: 0,
+        nftIcon: p.nftIcon,
+        isPlayer: false
+      }));
 
     if (appState.rocketQueuedBet >= MIN_GRAM) {
       appState.rocketBet = appState.rocketQueuedBet;
@@ -3146,9 +3051,8 @@
         appState.rocketPhase = "crashed";
         appState.rocketHistory.unshift(appState.rocketCrashAt);
         appState.rocketHistory = appState.rocketHistory.slice(0, 10);
-
         if (appState.rocketInRound && !appState.rocketCashedOut) {
-          showToast(`💥 Ракетка взорвалась на ${appState.rocketCrashAt.toFixed(2)}x`);
+          showToast(`💥 Взрыв на ${appState.rocketCrashAt.toFixed(2)}x`);
         }
         appState.rocketInRound = false;
         renderRocketUI();
@@ -3168,9 +3072,7 @@
   }
 
   function initRocketLoop() {
-    if (!appState.rocketLoopTimer) {
-      startRocketCountdown();
-    }
+    if (!appState.rocketLoopTimer) startRocketCountdown();
   }
 
   function stopRocketLoop() {
@@ -3195,7 +3097,6 @@
     const multEl = document.getElementById("rocketMult");
     const subEl = document.getElementById("rocketSubInfo");
     const btnEl = document.getElementById("rocketActionBtn");
-
     if (!badgeEl || !cdEl || !flightBox || !shipEl || !multEl || !btnEl) return;
 
     if (appState.rocketPhase === "countdown") {
@@ -3213,8 +3114,8 @@
       shipEl.style.transform = `translate3d(${lift * 0.5}px, -${lift}px, 0)`;
       if (subEl) {
         subEl.textContent = appState.rocketInRound && !appState.rocketCashedOut
-          ? `Ставка: ${fmt(appState.rocketBet)} GRAM · Выплата: NFT`
-          : (appState.rocketCashedOut ? "NFT забран, полёт продолжается" : "Следующий раунд скоро");
+          ? `Ставка: ${fmt(appState.rocketBet)} GRAM`
+          : (appState.rocketCashedOut ? "NFT забран" : "Следующий раунд скоро");
       }
     } else {
       badgeEl.textContent = `💥 CRASH ${appState.rocketCrashAt.toFixed(2)}x`;
@@ -3234,10 +3135,6 @@
       btnEl.disabled = true;
       btnEl.textContent = `Ставка ${fmt(appState.rocketQueuedBet)} GRAM на след. раунд`;
       btnEl.style.background = "var(--surface-3)";
-    } else if (appState.rocketInRound && appState.rocketCashedOut) {
-      btnEl.disabled = false;
-      btnEl.textContent = "Поставить на след. раунд";
-      btnEl.style.background = "linear-gradient(135deg, var(--purple), var(--blue), var(--cyan))";
     } else {
       btnEl.disabled = false;
       btnEl.textContent = "Сделать ставку";
@@ -3272,16 +3169,11 @@
       const nftWon = createNftGiftObject(winVal, "Rocket NFT");
       appState.rocketCashedOut = true;
       addNftToInventory(nftWon);
-
       const me = appState.rocketLiveFeed.find(x => x.isPlayer);
-      if (me) {
-        me.cashedOut = true;
-        me.targetMult = appState.rocketMult;
-        me.out = winVal;
-      }
+      if (me) { me.cashedOut = true; me.targetMult = appState.rocketMult; me.out = winVal; }
       renderRocketUI();
       renderLiveNftStrip();
-      showToast(`NFT забран: ${nftWon.name} (${fmt(winVal)} GRAM)`);
+      showToast(`NFT забран: ${nftWon.name}`);
       return;
     }
 
@@ -3291,10 +3183,8 @@
     if (isAdminUser()) {
       if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
       appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-      saveApp();
-      renderBalance();
-    } else {
-      appState.balance = 0.00;
+      saveLocal();
+      document.getElementById("balNum").textContent = fmt(appState.balance);
     }
 
     if (appState.rocketPhase === "countdown") {
@@ -3302,30 +3192,16 @@
       appState.rocketInRound = true;
       appState.rocketCashedOut = false;
       appState.rocketLiveFeed.unshift({
-        name: appState.username,
-        bet,
-        targetMult: 999,
-        cashedOut: false,
-        out: 0,
-        nftIcon: "💎",
-        isPlayer: true
+        name: appState.username, bet, targetMult: 999, cashedOut: false, out: 0, nftIcon: "💎", isPlayer: true
       });
     } else {
       appState.rocketQueuedBet = bet;
-      showToast(`Ставка ${fmt(bet)} GRAM на NFT-раунд принята`);
+      showToast(`Ставка ${fmt(bet)} GRAM принята на следующий раунд`);
     }
     renderRocketUI();
   }
 
   /* UPGRADER */
-  function getAllTargets() {
-    const out = [];
-    for (const c of appState.cases) {
-      for (const g of (c.pool || [])) out.push({ ...g, badge: "NFT" });
-    }
-    return out;
-  }
-
   function getSourceValue() {
     if (!appState.upgSource) return 0;
     if (appState.upgSource.type === "gram") return Number(appState.upgSource.amount) || 0;
@@ -3337,7 +3213,6 @@
     const safeStake = Math.max(MIN_GRAM, Number(stake) || 10);
     const safeChance = Math.max(1, Math.min(95, Number(chancePct) || 50));
     const targetPrice = Math.max(MIN_GRAM, Math.round(safeStake * (100 / safeChance) * HOUSE_RTP * 100) / 100);
-
     const pool = getAllTargets();
     if (pool.length > 0) {
       let bestGift = pool[0];
@@ -3346,26 +3221,19 @@
         const diff = Math.abs((Number(g.price) || 0) - targetPrice);
         if (diff < bestDiff) { bestDiff = diff; bestGift = g; }
       }
-      if (bestDiff <= targetPrice * 0.35) {
-        return { ...bestGift, badge: "NFT", autoPrice: targetPrice };
-      }
+      if (bestDiff <= targetPrice * 0.35) return { ...bestGift, badge: "NFT" };
     }
-
-    const generated = createNftGiftObject(targetPrice, "Auto NFT");
-    return { ...generated, autoPrice: targetPrice };
+    return createNftGiftObject(targetPrice, "Auto NFT");
   }
 
   function syncAutoUpgradeTarget() {
     const stake = getSourceValue() || Number(document.getElementById("upgPickGramInp")?.value) || 10;
-    const chance = Number(appState.upgChance) || 50;
-    appState.upgTarget = autoPickUpgradeTarget(stake, chance);
+    appState.upgTarget = autoPickUpgradeTarget(stake, Number(appState.upgChance) || 50);
     renderUpgraderUI();
   }
 
   function renderUpgraderUI() {
-    if (!appState.upgTarget) {
-      appState.upgTarget = autoPickUpgradeTarget(getSourceValue() || 10, appState.upgChance || 50);
-    }
+    if (!appState.upgTarget) appState.upgTarget = autoPickUpgradeTarget(getSourceValue() || 10, appState.upgChance || 50);
 
     const leftTitle = document.getElementById("upgLeftTitle");
     const leftSub = document.getElementById("upgLeftSub");
@@ -3380,34 +3248,28 @@
       leftSub.textContent = `NFT · ${fmt(appState.upgSource.gift.price)} GRAM`;
     }
 
-    const rightTitle = document.getElementById("upgRightTitle");
-    const rightSub = document.getElementById("upgRightSub");
-    rightTitle.textContent = appState.upgTarget.name;
-    rightSub.textContent = `NFT · ${fmt(appState.upgTarget.price)} GRAM`;
+    document.getElementById("upgRightTitle").textContent = appState.upgTarget.name;
+    document.getElementById("upgRightSub").textContent = `NFT · ${fmt(appState.upgTarget.price)} GRAM`;
 
     const ch = Number(appState.upgChance) || 50;
     document.getElementById("upgSlider").value = ch;
     document.getElementById("upgSliderLbl").textContent = `${ch.toFixed(1)}%`;
     document.getElementById("upgWheelChance").textContent = `${ch.toFixed(1)}%`;
     document.getElementById("upgWheelSub").textContent = `${appState.upgTarget.name} (${fmt(appState.upgTarget.price)})`;
-
-    const deg = (ch / 100) * 360;
-    document.getElementById("upgWheelRing").style.setProperty("--win-deg", `${deg.toFixed(2)}deg`);
+    document.getElementById("upgWheelRing").style.setProperty("--win-deg", `${((ch / 100) * 360).toFixed(2)}deg`);
   }
 
   function openUpgSourcePicker() {
     if (appState.upgSpinning) return;
     const nftBox = document.getElementById("upgNftPickList");
-    if (!appState.inventory.length) {
-      nftBox.innerHTML = `<div style="font-size:11.5px;color:var(--muted);">В инвентаре пока нет NFT-подарков</div>`;
-    } else {
-      nftBox.innerHTML = appState.inventory.map(r => `
-        <div class="pick-row" onclick="chooseNftAsSource('${r.uid}')">
-          <span><b>${r.gift.name}</b> <span style="color:var(--cyan);">(NFT)</span></span>
-          <b style="color:var(--gold);">${fmt(r.gift.price)} GRAM</b>
-        </div>
-      `).join("");
-    }
+    nftBox.innerHTML = appState.inventory.length
+      ? appState.inventory.map(r => `
+          <div class="pick-row" onclick="chooseNftAsSource('${r.uid}')">
+            <span><b>${r.gift.name}</b> <span style="color:var(--cyan);">(NFT)</span></span>
+            <b style="color:var(--gold);">${fmt(r.gift.price)} GRAM</b>
+          </div>
+        `).join("")
+      : `<div style="font-size:11.5px;color:var(--muted);">В инвентаре пока нет NFT-подарков</div>`;
     openModal("upgSrcModal");
   }
 
@@ -3434,12 +3296,8 @@
 
   function applyChancePreset(preset) {
     let next = 50;
-    if (typeof preset === "number") {
-      next = preset;
-    } else {
-      const mult = preset === "x2" ? 2 : (preset === "x4" ? 4 : 8);
-      next = (100 / mult) * HOUSE_RTP;
-    }
+    if (typeof preset === "number") next = preset;
+    else next = (100 / (preset === "x2" ? 2 : (preset === "x4" ? 4 : 8))) * HOUSE_RTP;
     appState.upgChance = Math.max(5, Math.min(85, Math.round(next * 10) / 10));
     syncAutoUpgradeTarget();
   }
@@ -3447,12 +3305,9 @@
   function startWheelUpgrade() {
     if (appState.upgSpinning) return;
     if (!appState.upgSource) {
-      const fallbackGram = Math.max(MIN_GRAM, Number(document.getElementById("upgPickGramInp")?.value) || 10);
-      appState.upgSource = { type: "gram", amount: fallbackGram };
+      appState.upgSource = { type: "gram", amount: Math.max(MIN_GRAM, Number(document.getElementById("upgPickGramInp")?.value) || 10) };
     }
-    if (!appState.upgTarget) {
-      syncAutoUpgradeTarget();
-    }
+    if (!appState.upgTarget) syncAutoUpgradeTarget();
 
     if (appState.upgSource.type === "gram") {
       const amt = Number(appState.upgSource.amount) || 0;
@@ -3460,13 +3315,11 @@
       if (isAdminUser()) {
         if (amt > appState.balance) { showToast("Недостаточно GRAM"); return; }
         appState.balance = Math.round((appState.balance - amt) * 100) / 100;
-        renderBalance();
-      } else {
-        appState.balance = 0.00;
+        document.getElementById("balNum").textContent = fmt(appState.balance);
       }
     } else {
       const idx = appState.inventory.findIndex(x => x.uid === appState.upgSource.uid);
-      if (idx === -1) { showToast("NFT-подарок не найден"); appState.upgSource = null; renderUpgraderUI(); return; }
+      if (idx === -1) { appState.upgSource = null; renderUpgraderUI(); return; }
       appState.inventory.splice(idx, 1);
     }
 
@@ -3479,10 +3332,7 @@
 
     const currentMod = ((appState.upgAngle % 360) + 360) % 360;
     const desiredMod = (360 - targetSectorAngle) % 360;
-    const stepDiff = (desiredMod - currentMod + 360) % 360;
-    const deltaAngle = 720 + stepDiff;
-
-    appState.upgAngle += deltaAngle;
+    appState.upgAngle += 720 + ((desiredMod - currentMod + 360) % 360);
     appState.upgSpinning = true;
     document.getElementById("upgRunBtn").disabled = true;
     document.getElementById("upgWheelRing").style.transform = `rotate(${appState.upgAngle}deg)`;
@@ -3491,24 +3341,18 @@
 
     setTimeout(() => {
       const finalMod = ((appState.upgAngle % 360) + 360) % 360;
-      const landedSectorAngle = (360 - finalMod) % 360;
-      const isActuallyWon = landedSectorAngle < winDeg;
-
+      const isWon = ((360 - finalMod) % 360) < winDeg;
       appState.upgSpinning = false;
       document.getElementById("upgRunBtn").disabled = false;
-
-      if (isActuallyWon) {
+      if (isWon) {
         addNftToInventory(targetCopy);
         renderLiveNftStrip();
         showToast(`Удача! Выигран NFT: ${targetCopy.name}`);
       } else {
-        showToast(`Проигрыш! Стрелка в серой зоне`);
+        showToast("Проигрыш!");
       }
-
-      if (appState.upgSource && appState.upgSource.type === "nft") {
-        appState.upgSource = null;
-      }
-      saveApp();
+      if (appState.upgSource && appState.upgSource.type === "nft") appState.upgSource = null;
+      saveLocal();
       syncAutoUpgradeTarget();
     }, 1630);
   }
@@ -3519,20 +3363,16 @@
     const bet = Math.round(Number(document.getElementById("minesBet").value) * 100) / 100;
     const mCnt = Number(document.getElementById("minesCount").value) || 3;
     if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-
     if (isAdminUser()) {
       if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
       appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-      renderBalance();
-    } else {
-      appState.balance = 0.00;
+      document.getElementById("balNum").textContent = fmt(appState.balance);
     }
-    saveApp();
+    saveLocal();
 
     const grid = Array(25).fill(0);
     let put = 0;
     while (put < mCnt) { const idx = Math.floor(Math.random() * 25); if (grid[idx] === 0) { grid[idx] = 1; put++; } }
-
     appState.minesActive = true; appState.minesBetVal = bet; appState.minesMinesTotal = mCnt;
     appState.minesGridData = grid; appState.minesOpened = []; appState.minesMultVal = 1.00;
     document.getElementById("minesTakeBtn").disabled = false;
@@ -3560,7 +3400,7 @@
     addNftToInventory(nftPrize);
     renderMinesUI();
     renderLiveNftStrip();
-    showToast(`Получен NFT: ${nftPrize.name} (${fmt(winVal)} GRAM)`);
+    showToast(`Получен NFT: ${nftPrize.name}`);
   }
 
   function renderMinesUI() {
@@ -3580,21 +3420,17 @@
   function setPlinkoDiff(diff) {
     if (appState.plinkoDropping) return;
     appState.plinkoDiff = diff;
-    document.querySelectorAll("#plinkoDiffPills .diff-btn").forEach(b => {
-      b.classList.toggle("active", b.dataset.diff === diff);
-    });
+    document.querySelectorAll("#plinkoDiffPills .diff-btn").forEach(b => b.classList.toggle("active", b.dataset.diff === diff));
     renderPlinkoUI(-1);
   }
 
   function renderPlinkoUI(hitSlot = -1) {
     const mode = PLINKO_MODES[appState.plinkoDiff] || PLINKO_MODES.easy;
-    const pegsContainer = document.getElementById("plinkoPegs");
     let pegsHtml = `<div class="plinko-ball" id="plinkoBall"></div>`;
     for (let r = 0; r < 8; r++) {
       pegsHtml += `<div class="plinko-row" data-row="${r}">${Array.from({ length: r + 3 }, (_, c) => `<span class="peg-dot" data-peg="${r}-${c}"></span>`).join("")}</div>`;
     }
-    pegsContainer.innerHTML = pegsHtml;
-
+    document.getElementById("plinkoPegs").innerHTML = pegsHtml;
     const slotsEl = document.getElementById("plinkoSlots");
     slotsEl.style.gridTemplateColumns = `repeat(${mode.mults.length}, 1fr)`;
     slotsEl.innerHTML = mode.mults.map((m, idx) => `<div class="p-slot ${idx === hitSlot ? "hit" : ""}">${m}x</div>`).join("");
@@ -3604,15 +3440,12 @@
     if (appState.plinkoDropping) return;
     const bet = Math.round(Number(document.getElementById("plinkoBet").value) * 100) / 100;
     if (!bet || bet < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-
     if (isAdminUser()) {
       if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
       appState.balance = Math.round((appState.balance - bet) * 100) / 100;
-      renderBalance();
-    } else {
-      appState.balance = 0.00;
+      document.getElementById("balNum").textContent = fmt(appState.balance);
     }
-    saveApp();
+    saveLocal();
 
     const mode = PLINKO_MODES[appState.plinkoDiff] || PLINKO_MODES.easy;
     appState.plinkoDropping = true;
@@ -3625,30 +3458,19 @@
     ball.style.top = "2px";
     ball.style.left = "50%";
 
-    let pos = 0;
-    let step = 0;
-
+    let pos = 0, step = 0;
     const stepInterval = setInterval(() => {
       document.querySelectorAll(".peg-dot.on").forEach(d => d.classList.remove("on"));
-
-      const goRight = Math.random() > mode.biasCenter;
-      if (goRight) pos++;
-
+      if (Math.random() > mode.biasCenter) pos++;
       const rowEl = pegsBox.querySelector(`.plinko-row[data-row="${step}"]`);
       if (rowEl) {
         const dots = rowEl.querySelectorAll(".peg-dot");
         const pegIdx = Math.min(dots.length - 1, Math.max(0, pos));
         if (dots[pegIdx]) dots[pegIdx].classList.add("on");
       }
-
       const boxW = pegsBox.clientWidth || 300;
-      const offsetRatio = (pos - (step + 1) / 2) * 0.075;
-      const leftPx = Math.max(18, Math.min(boxW - 18, boxW * 0.5 + boxW * offsetRatio));
-      const topPx = 8 + (step + 1) * 18;
-
-      ball.style.left = `${leftPx}px`;
-      ball.style.top = `${topPx}px`;
-
+      ball.style.left = `${Math.max(18, Math.min(boxW - 18, boxW * 0.5 + boxW * ((pos - (step + 1) / 2) * 0.075)))}px`;
+      ball.style.top = `${8 + (step + 1) * 18}px`;
       step++;
       if (step >= 8) {
         clearInterval(stepInterval);
@@ -3656,16 +3478,14 @@
           ball.style.display = "none";
           appState.plinkoDropping = false;
           document.getElementById("plinkoDropBtn").disabled = false;
-
           const idx = Math.min(mode.mults.length - 1, Math.max(0, pos));
           const mult = mode.mults[idx];
           const winVal = Math.max(MIN_GRAM, Math.round(bet * mult * 100) / 100);
           const nftPrize = createNftGiftObject(winVal, "Plinko NFT");
-
           renderPlinkoUI(idx);
           addNftToInventory(nftPrize);
           renderLiveNftStrip();
-          showToast(`Плинко ${mult}x → NFT: ${nftPrize.name} (${fmt(winVal)})`);
+          showToast(`Плинко ${mult}x → NFT: ${nftPrize.name}`);
         }, 140);
       }
     }, 150);
@@ -3683,23 +3503,17 @@
     document.getElementById("slotsBetVal").textContent = fmt(appState.slotsBet);
     document.getElementById("slotsBonusCost").textContent = fmt(Math.max(0.01, appState.slotsBet * 20));
     document.getElementById("slotsChanceCost").textContent = fmt(Math.max(0.01, appState.slotsBet * 0.25));
-
     document.getElementById("slotsBoard6x5").innerHTML = appState.slotsGrid.map((sym, idx) => `
       <div class="slot-cell-6x5 ${winIndices.includes(idx) ? "win-cell" : ""}">${sym}</div>
     `).join("");
-
-    [1, 2, 3].forEach(n => {
-      document.getElementById("spdSeg" + n).classList.toggle("on", appState.slotsSpeedLevel >= n);
-    });
-
+    [1, 2, 3].forEach(n => document.getElementById("spdSeg" + n).classList.toggle("on", appState.slotsSpeedLevel >= n));
     document.getElementById("autoSpinToggleBtn").textContent = appState.slotsAutoSpin ? "ВКЛ" : "ВЫКЛ";
     document.getElementById("slotsDoubleChanceBtn").classList.toggle("active", appState.slotsDoubleChance);
   }
 
   function stepSlotsBet(delta) {
     if (appState.slotsSpinning) return;
-    const next = Math.max(MIN_GRAM, Math.round((appState.slotsBet + delta) * 100) / 100);
-    appState.slotsBet = next;
+    appState.slotsBet = Math.max(MIN_GRAM, Math.round((appState.slotsBet + delta) * 100) / 100);
     renderSlotsUI();
   }
 
@@ -3714,11 +3528,10 @@
     clearInterval(autoSpinTimer);
     if (appState.slotsAutoSpin) {
       playSlots();
-      const delay = appState.slotsSpeedLevel === 3 ? 750 : (appState.slotsSpeedLevel === 2 ? 1050 : 1400);
       autoSpinTimer = setInterval(() => {
         if (!appState.slotsAutoSpin) { clearInterval(autoSpinTimer); return; }
         playSlots();
-      }, delay);
+      }, 1100);
     }
   }
 
@@ -3727,18 +3540,12 @@
     renderSlotsUI();
   }
 
-  function getSlotsRoundCost(isBonus) {
-    const base = appState.slotsBet;
-    if (isBonus) return Math.round(base * 20 * 100) / 100;
-    const extra = appState.slotsDoubleChance ? base * 0.25 : 0;
-    return Math.round((base + extra) * 100) / 100;
-  }
-
   function playSlots(isBonus = false) {
     if (appState.slotsSpinning) return;
-    const cost = getSlotsRoundCost(isBonus);
+    const cost = isBonus
+      ? Math.round(appState.slotsBet * 20 * 100) / 100
+      : Math.round((appState.slotsBet + (appState.slotsDoubleChance ? appState.slotsBet * 0.25 : 0)) * 100) / 100;
     if (cost < MIN_GRAM) { showToast("Ставка от 0.01 GRAM"); return; }
-
     if (isAdminUser()) {
       if (cost > appState.balance) {
         appState.slotsAutoSpin = false;
@@ -3748,28 +3555,22 @@
         return;
       }
       appState.balance = Math.round((appState.balance - cost) * 100) / 100;
-      renderBalance();
-    } else {
-      appState.balance = 0.00;
+      document.getElementById("balNum").textContent = fmt(appState.balance);
     }
-    saveApp();
+    saveLocal();
 
     appState.slotsSpinning = true;
     document.getElementById("slotsSpinBtn").disabled = true;
-
-    const tickMs = appState.slotsSpeedLevel === 3 ? 50 : (appState.slotsSpeedLevel === 2 ? 75 : 105);
-    const steps = appState.slotsSpeedLevel === 3 ? 4 : 6;
     let cur = 0;
-
     const spinTimer = setInterval(() => {
       appState.slotsGrid = Array.from({ length: 30 }, () => SLOT_SYMS[Math.floor(Math.random() * SLOT_SYMS.length)]);
       renderSlotsUI([]);
       cur++;
-      if (cur >= steps) {
+      if (cur >= 5) {
         clearInterval(spinTimer);
         finishSlotsSpin(isBonus);
       }
-    }, tickMs);
+    }, 65);
   }
 
   function finishSlotsSpin(isBonus) {
@@ -3778,27 +3579,21 @@
       if (!counts[sym]) counts[sym] = [];
       counts[sym].push(idx);
     });
-
     let totalMult = isBonus ? 2.2 : 0;
     const winIndices = [];
     for (const [, idxs] of Object.entries(counts)) {
       if (idxs.length >= 5) {
-        const m = idxs.length >= 7 ? 4.2 : 2.0;
-        totalMult += m;
+        totalMult += idxs.length >= 7 ? 4.2 : 2.0;
         winIndices.push(...idxs);
       }
     }
-
     if (totalMult > 0) {
       const winVal = Math.max(MIN_GRAM, Math.round(appState.slotsBet * totalMult * 100) / 100);
       const nftPrize = createNftGiftObject(winVal, "Slots NFT");
       addNftToInventory(nftPrize);
       renderLiveNftStrip();
-      showToast(`Слоты → NFT: ${nftPrize.name} (${fmt(winVal)})`);
-    } else {
-      showToast("Спин завершён");
+      showToast(`Слоты → NFT: ${nftPrize.name}`);
     }
-
     appState.slotsSpinning = false;
     document.getElementById("slotsSpinBtn").disabled = false;
     renderSlotsUI(winIndices);
@@ -3808,20 +3603,13 @@
     playSlots(true);
   }
 
-  /* Instant synchronous boot from cache + shared catalog sync */
   initTG();
-  loadApp();
-  renderBalance();
-  updateWalletButton();
+  loadLocal();
+  if (isAdminUser()) document.getElementById("balNum").textContent = fmt(appState.balance);
+  updateWalletLabel();
   renderLiveNftStrip();
   renderCasesGrid();
-
-  fetchCatalogFromSupabase();
-  setInterval(() => {
-    if (!appState.spinningCase && !appState.upgSpinning && !appState.slotsSpinning && !appState.plinkoDropping) {
-      fetchCatalogFromSupabase();
-    }
-  }, 2500);
+  syncCasesNow(false);
 </script>
 </body>
 </html>
