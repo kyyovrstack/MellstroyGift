@@ -2025,8 +2025,8 @@
   const HOUSE_RTP = 0.85;
   const NANO = 1_000_000_000;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-  const SAVE_KEY = "mellstroy_gift_fast_v11";
-  const CATALOG_KEY = "mellstroy_gift_catalog_v11";
+  const SAVE_KEY = "mellstroy_gift_fast_v12";
+  const CATALOG_KEY = "mellstroy_gift_catalog_v12";
   const SUPABASE_URL = "https://ztjmebmpxmxtofnlboyo.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "Sb_publishable_tuZ8DhQusariwnue3dIwGg_MsfnMHCj";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
@@ -2108,6 +2108,7 @@
     walletAddr: "",
     spinningCase: false,
     lastUpdatedAt: 0,
+    isSavingCatalog: false,
     rocketPhase: "countdown",
     rocketCountdownSec: 2,
     rocketBet: 0,
@@ -2142,6 +2143,7 @@
 
   let autoSpinTimer = null;
   let caseSpinTimer = null;
+  let liveSyncTimer = null;
 
   function fmt(v) {
     return (Number(v) || 0).toFixed(2);
@@ -2161,7 +2163,7 @@
     t.textContent = msg;
     t.style.display = "block";
     clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 1700);
+    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 1800);
   }
 
   function setInp(id, val) {
@@ -2227,10 +2229,12 @@
         inventory: appState.inventory,
         walletAddr: appState.walletAddr
       }));
-      localStorage.setItem(CATALOG_KEY, JSON.stringify({
-        cases: appState.cases,
-        updatedAt: appState.lastUpdatedAt
-      }));
+      if (Array.isArray(appState.cases) && appState.cases.length > 0) {
+        localStorage.setItem(CATALOG_KEY, JSON.stringify({
+          cases: appState.cases,
+          updatedAt: appState.lastUpdatedAt
+        }));
+      }
     } catch (e) {}
   }
 
@@ -2302,34 +2306,50 @@
   }
 
   async function pushCasesToSupabase() {
-    if (!isAdminUser()) return;
+    const ts = Date.now();
+    appState.lastUpdatedAt = ts;
+    appState.isSavingCatalog = true;
+    const el = document.getElementById("dbStatusText");
+    if (el) el.textContent = "Сохранение...";
+
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/app_state?on_conflict=id`, {
         method: "POST",
         headers: { ...sbHeaders(), Prefer: "resolution=merge-duplicates,return=minimal" },
         body: JSON.stringify([{
           id: STATE_ROW_ID,
+          updated_at: ts,
           data: {
             cases: appState.cases,
-            updatedAt: appState.lastUpdatedAt
+            updatedAt: ts
           }
         }])
       });
-      const el = document.getElementById("dbStatusText");
-      if (el) el.textContent = res.ok ? "Сохранено в Supabase" : "Ошибка сервера";
+      appState.isSavingCatalog = false;
+      if (res.ok) {
+        saveLocal();
+        if (el) el.textContent = "Сохранено в Supabase (общий доступ)";
+        return true;
+      } else {
+        if (el) el.textContent = `Ошибка сервера (${res.status})`;
+        return false;
+      }
     } catch (e) {
-      const el = document.getElementById("dbStatusText");
-      if (el) el.textContent = "Нет сети";
+      appState.isSavingCatalog = false;
+      if (el) el.textContent = "Нет сети (сохранено локально)";
+      return false;
     }
   }
 
-  function saveCatalog() {
+  async function saveCatalog() {
     appState.lastUpdatedAt = Date.now();
     saveLocal();
-    if (isAdminUser()) pushCasesToSupabase();
+    const ok = await pushCasesToSupabase();
+    if (!ok) showToast("Сохранено локально, проверь сеть/Supabase");
+    return ok;
   }
 
-  async function fetchRemoteCases(timeoutMs = 1500) {
+  async function fetchRemoteCases(timeoutMs = 2500) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -2355,33 +2375,59 @@
     }
   }
 
-  async function syncCasesNow(notify = false) {
-    const remote = await fetchRemoteCases(2200);
-    if (!remote) {
-      if (notify) showToast("Не удалось обновить кейсы");
-      return;
-    }
+  function applyRemoteIfNewer(remote) {
+    if (!remote || !Array.isArray(remote.cases) || !remote.cases.length) return false;
+    if (appState.isSavingCatalog) return false;
 
-    if (isAdminUser() && appState.lastUpdatedAt > remote.updatedAt + 200) {
-      await pushCasesToSupabase();
-      if (notify) showToast("Кейсы отправлены игрокам");
-      return;
+    if (appState.lastUpdatedAt > remote.updatedAt + 100) {
+      return false;
     }
 
     const changed = JSON.stringify(remote.cases) !== JSON.stringify(appState.cases);
     appState.cases = remote.cases;
-    if (remote.updatedAt > appState.lastUpdatedAt) appState.lastUpdatedAt = remote.updatedAt;
+    if (remote.updatedAt > appState.lastUpdatedAt) {
+      appState.lastUpdatedAt = remote.updatedAt;
+    }
     saveLocal();
 
     if (changed) {
       renderCasesGrid();
       renderLiveNftStrip();
-      if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
+      if (appState.openedCaseId && !appState.spinningCase) {
+        const stillExists = appState.cases.some(c => c.id === appState.openedCaseId);
+        if (stillExists) {
+          renderOpenCase();
+        } else {
+          goBackToCases();
+        }
+      }
+      if (isAdminUser()) renderAdminUI();
     }
-    if (isAdminUser()) renderAdminUI();
+    return changed;
+  }
+
+  async function syncCasesNow(notify = false) {
+    if (appState.isSavingCatalog) return;
+    if (isAdminUser() && appState.lastUpdatedAt > 0) {
+      const remoteBefore = await fetchRemoteCases(2200);
+      if (!remoteBefore || appState.lastUpdatedAt > remoteBefore.updatedAt + 100) {
+        const pushed = await pushCasesToSupabase();
+        if (isAdminUser()) renderAdminUI();
+        if (notify) showToast(pushed ? "Кейсы сохранены в базе" : "Ошибка сохранения");
+        return;
+      }
+    }
+
+    const remote = await fetchRemoteCases(2500);
+    if (!remote) {
+      if (notify) showToast("Не удалось получить данные с сервера");
+      return;
+    }
+
+    const changed = applyRemoteIfNewer(remote);
     const el = document.getElementById("dbStatusText");
     if (el) el.textContent = "Синхронизировано с Supabase";
-    if (notify) showToast(changed ? "Кейсы обновлены" : "Кейсы актуальны");
+    if (notify) showToast(changed ? "Список кейсов обновлён" : "Кейсы актуальны");
   }
 
   function initTG() {
@@ -2719,16 +2765,9 @@
     if (c) document.getElementById("openCaseTitle").textContent = c.title;
     renderOpenCase();
 
-    const remote = await fetchRemoteCases(1200);
+    const remote = await fetchRemoteCases(1800);
     if (remote && !appState.spinningCase && appState.openedCaseId === caseId) {
-      const changed = JSON.stringify(remote.cases) !== JSON.stringify(appState.cases);
-      appState.cases = remote.cases;
-      if (remote.updatedAt > appState.lastUpdatedAt) appState.lastUpdatedAt = remote.updatedAt;
-      saveLocal();
-      if (changed) {
-        renderOpenCase();
-        renderLiveNftStrip();
-      }
+      applyRemoteIfNewer(remote);
     }
   }
 
@@ -2852,7 +2891,7 @@
     openModal("editGiftModal");
   }
 
-  function saveEditedGiftInCase() {
+  async function saveEditedGiftInCase() {
     if (!isAdminUser()) return;
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c || !appState.editingGiftId) return;
@@ -2870,35 +2909,29 @@
     if (!name) { showToast("Введи название подарка"); return; }
     if (!price || price < MIN_GRAM) { showToast("Цена от 0.01 GRAM"); return; }
 
-    const applyChanges = (fileData) => {
-      g.name = name;
-      g.price = price;
-      g.weight = weight;
-      g.badge = badge;
-      g.icon = icon;
-      if (fileData) g.img = fileData;
-      else if (url) g.img = url;
-      appState.editingGiftId = null;
-      saveCatalog();
-      closeModal("editGiftModal");
-      renderOpenCase();
-      renderLiveNftStrip();
-      showToast(`Подарок «${g.name}» обновлён`);
-    };
+    const fileData = (fileInput && fileInput.files && fileInput.files[0]) ? await readImgFile(fileInput) : "";
+    g.name = name;
+    g.price = price;
+    g.weight = weight;
+    g.badge = badge;
+    g.icon = icon;
+    if (fileData) g.img = fileData;
+    else if (url) g.img = url;
+    appState.editingGiftId = null;
 
-    if (fileInput && fileInput.files && fileInput.files[0]) {
-      readImgFile(fileInput).then(applyChanges);
-    } else {
-      applyChanges("");
-    }
+    await saveCatalog();
+    closeModal("editGiftModal");
+    renderOpenCase();
+    renderLiveNftStrip();
+    showToast(`Подарок «${g.name}» обновлён`);
   }
 
-  function deleteGiftFromOpenedCase(giftId) {
+  async function deleteGiftFromOpenedCase(giftId) {
     if (!isAdminUser()) return;
     const c = appState.cases.find(x => x.id === appState.openedCaseId);
     if (!c) return;
     c.pool = (c.pool || []).filter(item => item.id !== giftId);
-    saveCatalog();
+    await saveCatalog();
     renderOpenCase();
     renderLiveNftStrip();
     showToast("Подарок удалён из кейса");
@@ -2981,7 +3014,7 @@
     c.title = title; c.price = price; c.tag = tag;
     if (file || url) c.img = file || url;
     document.getElementById("edCaseImgFile").value = "";
-    saveCatalog();
+    await saveCatalog();
     renderOpenCase(); renderCasesGrid();
     showToast("Кейс сохранён");
   }
@@ -3002,7 +3035,7 @@
     document.getElementById("edGiftName").value = "";
     document.getElementById("edGiftImgUrl").value = "";
     document.getElementById("edGiftImgFile").value = "";
-    saveCatalog();
+    await saveCatalog();
     renderOpenCase(); renderLiveNftStrip();
     showToast(`NFT «${name}» добавлен`);
   }
@@ -3020,7 +3053,7 @@
     document.getElementById("newCaseTitle").value = "";
     document.getElementById("newCaseImgUrl").value = "";
     document.getElementById("newCaseImgFile").value = "";
-    saveCatalog();
+    await saveCatalog();
     renderCasesGrid(); renderAdminUI();
     showToast(`Кейс «${title}» создан`);
   }
@@ -3040,16 +3073,16 @@
     document.getElementById("admGiftName").value = "";
     document.getElementById("admGiftImgUrl").value = "";
     document.getElementById("admGiftImgFile").value = "";
-    saveCatalog();
+    await saveCatalog();
     renderAdminUI(); renderLiveNftStrip();
     showToast(`NFT добавлен в «${c.title}»`);
   }
 
-  function deleteCaseAdmin(cid) {
+  async function deleteCaseAdmin(cid) {
     if (!isAdminUser()) return;
     if (appState.cases.length <= 1) { showToast("Нужен хотя бы 1 кейс"); return; }
     appState.cases = appState.cases.filter(x => x.id !== cid);
-    saveCatalog();
+    await saveCatalog();
     renderCasesGrid(); renderAdminUI();
     showToast("Кейс удалён");
   }
@@ -3750,24 +3783,38 @@
     playSlots(true);
   }
 
+  function startBackgroundSync() {
+    clearInterval(liveSyncTimer);
+    liveSyncTimer = setInterval(async () => {
+      if (document.visibilityState !== "visible") return;
+      if (appState.spinningCase || appState.isSavingCatalog) return;
+      const remote = await fetchRemoteCases(2000);
+      if (remote) applyRemoteIfNewer(remote);
+    }, 8000);
+  }
+
   async function bootApp() {
     initTG();
     loadLocal();
-    const remote = await fetchRemoteCases(1400);
-    if (remote) {
-      if (isAdminUser() && appState.lastUpdatedAt > remote.updatedAt + 200) {
-        await pushCasesToSupabase();
-      } else {
-        appState.cases = remote.cases;
-        if (remote.updatedAt > appState.lastUpdatedAt) appState.lastUpdatedAt = remote.updatedAt;
-        saveLocal();
-      }
-    }
     renderBalanceUI();
     if (isAdminUser()) renderAdminUI();
     updateWalletLabel();
     renderLiveNftStrip();
     renderCasesGrid();
+
+    const remote = await fetchRemoteCases(2200);
+    if (remote) {
+      if (isAdminUser() && appState.lastUpdatedAt > remote.updatedAt + 100) {
+        await pushCasesToSupabase();
+      } else {
+        applyRemoteIfNewer(remote);
+      }
+    } else if (isAdminUser() && appState.cases.length > 0) {
+      await pushCasesToSupabase();
+    }
+
+    if (isAdminUser()) renderAdminUI();
+    startBackgroundSync();
   }
 
   bootApp();
