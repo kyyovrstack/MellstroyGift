@@ -505,7 +505,7 @@
     }
 
     .btn-orange:disabled {
-      opacity: 0.6;
+      opacity: 0.65;
       cursor: not-allowed;
     }
 
@@ -1332,6 +1332,23 @@
       margin-bottom: 10px;
     }
 
+    .crypto-box {
+      background: #080b18;
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      border-radius: 14px;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 11.5px;
+    }
+
+    .crypto-addr {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--cyan);
+      word-break: break-all;
+      margin: 4px 0;
+      font-size: 11px;
+    }
+
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -1839,31 +1856,46 @@
   </div>
 </div>
 
-<!-- Wallet & Deposit Modal -->
+<!-- Crypto Wallet & Deposit Modal -->
 <div class="modal-bg" id="walletModal">
   <div class="modal-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <b>👛 Кошелёк и депозит</b>
+      <b>👛 Криптокошелёк TON</b>
       <button class="wallet-mini" onclick="closeModal('walletModal')">✕</button>
     </div>
+
+    <div class="crypto-box">
+      <div style="color:var(--muted);">Кошелёк для пополнения:</div>
+      <div class="crypto-addr" id="receiverWalletView"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+        <span style="color:var(--muted);">Комментарий (MEMO): <b style="color:#fff;" id="depMemoView">-</b></span>
+        <button class="wallet-mini" onclick="copyReceiverWallet()">Копировать</button>
+      </div>
+    </div>
+
     <div class="fg">
-      <label>Адрес кошелька (UQ... / EQ...)</label>
-      <input class="inp" id="walletAddrInp" placeholder="Вставь адрес кошелька" />
+      <label>Твой адрес кошелька (UQ... / EQ...)</label>
+      <input class="inp" id="walletAddrInp" placeholder="Вставь свой TON-адрес" />
     </div>
     <div class="fg">
-      <label>Сумма депозита (от 0.01 GRAM)</label>
-      <input class="inp" id="walletDepAmtInp" type="number" step="0.01" min="0.01" value="0.01" />
+      <label>Сумма перевода (TON, от 0.01)</label>
+      <input class="inp" id="walletDepAmtInp" type="number" step="0.01" min="0.01" value="0.50" />
     </div>
     <div class="row4">
-      <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 0.01)">0.01</button>
       <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 0.1)">0.1</button>
+      <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 0.5)">0.5</button>
       <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 1)">1</button>
       <button class="wallet-mini" onclick="setInp('walletDepAmtInp', 5)">5</button>
     </div>
-    <div class="row2">
+    <div class="row2" style="margin-bottom:8px;">
       <button class="wallet-mini" style="padding:10px;" onclick="saveWalletAddress()">Сохранить адрес</button>
-      <button class="dep-mini" style="padding:10px;" onclick="confirmDepositFromModal()">+ Депозит</button>
+      <button class="dep-mini" style="padding:10px;" onclick="launchCryptoWalletDeposit()">Открыть кошелёк</button>
     </div>
+    <div class="fg" style="margin-bottom:6px;">
+      <label>Хэш транзакции (TX Hash после отправки)</label>
+      <input class="inp" id="txHashInp" placeholder="Вставь TX Hash после перевода" />
+    </div>
+    <button class="btn-green" onclick="submitCryptoTxForVerification()">Отправить перевод на проверку</button>
   </div>
 </div>
 
@@ -1991,8 +2023,8 @@
   const MIN_GRAM = 0.01;
   const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-  const SAVE_KEY = "mellstroy_gift_fast_v9";
-  const CATALOG_KEY = "mellstroy_gift_catalog_v9";
+  const SAVE_KEY = "mellstroy_gift_fast_v10";
+  const CATALOG_KEY = "mellstroy_gift_catalog_v10";
   const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
@@ -2126,7 +2158,7 @@
     t.textContent = msg;
     t.style.display = "block";
     clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 1600);
+    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 1700);
   }
 
   function setInp(id, val) {
@@ -2263,56 +2295,62 @@
     if (isAdminUser()) pushCasesToSupabase();
   }
 
-  async function syncCasesNow(notify = false) {
+  async function fetchRemoteCases(timeoutMs = 1500) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data,updated_at`;
       const res = await fetch(url, {
         cache: "no-store",
+        signal: controller.signal,
         headers: {
           apikey: SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
         }
       });
-      if (!res.ok) {
-        if (notify) showToast("Не удалось обновить кейсы");
-        return;
-      }
+      clearTimeout(timer);
+      if (!res.ok) return null;
       const rows = await res.json();
-      if (!Array.isArray(rows) || !rows.length) {
-        if (notify) showToast("Кейсы актуальны");
-        return;
-      }
-
+      if (!Array.isArray(rows) || !rows.length) return null;
       const row = rows[0];
       const payload = (row && typeof row.data === "object" && row.data !== null) ? row.data : row;
       const remoteCases = normalizeCases(payload && Array.isArray(payload.cases) ? payload.cases : []);
       const remoteTs = Number((payload && (payload.updatedAt || payload.updated_at)) || row.updated_at || 0) || 0;
-
-      if (!remoteCases.length) return;
-
-      if (isAdminUser() && appState.lastUpdatedAt > remoteTs + 200) {
-        await pushCasesToSupabase();
-        if (notify) showToast("Кейсы отправлены игрокам");
-        return;
-      }
-
-      const changed = JSON.stringify(remoteCases) !== JSON.stringify(appState.cases);
-      appState.cases = remoteCases;
-      if (remoteTs > appState.lastUpdatedAt) appState.lastUpdatedAt = remoteTs;
-      saveLocal();
-
-      if (changed) {
-        renderCasesGrid();
-        renderLiveNftStrip();
-        if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
-      }
-      if (isAdminUser()) renderAdminUI();
-      const el = document.getElementById("dbStatusText");
-      if (el) el.textContent = "Синхронизировано с Supabase";
-      if (notify) showToast(changed ? "Кейсы обновлены" : "Кейсы актуальны");
+      if (!remoteCases.length) return null;
+      return { cases: remoteCases, updatedAt: remoteTs };
     } catch (e) {
-      if (notify) showToast("Ошибка сети при обновлении");
+      clearTimeout(timer);
+      return null;
     }
+  }
+
+  async function syncCasesNow(notify = false) {
+    const remote = await fetchRemoteCases(2200);
+    if (!remote) {
+      if (notify) showToast("Не удалось обновить кейсы");
+      return;
+    }
+
+    if (isAdminUser() && appState.lastUpdatedAt > remote.updatedAt + 200) {
+      await pushCasesToSupabase();
+      if (notify) showToast("Кейсы отправлены игрокам");
+      return;
+    }
+
+    const changed = JSON.stringify(remote.cases) !== JSON.stringify(appState.cases);
+    appState.cases = remote.cases;
+    if (remote.updatedAt > appState.lastUpdatedAt) appState.lastUpdatedAt = remote.updatedAt;
+    saveLocal();
+
+    if (changed) {
+      renderCasesGrid();
+      renderLiveNftStrip();
+      if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
+    }
+    if (isAdminUser()) renderAdminUI();
+    const el = document.getElementById("dbStatusText");
+    if (el) el.textContent = "Синхронизировано с Supabase";
+    if (notify) showToast(changed ? "Кейсы обновлены" : "Кейсы актуальны");
   }
 
   function initTG() {
@@ -2355,14 +2393,29 @@
     document.getElementById("walletBtnBack").textContent = txt;
   }
 
+  function getDepositMemo() {
+    return `MG_${appState.userId || "GUEST"}`;
+  }
+
   function openWalletModal() {
+    document.getElementById("receiverWalletView").textContent = RECEIVER_WALLET;
+    document.getElementById("depMemoView").textContent = getDepositMemo();
     document.getElementById("walletAddrInp").value = appState.walletAddr || "";
-    document.getElementById("walletDepAmtInp").value = "0.01";
+    document.getElementById("walletDepAmtInp").value = "0.50";
+    document.getElementById("txHashInp").value = "";
     openModal("walletModal");
   }
 
   function openDepositModal() {
     openWalletModal();
+  }
+
+  function copyReceiverWallet() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(RECEIVER_WALLET).then(() => showToast("Адрес скопирован")).catch(() => showToast(RECEIVER_WALLET));
+    } else {
+      showToast(RECEIVER_WALLET);
+    }
   }
 
   function saveWalletAddress() {
@@ -2380,31 +2433,78 @@
     }
   }
 
-  function confirmDepositFromModal() {
+  function launchCryptoWalletDeposit() {
     const addr = document.getElementById("walletAddrInp").value.trim() || appState.walletAddr;
     const amt = Math.round(Number(document.getElementById("walletDepAmtInp").value) * 100) / 100;
-    if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
-    if (addr) appState.walletAddr = addr;
-
-    if (isAdminUser()) {
-      appState.balance = Math.round((appState.balance + amt) * 100) / 100;
-      document.getElementById("balNum").textContent = fmt(appState.balance);
-    } else {
-      appState.balance = 0.00;
+    if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 TON"); return; }
+    if (addr) {
+      appState.walletAddr = addr;
+      saveLocal();
+      updateWalletLabel();
     }
-    saveLocal();
-    updateWalletLabel();
-    updateCaseButtonText();
-    closeModal("walletModal");
+
+    const memo = getDepositMemo();
+    const nanoAmt = Math.round(amt * 1e9);
+    const tonDeepLink = `ton://transfer/${RECEIVER_WALLET}?amount=${nanoAmt}&text=${encodeURIComponent(memo)}`;
+    const tonkeeperWebLink = `https://app.tonkeeper.com/transfer/${RECEIVER_WALLET}?amount=${nanoAmt}&text=${encodeURIComponent(memo)}`;
 
     sendBotData({
-      action: "real_deposit",
-      amount: amt,
+      action: "crypto_deposit_initiated",
+      amountTon: amt,
+      memo,
       fromWallet: appState.walletAddr,
       toWallet: RECEIVER_WALLET,
       userId: appState.userId
     });
-    showToast(`Депозит +${fmt(amt)} GRAM засчитан`);
+
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg && typeof tg.openLink === "function") {
+      try {
+        tg.openLink(tonkeeperWebLink);
+        return;
+      } catch (e) {}
+    }
+
+    const anchor = document.createElement("a");
+    anchor.href = tonDeepLink;
+    anchor.rel = "noopener";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    setTimeout(() => {
+      if (document.visibilityState === "visible") {
+        window.open(tonkeeperWebLink, "_blank", "noopener");
+      }
+    }, 600);
+  }
+
+  function submitCryptoTxForVerification() {
+    const addr = document.getElementById("walletAddrInp").value.trim() || appState.walletAddr;
+    const amt = Math.round(Number(document.getElementById("walletDepAmtInp").value) * 100) / 100;
+    const txHash = document.getElementById("txHashInp").value.trim();
+
+    if (!amt || amt < MIN_GRAM) { showToast("Укажи сумму от 0.01 TON"); return; }
+    if (!txHash || txHash.length < 8) { showToast("Вставь TX Hash перевода"); return; }
+
+    if (addr) {
+      appState.walletAddr = addr;
+      saveLocal();
+      updateWalletLabel();
+    }
+
+    sendBotData({
+      action: "crypto_deposit_verify",
+      amountTon: amt,
+      txHash,
+      memo: getDepositMemo(),
+      fromWallet: appState.walletAddr,
+      toWallet: RECEIVER_WALLET,
+      userId: appState.userId
+    });
+
+    closeModal("walletModal");
+    showToast("Транзакция отправлена на проверку");
   }
 
   function openVisModal() { if (isAdminUser()) openModal("visModal"); }
@@ -2570,7 +2670,7 @@
     `).join("");
   }
 
-  function openCaseById(caseId) {
+  async function openCaseById(caseId) {
     appState.openedCaseId = caseId;
     appState.spinningCase = false;
     clearTimeout(caseSpinTimer);
@@ -2582,6 +2682,18 @@
     document.getElementById("caseOpenView").style.display = "block";
     if (c) document.getElementById("openCaseTitle").textContent = c.title;
     renderOpenCase();
+
+    const remote = await fetchRemoteCases(1200);
+    if (remote && !appState.spinningCase) {
+      const changed = JSON.stringify(remote.cases) !== JSON.stringify(appState.cases);
+      appState.cases = remote.cases;
+      if (remote.updatedAt > appState.lastUpdatedAt) appState.lastUpdatedAt = remote.updatedAt;
+      saveLocal();
+      if (changed) {
+        renderOpenCase();
+        renderLiveNftStrip();
+      }
+    }
   }
 
   function goBackToCases() {
@@ -2601,7 +2713,7 @@
     if (!c || !btn) return;
     if (appState.spinningCase) {
       btn.disabled = true;
-      btn.textContent = "Крутим NFT (3 сек)...";
+      btn.textContent = "Открываем кейс...";
     } else if (isAdminUser() && appState.balance < Number(c.price)) {
       btn.disabled = false;
       btn.textContent = "💳 Пополнить баланс";
@@ -2771,7 +2883,7 @@
     const btn = document.getElementById("caseActionBtn");
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Крутим NFT (3 сек)...";
+      btn.textContent = "Открываем кейс...";
     }
 
     const pool = Array.isArray(c.pool) ? c.pool : [];
@@ -2807,9 +2919,12 @@
     const step = 96;
     const shift = Math.round(winIdx * step + 44);
 
-    void track.offsetWidth;
-    track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.12, 0.88, 0.2, 1)`;
-    track.style.transform = `translate3d(-${shift}px, 0, 0)`;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.12, 0.88, 0.2, 1)`;
+        track.style.transform = `translate3d(-${shift}px, 0, 0)`;
+      });
+    });
 
     caseSpinTimer = setTimeout(() => {
       appState.spinningCase = false;
@@ -3603,13 +3718,29 @@
     playSlots(true);
   }
 
-  initTG();
-  loadLocal();
-  if (isAdminUser()) document.getElementById("balNum").textContent = fmt(appState.balance);
-  updateWalletLabel();
-  renderLiveNftStrip();
-  renderCasesGrid();
-  syncCasesNow(false);
+  async function bootApp() {
+    initTG();
+    loadLocal();
+    const remote = await fetchRemoteCases(1400);
+    if (remote) {
+      if (isAdminUser() && appState.lastUpdatedAt > remote.updatedAt + 200) {
+        await pushCasesToSupabase();
+      } else {
+        appState.cases = remote.cases;
+        if (remote.updatedAt > appState.lastUpdatedAt) appState.lastUpdatedAt = remote.updatedAt;
+        saveLocal();
+      }
+    }
+    if (isAdminUser()) {
+      document.getElementById("balNum").textContent = fmt(appState.balance);
+      renderAdminUI();
+    }
+    updateWalletLabel();
+    renderLiveNftStrip();
+    renderCasesGrid();
+  }
+
+  bootApp();
 </script>
 </body>
 </html>
