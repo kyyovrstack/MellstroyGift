@@ -159,6 +159,27 @@
       border-radius: 999px;
     }
 
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      color: #6ee7b7;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
     .card {
       background: linear-gradient(160deg, var(--card-2), var(--card));
       border: 1px solid var(--border);
@@ -490,7 +511,12 @@
       background: linear-gradient(135deg, #10b981, #059669);
     }
 
-    .primary-btn:active {
+    .primary-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .primary-btn:active:not(:disabled) {
       transform: scale(0.98);
     }
 
@@ -738,26 +764,44 @@
 
     .crash-sky {
       position: relative;
-      height: 190px;
+      height: 182px;
       border-radius: 20px;
-      background: radial-gradient(circle at 50% 60%, rgba(168, 85, 247, 0.3), var(--bg) 75%);
+      background: radial-gradient(circle at 50% 60%, rgba(168, 85, 247, 0.32), var(--bg) 75%);
       border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .crash-top-row {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
     }
 
     .rocket-sprite {
       font-size: 46px;
-      transition: transform 0.1s linear;
+      transition: transform 0.08s linear;
     }
 
     .crash-mult-big {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 900;
       margin-top: 4px;
+    }
+
+    .live-players-box {
+      max-height: 230px;
+      overflow-y: auto;
+      padding-right: 2px;
     }
 
     .live-bet-row {
@@ -766,9 +810,33 @@
       justify-content: space-between;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 15px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
+      border-radius: 14px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .live-bet-row.me-row {
+      border-color: rgba(251, 191, 36, 0.65);
+      background: linear-gradient(160deg, rgba(251, 191, 36, 0.12), var(--card));
+    }
+
+    .tag-cashed {
+      color: #6ee7b7;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .tag-flying {
+      color: #e9d5ff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .tag-crashed {
+      color: #fda4af;
+      font-weight: 800;
+      font-size: 12px;
     }
 
     .bottom-nav {
@@ -949,8 +1017,8 @@
         </div>
         <div class="game-tile" onclick="openGame('crash')">
           <span class="game-tile-emoji">🚀</span>
-          <div class="game-tile-name">Crash</div>
-          <div class="game-tile-sub">Полёт ракеты до краша</div>
+          <div class="game-tile-name">Crash Live</div>
+          <div class="game-tile-sub">100 игроков · Непрерывный полёт</div>
         </div>
       </div>
 
@@ -1242,23 +1310,35 @@
 
       <div id="scene-crash" style="display:none;">
         <div class="crash-sky">
+          <div class="crash-top-row">
+            <span class="live-pill"><span class="live-dot"></span>LIVE</span>
+            <span class="muted" id="crashRoundId">Раунд #1</span>
+          </div>
           <div class="rocket-sprite" id="crashRocket">🚀</div>
           <div class="crash-mult-big" id="crashMultText">1.00x</div>
-          <div class="muted" id="crashStatusSub">Введите ставку и нажмите старт</div>
+          <div class="muted" id="crashStatusSub">Ставок в раунде: 0</div>
         </div>
 
         <div class="card">
           <div class="grid-2" style="margin-bottom:10px;">
             <div>
-              <label class="muted">Ставка (GRAM)</label>
+              <label class="muted">Ваша ставка (GRAM)</label>
               <input type="number" id="crashBet" step="0.5" min="0.5" value="1" />
             </div>
             <div>
-              <label class="muted">Автовывод (x)</label>
-              <input type="number" id="crashCashoutTarget" step="0.1" min="1.1" value="1.8" />
+              <label class="muted">Автовывод (x, 0 = ручной)</label>
+              <input type="number" id="crashCashoutTarget" step="0.1" min="0" value="1.8" />
             </div>
           </div>
-          <button class="primary-btn blue" id="crashBtn" onclick="runCrashRound()">Сделать ставку</button>
+          <button class="primary-btn blue" id="crashBtn" onclick="handleCrashAction()">Поставить в Live</button>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-top:0;">
+            <span>👥 Игроки в раунде</span>
+            <span class="pill-tag" id="crashPlayersCount">0 ставок</span>
+          </div>
+          <div class="live-players-box" id="crashLiveList"></div>
         </div>
       </div>
     </div>
@@ -1289,7 +1369,7 @@
     const ADMIN_ID = 5200591975;
     const DEFAULT_PLAYER_ID = 1000001;
     const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-    const STORE_KEY = "mellstroy_gift_gram_v4";
+    const STORE_KEY = "mellstroy_gift_gram_v5";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1878,7 +1958,7 @@
         plinko: "🟣 Plinko",
         slots: "🎰 Слоты 5×5",
         mines: "💣 Mines",
-        crash: "🚀 Crash"
+        crash: "🚀 Crash Live"
       };
       document.getElementById("modalGameTitle").textContent = titles[name] || "Игра";
       ["plinko", "slots", "mines", "crash"].forEach(g => {
@@ -1897,7 +1977,7 @@
       } else if (name === "mines") {
         initMinesIdle();
       } else if (name === "crash") {
-        resetCrashDisplay();
+        renderCrashUI();
       }
     }
 
@@ -2387,73 +2467,238 @@
       }
     }
 
-    /* CRASH */
-    let crashRunning = false;
+    /* CRASH LIVE (100 ИГРОКОВ И НЕПРЕРЫВНЫЙ ЦИКЛ) */
+    const CRASH_BOT_NAMES = [
+      "night_wolf", "gram_king", "pepe_lord", "turbo_fox", "alex_777", "nova_star", "dasha_k", "max_pro",
+      "mellow_x", "crypt_vibe", "leo_fast", "savage_01", "vika_glow", "den_kzn", "gold_rush", "zver_99",
+      "kiki_boom", "storm_ua", "artem_v", "lisa_play", "ton_hunter", "blaze_in", "roma_win", "sky_drift",
+      "nina_top", "shadow_m", "lucky_cat", "dimon_r", "echo_x", "kira_sweet", "vlad_k", "frost_bite",
+      "mila_sun", "oleg_7", "dark_horse", "sonya_b", "tim_flow", "vera_star", "goga_m", "flash_run",
+      "polina_v", "nik_pro", "delta_9", "anya_mix", "slava_t", "titan_x", "yana_rose", "kirill_d",
+      "phantom_k", "eva_lux", "sergey_m", "drift_king", "karina_p", "rocky_1", "marina_z", "viper_x",
+      "egor_k", "alina_v", "zenit_9", "pasha_r", "stella_m", "raptor_x", "diana_l", "bobby_g",
+      "masha_t", "ivan_77", "cobra_v", "liza_k", "anton_m", "spark_x", "sofia_r", "denis_p",
+      "valeria_n", "taras_k", "frost_x", "ksusha_m", "ilyas_r", "maya_star", "roman_d", "nasty_v",
+      "bek_01", "ira_glow", "rustam_k", "milana_t", "gleb_x", "daria_m", "vadim_r", "ellie_p",
+      "timur_7", "veronika_k", "sasha_b", "kristina_v", "marat_x", "uliana_m", "denchik_r", "elena_star",
+      "arthur_k", "polly_v", "misha_9", "tamara_x"
+    ];
 
-    function resetCrashDisplay() {
-      document.getElementById("crashMultText").textContent = "1.00x";
-      document.getElementById("crashMultText").style.color = "#ffffff";
-      document.getElementById("crashRocket").style.transform = "translate(0px, 0px) rotate(0deg)";
-      document.getElementById("crashStatusSub").textContent = "Готово к старту";
+    let crashPhase = "flying"; // "flying" | "crashed"
+    let crashRoundNum = 1;
+    let crashCurM = 1.0;
+    let crashTargetPoint = 2.1;
+    let crashLiveBets = [];
+    let crashMyBet = null; // { amount, targetMult, cashedOut, payout }
+
+    function generateCrashTargetPoint() {
+      const winChance = Number(state.chances.crash || 45) / 100;
+      const roll = Math.random();
+      if (roll < winChance * 0.65) {
+        return Number((2.2 + Math.random() * 5.8).toFixed(2));
+      }
+      if (roll < winChance) {
+        return Number((1.5 + Math.random() * 1.4).toFixed(2));
+      }
+      return Number((1.04 + Math.random() * 0.75).toFixed(2));
     }
 
-    function runCrashRound() {
-      if (crashRunning) return;
+    function startNewCrashLiveRound() {
+      crashPhase = "flying";
+      crashCurM = 1.0;
+      crashTargetPoint = generateCrashTargetPoint();
+      crashMyBet = null;
+
+      // Формируем список из 100 игроков и выбираем 24-45 активных ставок на текущий раунд
+      const activeCount = 24 + Math.floor(Math.random() * 22);
+      const shuffled = [...CRASH_BOT_NAMES].sort(() => Math.random() - 0.5).slice(0, activeCount);
+
+      crashLiveBets = shuffled.map(nick => {
+        const amt = Number(([0.5, 1, 2, 3, 5, 10, 15, 25][Math.floor(Math.random() * 8)]).toFixed(2));
+        const cashAt = Number((1.15 + Math.pow(Math.random(), 1.7) * 5.2).toFixed(2));
+        return {
+          nick,
+          amount: amt,
+          cashAt,
+          cashedOut: false,
+          payout: 0,
+          isMe: false
+        };
+      });
+
+      renderCrashUI();
+    }
+
+    function handleCrashAction() {
+      if (crashPhase !== "flying") {
+        return toast("Дождитесь старта следующего Live-раунда");
+      }
+
+      // Если игрок уже в раунде и ещё не забрал — забираем по текущему множителю
+      if (crashMyBet && !crashMyBet.cashedOut) {
+        const payout = Number((crashMyBet.amount * crashCurM).toFixed(2));
+        crashMyBet.cashedOut = true;
+        crashMyBet.payout = payout;
+        setBalOf(state.user.id, balOf() + payout);
+        saveState();
+        renderTop();
+        setBanner("win", `Вы забрали +${fmt(payout)} на ${crashCurM.toFixed(2)}x!`);
+        renderCrashUI();
+        return;
+      }
+
+      if (crashMyBet && crashMyBet.cashedOut) {
+        return toast("Вы уже забрали выигрыш в этом раунде");
+      }
+
       const bet = Number(document.getElementById("crashBet").value || 0);
-      const target = Math.max(1.1, Number(document.getElementById("crashCashoutTarget").value || 1.8));
+      const rawTarget = Number(document.getElementById("crashCashoutTarget").value || 0);
+      const targetMult = rawTarget >= 1.05 ? rawTarget : 0;
       const curBal = balOf();
-      if (bet <= 0 || isNaN(bet)) return toast("Введите ставку");
+
+      if (bet <= 0 || isNaN(bet)) return toast("Введите сумму ставки");
       if (curBal < bet) return toast("Недостаточно GRAM");
 
-      crashRunning = true;
-      clearBanner();
       setBalOf(state.user.id, curBal - bet);
       saveState();
       renderTop();
+      clearBanner();
 
-      const chance = Number(state.chances.crash || 45) / 100;
-      const willReachTarget = Math.random() < chance;
-      const crashAt = willReachTarget
-        ? Number((target + Math.random() * 1.6).toFixed(2))
-        : Number((1.05 + Math.random() * Math.max(0.1, target - 1.15)).toFixed(2));
+      crashMyBet = {
+        amount: bet,
+        targetMult,
+        cashedOut: false,
+        payout: 0
+      };
 
-      let curM = 1.0;
-      const multEl = document.getElementById("crashMultText");
-      const rocketEl = document.getElementById("crashRocket");
-      const subEl = document.getElementById("crashStatusSub");
-      multEl.style.color = "#ffffff";
-      subEl.textContent = `Полёт · Автовывод ${target.toFixed(2)}x`;
+      crashLiveBets.unshift({
+        nick: state.user.name || "Вы",
+        amount: bet,
+        cashAt: targetMult || 999,
+        cashedOut: false,
+        payout: 0,
+        isMe: true
+      });
 
-      const timer = setInterval(() => {
-        curM = Number((curM + 0.06).toFixed(2));
-        multEl.textContent = curM.toFixed(2) + "x";
-        const lift = Math.min(48, (curM - 1) * 18);
-        const shift = Math.min(36, (curM - 1) * 14);
-        rocketEl.style.transform = `translate(${shift}px, ${-lift}px) rotate(-14deg)`;
+      toast(`Ставка ${fmt(bet)} принята в Live`);
+      renderCrashUI();
+    }
 
-        if (curM >= target && willReachTarget) {
-          clearInterval(timer);
-          const win = Number((bet * target).toFixed(2));
-          setBalOf(state.user.id, balOf() + win);
+    function tickCrashLive() {
+      if (crashPhase === "flying") {
+        const step = crashCurM < 2 ? 0.03 : (crashCurM < 5 ? 0.06 : 0.11);
+        crashCurM = Number((crashCurM + step).toFixed(2));
+
+        // Боты забирают свои ставки при достижении своего cashAt
+        for (const b of crashLiveBets) {
+          if (!b.isMe && !b.cashedOut && crashCurM >= b.cashAt && crashCurM < crashTargetPoint) {
+            b.cashedOut = true;
+            b.payout = Number((b.amount * crashCurM).toFixed(2));
+          }
+        }
+
+        // Автовывод игрока
+        if (crashMyBet && !crashMyBet.cashedOut && crashMyBet.targetMult >= 1.05 && crashCurM >= crashMyBet.targetMult && crashCurM < crashTargetPoint) {
+          const payout = Number((crashMyBet.amount * crashMyBet.targetMult).toFixed(2));
+          crashMyBet.cashedOut = true;
+          crashMyBet.payout = payout;
+          const myEntry = crashLiveBets.find(x => x.isMe);
+          if (myEntry) {
+            myEntry.cashedOut = true;
+            myEntry.payout = payout;
+          }
+          setBalOf(state.user.id, balOf() + payout);
           saveState();
           renderTop();
-          multEl.style.color = "var(--green)";
-          subEl.textContent = `Выведено на ${target.toFixed(2)}x (краш на ${crashAt.toFixed(2)}x)`;
-          setBanner("win", `Выигрыш: +${fmt(win)}`);
-          crashRunning = false;
+          setBanner("win", `Автовывод сработал на ${crashMyBet.targetMult.toFixed(2)}x: +${fmt(payout)}`);
+        }
+
+        // Проверка краша
+        if (crashCurM >= crashTargetPoint) {
+          crashCurM = crashTargetPoint;
+          crashPhase = "crashed";
+          if (crashMyBet && !crashMyBet.cashedOut) {
+            setBanner("lose", `Краш на ${crashTargetPoint.toFixed(2)}x — ставка ${fmt(crashMyBet.amount)} сгорела`);
+          }
+          renderCrashUI();
+
+          setTimeout(() => {
+            crashRoundNum++;
+            startNewCrashLiveRound();
+          }, 2200);
           return;
         }
 
-        if (curM >= crashAt) {
-          clearInterval(timer);
-          multEl.textContent = crashAt.toFixed(2) + "x";
-          multEl.style.color = "var(--red)";
-          rocketEl.style.transform = "translate(10px, 6px) rotate(35deg)";
-          subEl.textContent = `Краш на ${crashAt.toFixed(2)}x`;
-          setBanner("lose", `Ракета упала на ${crashAt.toFixed(2)}x (-${fmt(bet)})`);
-          crashRunning = false;
+        renderCrashUI();
+      }
+    }
+
+    function renderCrashUI() {
+      const multEl = document.getElementById("crashMultText");
+      const rocketEl = document.getElementById("crashRocket");
+      const subEl = document.getElementById("crashStatusSub");
+      const roundEl = document.getElementById("crashRoundId");
+      const btnEl = document.getElementById("crashBtn");
+      const listEl = document.getElementById("crashLiveList");
+      const cntEl = document.getElementById("crashPlayersCount");
+
+      if (!multEl) return;
+
+      roundEl.textContent = `Раунд #${crashRoundNum}`;
+      multEl.textContent = crashCurM.toFixed(2) + "x";
+
+      if (crashPhase === "flying") {
+        multEl.style.color = "#ffffff";
+        const lift = Math.min(44, (crashCurM - 1) * 16);
+        const shift = Math.min(34, (crashCurM - 1) * 12);
+        rocketEl.style.transform = `translate(${shift}px, ${-lift}px) rotate(-14deg)`;
+        subEl.textContent = `Полёт идёт · Ставок: ${crashLiveBets.length} (из 100 игроков)`;
+
+        if (crashMyBet && !crashMyBet.cashedOut) {
+          const curWin = (crashMyBet.amount * crashCurM).toFixed(2);
+          btnEl.disabled = false;
+          btnEl.className = "primary-btn green";
+          btnEl.textContent = `Забрать ${curWin} GRAM (${crashCurM.toFixed(2)}x)`;
+        } else if (crashMyBet && crashMyBet.cashedOut) {
+          btnEl.disabled = true;
+          btnEl.className = "primary-btn";
+          btnEl.textContent = `Выведено +${crashMyBet.payout.toFixed(2)} GRAM`;
+        } else {
+          btnEl.disabled = false;
+          btnEl.className = "primary-btn blue";
+          btnEl.textContent = "Поставить в Live";
         }
-      }, 65);
+      } else {
+        multEl.style.color = "var(--red)";
+        rocketEl.style.transform = "translate(10px, 8px) rotate(36deg)";
+        subEl.textContent = `Краш на ${crashTargetPoint.toFixed(2)}x · Новый раунд через 2 сек`;
+        btnEl.disabled = true;
+        btnEl.className = "primary-btn";
+        btnEl.textContent = "Ожидание нового раунда...";
+      }
+
+      cntEl.textContent = `${crashLiveBets.length} ставок`;
+
+      listEl.innerHTML = crashLiveBets.map(b => {
+        let rightHtml = "";
+        if (b.cashedOut) {
+          rightHtml = `<span class="tag-cashed">+${b.payout.toFixed(2)} GRAM</span>`;
+        } else if (crashPhase === "crashed") {
+          rightHtml = `<span class="tag-crashed">Краш</span>`;
+        } else {
+          rightHtml = `<span class="tag-flying">${crashCurM.toFixed(2)}x</span>`;
+        }
+
+        return `
+          <div class="live-bet-row ${b.isMe ? "me-row" : ""}">
+            <div>
+              <b>${esc(b.nick)}</b>
+              <div class="muted">${b.amount.toFixed(2)} GRAM</div>
+            </div>
+            ${rightHtml}
+          </div>
+        `;
+      }).join("");
     }
 
     /* ИНВЕНТАРЬ */
@@ -2837,6 +3082,10 @@
     drawPlinkoFrame(null);
     updateDepEquivalent();
     initTonConnect();
+
+    // Запуск непрерывного Live-цикла ракеты сразу при загрузке приложения
+    startNewCrashLiveRound();
+    setInterval(tickCrashLive, 120);
   </script>
 </body>
 </html>
