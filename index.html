@@ -1396,7 +1396,7 @@
     let addItemPickedImg = "";
     const editItemPickedImgs = {};
 
-    function readGalleryImageAsDataUrl(file, maxSide = 420) {
+    function readGalleryImageAsDataUrl(file, maxSide = 200) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith("image/")) {
           return reject(new Error("not_image"));
@@ -1419,7 +1419,7 @@
             canvas.height = h;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.85));
+            resolve(canvas.toDataURL("image/jpeg", 0.65));
           };
           img.onerror = reject;
           img.src = reader.result;
@@ -1584,8 +1584,23 @@
     function saveState() {
       try {
         localStorage.setItem(STORE_KEY, JSON.stringify(state));
+        return true;
       } catch (e) {
-        toast("Недостаточно места в памяти браузера для фото");
+        try {
+          const lightState = {
+            ...state,
+            cases: (state.cases || []).map(c => ({
+              ...c,
+              img: "",
+              items: (c.items || []).map(it => ({ ...it, img: "" }))
+            })),
+            inventory: (state.inventory || []).map(inv => ({ ...inv, img: "" }))
+          };
+          localStorage.setItem(STORE_KEY, JSON.stringify(lightState));
+          state.cases = lightState.cases;
+          state.inventory = lightState.inventory;
+        } catch (_) {}
+        return false;
       }
     }
 
@@ -1804,7 +1819,6 @@
       const durationMs = 2700;
       const startTime = performance.now();
 
-      // Плавное замедление (quintic ease-out) на 2.7 секунды
       function easeOutQuint(t) {
         return 1 - Math.pow(1 - t, 5);
       }
@@ -2479,7 +2493,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        newCasePickedImg = await readGalleryImageAsDataUrl(f, 420);
+        newCasePickedImg = await readGalleryImageAsDataUrl(f, 200);
         document.getElementById("newCaseImgPreview").src = newCasePickedImg;
         document.getElementById("newCaseImgPreviewWrap").style.display = "flex";
       } catch {
@@ -2498,7 +2512,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        editCasePickedImg = await readGalleryImageAsDataUrl(f, 420);
+        editCasePickedImg = await readGalleryImageAsDataUrl(f, 200);
         const prev = document.getElementById("editCaseImgPreview");
         if (prev) {
           prev.src = editCasePickedImg;
@@ -2521,7 +2535,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        addItemPickedImg = await readGalleryImageAsDataUrl(f, 380);
+        addItemPickedImg = await readGalleryImageAsDataUrl(f, 200);
         const prev = document.getElementById("addItemImgPreview");
         if (prev) {
           prev.src = addItemPickedImg;
@@ -2536,7 +2550,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        editItemPickedImgs[iid] = await readGalleryImageAsDataUrl(f, 380);
+        editItemPickedImgs[iid] = await readGalleryImageAsDataUrl(f, 200);
         const prev = document.getElementById("iprev_" + iid);
         if (prev) {
           prev.src = editItemPickedImgs[iid];
