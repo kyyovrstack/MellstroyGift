@@ -1799,9 +1799,9 @@
   <!-- 5. ADMIN (ID 5200591975) -->
   <div id="sec-admin" class="sec">
     <div class="card">
-      <div class="card-title">🗄️ Мгновенный кэш каталога</div>
+      <div class="card-title">🗄️ Синхронизация каталога для игроков</div>
       <div class="info-line" style="margin-bottom:0;">
-        <span>Режим: <b style="color:var(--cyan);" id="dbStatusText">0 мс (локально)</b></span>
+        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Кэш + Supabase</b></span>
       </div>
     </div>
 
@@ -2020,8 +2020,11 @@
   const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_nft_all_v7";
-  const CATALOG_INSTANT_STR_KEY = "mellstroy_gift_catalog_str_v7";
+  const SAVE_KEY = "mellstroy_gift_nft_all_v8";
+  const CATALOG_INSTANT_STR_KEY = "mellstroy_gift_catalog_str_v8";
+  const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
+  const STATE_ROW_ID = "mellstroy_gift_global_state";
   const CASE_SPIN_DURATION_MS = 3000;
 
   const INITIAL_CASES = [
@@ -2099,6 +2102,7 @@
     editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
+    lastUpdatedAt: 0,
     /* Rocket */
     rocketPhase: "countdown",
     rocketCountdownSec: 2,
@@ -2139,6 +2143,7 @@
   let tonConnectUI = null;
   let autoSpinTimer = null;
   let caseSpinTimer = null;
+  let pushTimer = null;
 
   function fmt(v) {
     return (Number(v) || 0).toFixed(2);
@@ -2152,6 +2157,11 @@
     if (!isAdminUser()) {
       appState.balance = 0.00;
     }
+  }
+
+  function setDbBadge(text) {
+    const el = document.getElementById("dbStatusText");
+    if (el) el.textContent = text;
   }
 
   function showToast(msg) {
@@ -2226,23 +2236,30 @@
         balance: isAdminUser() ? appState.balance : 0,
         inventory: appState.inventory
       }));
-      localStorage.setItem(CATALOG_INSTANT_STR_KEY, JSON.stringify({ cases: appState.cases }));
+      localStorage.setItem(CATALOG_INSTANT_STR_KEY, JSON.stringify({
+        cases: appState.cases,
+        updatedAt: appState.lastUpdatedAt
+      }));
     } catch (e) {}
   }
 
   function loadApp() {
     let loadedCases = normalizeCases(JSON.parse(JSON.stringify(INITIAL_CASES)));
+    let loadedTs = 0;
+
     try {
       const rawStr = localStorage.getItem(CATALOG_INSTANT_STR_KEY);
       if (rawStr) {
         const catRaw = JSON.parse(rawStr);
         if (catRaw && Array.isArray(catRaw.cases) && catRaw.cases.length) {
           loadedCases = normalizeCases(catRaw.cases);
+          loadedTs = Number(catRaw.updatedAt) || 0;
         }
       }
     } catch (e) {}
 
     appState.cases = loadedCases;
+    appState.lastUpdatedAt = loadedTs;
     appState.balance = 0.00;
     appState.inventory = [];
 
@@ -2258,21 +2275,97 @@
     enforceZeroBalanceForPlayers();
   }
 
+  async function pushCatalogToSupabase() {
+    if (!isAdminUser()) return;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/app_state?on_conflict=id`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+          Prefer: "resolution=merge-duplicates,return=minimal"
+        },
+        body: JSON.stringify([{
+          id: STATE_ROW_ID,
+          data: {
+            cases: appState.cases,
+            updatedAt: appState.lastUpdatedAt
+          }
+        }])
+      });
+      if (res.ok) setDbBadge("Онлайн (Supabase)");
+    } catch (e) {
+      setDbBadge("Кэш (офлайн)");
+    }
+  }
+
   function autoSaveCatalog() {
+    appState.lastUpdatedAt = Date.now();
     saveApp();
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(() => {
+      pushCatalogToSupabase();
+    }, 50);
+  }
+
+  async function fetchCatalogFromSupabase() {
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data,updated_at`;
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+        }
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (!Array.isArray(rows) || !rows.length) return;
+
+      const row = rows[0];
+      const payload = (row && typeof row.data === "object" && row.data !== null) ? row.data : row;
+      const remoteCases = normalizeCases(payload && Array.isArray(payload.cases) ? payload.cases : []);
+      const remoteTs = Number((payload && (payload.updatedAt || payload.updated_at)) || row.updated_at || 0) || 0;
+
+      if (!remoteCases.length) return;
+
+      if (isAdminUser() && appState.lastUpdatedAt > remoteTs + 200) {
+        await pushCatalogToSupabase();
+        return;
+      }
+
+      const changed = JSON.stringify(remoteCases) !== JSON.stringify(appState.cases);
+      appState.cases = remoteCases;
+      if (remoteTs > appState.lastUpdatedAt) {
+        appState.lastUpdatedAt = remoteTs;
+      }
+      saveApp();
+
+      if (changed) {
+        renderCasesGrid();
+        renderLiveNftStrip();
+        if (appState.openedCaseId && !appState.spinningCase) {
+          renderOpenCase();
+        }
+      }
+      if (isAdminUser()) {
+        renderAdminUI();
+      }
+      setDbBadge("Онлайн (Supabase)");
+    } catch (e) {}
   }
 
   function initTG() {
     const tg = window.Telegram && window.Telegram.WebApp;
     let uid = null;
     if (tg) {
-      tg.ready();
-      tg.expand();
       const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
       if (u && u.id) {
         uid = Number(u.id);
         appState.username = u.username ? "@" + u.username : (u.first_name || "Игрок");
       }
+      try { tg.ready(); tg.expand(); } catch (e) {}
     }
     if (!uid) {
       const q = new URLSearchParams(window.location.search);
@@ -3715,13 +3808,20 @@
     playSlots(true);
   }
 
-  /* Instant synchronous boot — 0 ms delay */
+  /* Instant synchronous boot from cache + shared catalog sync */
   initTG();
   loadApp();
   renderBalance();
   updateWalletButton();
   renderLiveNftStrip();
   renderCasesGrid();
+
+  fetchCatalogFromSupabase();
+  setInterval(() => {
+    if (!appState.spinningCase && !appState.upgSpinning && !appState.slotsSpinning && !appState.plinkoDropping) {
+      fetchCatalogFromSupabase();
+    }
+  }, 2500);
 </script>
 </body>
 </html>
