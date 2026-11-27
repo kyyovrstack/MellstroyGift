@@ -3,23 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GRAM PLAY — Mini App</title>
+  <title>GRAM PLAY — Casino Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: #0f0f13;
-      --surface: #18181f;
-      --surface-2: #22222c;
-      --surface-3: #2b2b38;
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #f5f5f7;
-      --muted: #8e8ea0;
+      --bg: #080614;
+      --bg-2: #0f0b24;
+      --card: #161133;
+      --card-2: #201947;
+      --card-3: #2b225c;
+      --border: rgba(168, 85, 247, 0.28);
+      --text: #ffffff;
+      --muted: #a1a1bd;
       --purple: #8b5cf6;
-      --purple-dark: #6d28d9;
-      --blue: #2563eb;
+      --purple-bright: #a855f7;
+      --pink: #ec4899;
+      --cyan: #22d3ee;
       --green: #10b981;
-      --red: #ef4444;
-      --amber: #f59e0b;
+      --red: #f43f5e;
+      --gold: #fbbf24;
     }
 
     * {
@@ -32,7 +34,11 @@
       margin: 0;
       padding: 0;
       min-height: 100dvh;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(168, 85, 247, 0.34), transparent 45%),
+        radial-gradient(circle at 88% 12%, rgba(236, 72, 153, 0.24), transparent 42%),
+        radial-gradient(circle at 50% 100%, rgba(34, 211, 238, 0.12), transparent 50%),
+        var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
       overflow-x: hidden;
@@ -42,16 +48,45 @@
       max-width: 480px;
       margin: 0 auto;
       min-height: 100dvh;
-      padding: 10px 12px 86px;
+      padding: 12px 12px 92px;
     }
 
     /* Верхняя панель */
     .top-bar {
+      position: sticky;
+      top: 8px;
+      z-index: 25;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 12px;
+      padding: 8px 10px;
+      background: rgba(16, 12, 38, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      margin-bottom: 14px;
+    }
+
+    .row-gap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar-chip {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--purple-bright), var(--pink));
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 13px;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.45);
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
     .icon-btn {
@@ -59,74 +94,56 @@
       height: 36px;
       border-radius: 12px;
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--card-2);
       color: var(--text);
       font-size: 15px;
-      font-weight: 700;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-    }
-
-    .avatar-chip {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2563eb, #8b5cf6);
-      display: grid;
-      place-items: center;
       font-weight: 800;
-      font-size: 13px;
+      display: grid;
+      place-items: center;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     .bal-box {
       display: flex;
       align-items: center;
       gap: 6px;
-      background: var(--surface);
+      background: var(--bg-2);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 4px 6px 4px 10px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .cur-switch {
-      border: none;
+      border: 1px solid rgba(168, 85, 247, 0.35);
       border-radius: 10px;
-      padding: 4px 7px;
-      background: var(--surface-2);
-      color: var(--text);
+      padding: 5px 8px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(236, 72, 153, 0.2));
+      color: #fff;
       font-size: 11px;
       font-weight: 800;
       cursor: pointer;
     }
 
     .plus-sq {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border: none;
-      border-radius: 9px;
-      background: var(--surface-2);
-      color: var(--text);
-      font-size: 16px;
-      font-weight: 700;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
       cursor: pointer;
     }
 
-    /* Карточки и секции */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
+    /* Заголовки и карточки */
     .section-title {
-      font-size: 15px;
-      font-weight: 800;
+      font-size: 16px;
+      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -135,10 +152,21 @@
 
     .pill-tag {
       font-size: 11px;
-      color: var(--muted);
-      background: var(--surface-2);
-      padding: 3px 8px;
+      font-weight: 800;
+      color: #e9d5ff;
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 4px 10px;
       border-radius: 999px;
+    }
+
+    .card {
+      background: linear-gradient(160deg, var(--card-2), var(--card));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
     }
 
     /* Play Hub */
@@ -149,27 +177,41 @@
     }
 
     .game-tile {
-      background: var(--surface);
+      position: relative;
+      background: linear-gradient(155deg, rgba(43, 34, 92, 0.92), rgba(20, 15, 48, 0.96));
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 14px;
       cursor: pointer;
-      transition: transform 0.14s ease, border-color 0.14s ease;
+      overflow: hidden;
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+
+    .game-tile::after {
+      content: "";
+      position: absolute;
+      width: 84px;
+      height: 84px;
+      right: -18px;
+      top: -18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.36), transparent 70%);
+      pointer-events: none;
     }
 
     .game-tile:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
     }
 
     .game-tile-emoji {
-      font-size: 26px;
+      font-size: 28px;
       margin-bottom: 6px;
       display: block;
     }
 
     .game-tile-name {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .game-tile-sub {
@@ -180,11 +222,12 @@
 
     /* Кейсы */
     .case-box {
-      background: var(--surface);
+      background: linear-gradient(150deg, rgba(38, 29, 84, 0.95), rgba(18, 13, 44, 0.98));
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 12px;
+      border-radius: 22px;
+      padding: 14px;
       margin-bottom: 12px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
     }
 
     .case-head {
@@ -197,13 +240,19 @@
 
     .case-open-btn {
       border: none;
-      border-radius: 12px;
+      border-radius: 13px;
       padding: 10px 14px;
-      background: var(--purple);
+      background: linear-gradient(135deg, var(--purple-bright), var(--pink));
       color: #fff;
-      font-weight: 800;
-      font-size: 13px;
+      font-weight: 900;
+      font-size: 12px;
+      box-shadow: 0 0 18px rgba(236, 72, 153, 0.35);
       cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .case-open-btn:active {
+      transform: scale(0.97);
     }
 
     .case-items-row {
@@ -219,15 +268,61 @@
 
     .case-item-chip {
       min-width: 92px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      background: rgba(8, 6, 20, 0.72);
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      border-radius: 13px;
       padding: 8px;
       text-align: center;
       flex-shrink: 0;
     }
 
-    /* Сегменты и инпуты */
+    /* Горизонтальная рулетка открытия кейса */
+    .case-spinner-wrap {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      border-radius: 18px;
+      padding: 14px 0;
+      margin: 12px 0;
+    }
+
+    .case-center-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold), var(--pink));
+      transform: translateX(-50%);
+      z-index: 6;
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+    }
+
+    .case-spinner-track {
+      display: flex;
+      gap: 8px;
+      padding-left: 50%;
+      will-change: transform;
+    }
+
+    .spinner-card {
+      width: 96px;
+      min-width: 96px;
+      background: linear-gradient(160deg, var(--card-3), var(--card));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 10px 6px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .spinner-card.winner-glow {
+      border-color: var(--gold);
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
+    }
+
+    /* Элементы управления */
     .seg-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -245,13 +340,14 @@
       background: transparent;
       color: var(--muted);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
     }
 
     .seg-btn.active {
-      background: var(--purple);
+      background: linear-gradient(135deg, var(--purple), var(--purple-bright));
       color: #fff;
+      box-shadow: 0 0 14px rgba(139, 92, 246, 0.45);
     }
 
     .bet-bar {
@@ -286,45 +382,44 @@
     .primary-btn {
       width: 100%;
       border: none;
-      border-radius: 14px;
+      border-radius: 15px;
       padding: 13px 16px;
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 900;
       color: #fff;
-      background: var(--surface-3);
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      box-shadow: 0 6px 22px rgba(139, 92, 246, 0.38);
       cursor: pointer;
-      transition: transform 0.12s ease, opacity 0.12s ease;
-    }
-
-    .primary-btn.ready {
-      background: var(--purple);
+      transition: transform 0.12s ease;
     }
 
     .primary-btn.blue {
-      background: var(--blue);
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      box-shadow: 0 6px 22px rgba(59, 130, 246, 0.38);
     }
 
     .primary-btn.green {
-      background: var(--green);
-      color: #08150f;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 6px 22px rgba(16, 185, 129, 0.38);
     }
 
     .primary-btn:active {
-      transform: scale(0.99);
+      transform: scale(0.98);
     }
 
     /* Plinko */
     .plinko-stage {
       position: relative;
-      background: radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.34), #15141f 75%);
-      border: 1px solid rgba(139, 92, 246, 0.25);
-      border-radius: 18px;
+      background: radial-gradient(circle at 50% 18%, rgba(168, 85, 247, 0.4), #130e2b 76%);
+      border: 1px solid rgba(168, 85, 247, 0.38);
+      border-radius: 20px;
       overflow: hidden;
     }
 
     #plinkoCanvas {
       width: 100%;
-      height: 310px;
+      height: 300px;
       display: block;
     }
 
@@ -336,29 +431,31 @@
     }
 
     .plinko-mult {
-      background: #4c1d95;
-      color: #f3e8ff;
-      border-radius: 6px;
+      background: linear-gradient(180deg, #6d28d9, #4c1d95);
+      color: #fff;
+      border-radius: 7px;
       padding: 5px 2px;
       text-align: center;
       font-size: 10px;
-      font-weight: 800;
+      font-weight: 900;
+      transition: transform 0.15s ease;
     }
 
     .plinko-mult.hit {
-      background: var(--green);
+      background: linear-gradient(135deg, #10b981, #34d399);
       color: #052e16;
-      transform: scale(1.08);
+      transform: scale(1.1);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.7);
     }
 
-    /* СЛОТЫ 5x5 */
+    /* Слоты 5x5 */
     .slots-board {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 6px;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 10px;
       margin-bottom: 10px;
     }
@@ -366,26 +463,26 @@
     .slot-cell {
       aspect-ratio: 1 / 1;
       border-radius: 12px;
-      background: var(--surface-2);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: linear-gradient(160deg, var(--card-2), var(--card));
+      border: 1px solid rgba(255, 255, 255, 0.08);
       display: grid;
       place-items: center;
       font-size: 24px;
-      transition: transform 0.12s ease, border-color 0.2s ease, background 0.2s ease;
+      transition: transform 0.14s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .slot-cell.spinning {
-      animation: slotShake 0.14s infinite linear;
-      color: #e9d5ff;
+      animation: slotBlur 0.13s infinite linear;
     }
 
     .slot-cell.win-cell {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: var(--green);
+      border-color: var(--gold);
+      background: linear-gradient(160deg, rgba(251, 191, 36, 0.28), rgba(168, 85, 247, 0.25));
+      box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
       transform: scale(1.05);
     }
 
-    @keyframes slotShake {
+    @keyframes slotBlur {
       0% { transform: translateY(-2px); }
       50% { transform: translateY(2px); }
       100% { transform: translateY(-2px); }
@@ -403,8 +500,8 @@
       height: 42px;
       border-radius: 12px;
       border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
+      background: var(--card-2);
+      color: #fff;
       font-size: 20px;
       font-weight: 800;
       cursor: pointer;
@@ -418,7 +515,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 15px;
     }
 
@@ -426,18 +523,19 @@
       width: 66px;
       height: 66px;
       border-radius: 50%;
-      border: 3px solid rgba(139, 92, 246, 0.45);
-      background: var(--purple-dark);
+      border: 3px solid rgba(236, 72, 153, 0.55);
+      background: linear-gradient(135deg, var(--purple-bright), var(--pink));
       color: #fff;
       font-size: 26px;
       display: grid;
       place-items: center;
       margin: 8px auto;
+      box-shadow: 0 0 22px rgba(236, 72, 153, 0.45);
       cursor: pointer;
     }
 
     .spin-wheel-btn.spinning {
-      animation: spinRot 0.7s linear infinite;
+      animation: spinRot 0.65s linear infinite;
     }
 
     @keyframes spinRot {
@@ -468,11 +566,11 @@
       padding: 12px;
       text-align: left;
       color: #fff;
-      background: linear-gradient(135deg, #0d9488, #2563eb);
+      background: linear-gradient(135deg, #06b6d4, #6366f1);
       cursor: pointer;
     }
 
-    /* MINES 5x5 */
+    /* Mines 5x5 */
     .mines-mults {
       display: flex;
       gap: 6px;
@@ -487,7 +585,8 @@
     }
 
     .m-pill {
-      background: var(--surface-2);
+      background: var(--card-2);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 6px 10px;
       font-size: 12px;
@@ -497,12 +596,13 @@
     }
 
     .m-pill.current {
-      background: var(--purple);
+      background: linear-gradient(135deg, var(--purple-bright), var(--pink));
       color: #fff;
+      border-color: transparent;
     }
 
     .m-pill.gold {
-      color: var(--amber);
+      color: var(--gold);
     }
 
     .mines-grid {
@@ -518,15 +618,15 @@
 
     .mine-tile {
       aspect-ratio: 1 / 1;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      background: var(--surface-2);
-      color: #525266;
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      border-radius: 13px;
+      background: linear-gradient(160deg, var(--card-2), var(--card));
+      color: #a5a5c8;
       font-size: 20px;
       display: grid;
       place-items: center;
       cursor: pointer;
-      transition: transform 0.1s ease, background 0.15s ease;
+      transition: transform 0.1s ease;
     }
 
     .mine-tile:active {
@@ -534,21 +634,22 @@
     }
 
     .mine-tile.safe-open {
-      background: rgba(16, 185, 129, 0.22);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.25));
       border-color: var(--green);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
       color: #fff;
     }
 
     .mine-tile.mine-boom {
-      background: rgba(239, 68, 68, 0.32);
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.45), rgba(190, 18, 60, 0.35));
       border-color: var(--red);
+      box-shadow: 0 0 16px rgba(244, 63, 94, 0.55);
       color: #fff;
     }
 
     .mine-tile.mine-reveal {
-      background: rgba(239, 68, 68, 0.14);
-      border-color: rgba(239, 68, 68, 0.45);
-      opacity: 0.92;
+      background: rgba(244, 63, 94, 0.16);
+      border-color: rgba(244, 63, 94, 0.5);
     }
 
     .mine-tile.safe-reveal {
@@ -556,12 +657,12 @@
       opacity: 0.45;
     }
 
-    /* CRASH */
+    /* Crash */
     .crash-sky {
       position: relative;
       height: 190px;
-      border-radius: 18px;
-      background: radial-gradient(circle at 50% 60%, rgba(139, 92, 246, 0.22), var(--bg) 75%);
+      border-radius: 20px;
+      background: radial-gradient(circle at 50% 60%, rgba(168, 85, 247, 0.3), var(--bg) 75%);
       border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -577,7 +678,7 @@
     }
 
     .crash-mult-big {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 900;
       margin-top: 4px;
     }
@@ -586,9 +687,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 15px;
       padding: 10px 12px;
       margin-bottom: 8px;
     }
@@ -600,7 +701,8 @@
       right: 0;
       bottom: 0;
       z-index: 30;
-      background: #14141a;
+      background: rgba(15, 11, 36, 0.94);
+      backdrop-filter: blur(16px);
       border-top: 1px solid var(--border);
       padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
     }
@@ -617,10 +719,10 @@
       border: none;
       background: transparent;
       color: var(--muted);
-      border-radius: 12px;
+      border-radius: 13px;
       padding: 6px 2px;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -629,20 +731,20 @@
     }
 
     .nav-item.active {
-      background: var(--surface-2);
-      color: var(--text);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.28), rgba(236, 72, 153, 0.2));
+      color: #fff;
     }
 
-    /* Модалка игры */
+    /* Модалки */
     .modal-wrap {
       position: fixed;
       inset: 0;
       z-index: 50;
-      background: rgba(5, 5, 8, 0.85);
+      background: rgba(5, 4, 12, 0.86);
       backdrop-filter: blur(8px);
       display: none;
       overflow-y: auto;
-      padding: 10px 12px 30px;
+      padding: 12px 12px 32px;
     }
 
     .modal-wrap.open {
@@ -675,30 +777,31 @@
     }
 
     .status-win {
-      background: rgba(16, 185, 129, 0.16);
-      border: 1px solid rgba(16, 185, 129, 0.45);
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.5);
       color: #6ee7b7;
     }
 
     .status-lose {
-      background: rgba(239, 68, 68, 0.16);
-      border: 1px solid rgba(239, 68, 68, 0.45);
-      color: #fca5a5;
+      background: rgba(244, 63, 94, 0.18);
+      border: 1px solid rgba(244, 63, 94, 0.5);
+      color: #fda4af;
     }
 
     .toast {
       position: fixed;
-      top: 58px;
+      top: 66px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 80;
-      background: var(--surface-3);
-      border: 1px solid var(--purple);
+      z-index: 90;
+      background: var(--card-3);
+      border: 1px solid var(--purple-bright);
       color: #fff;
-      padding: 8px 14px;
-      border-radius: 12px;
+      padding: 9px 15px;
+      border-radius: 13px;
       font-size: 12px;
       font-weight: 800;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       display: none;
       max-width: 90%;
       text-align: center;
@@ -708,22 +811,21 @@
       display: block;
     }
 
-    .row-gap { display: flex; gap: 8px; align-items: center; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .mt-8 { margin-top: 8px; }
     .mt-12 { margin-top: 12px; }
     .muted { color: var(--muted); font-size: 12px; }
     .btn-sm {
       border: none;
-      border-radius: 10px;
-      padding: 8px 11px;
+      border-radius: 11px;
+      padding: 8px 12px;
       font-size: 12px;
       font-weight: 800;
       color: #fff;
       background: var(--purple);
       cursor: pointer;
     }
-    .btn-sm.green { background: var(--green); color: #062216; }
+    .btn-sm.green { background: var(--green); color: #052e16; }
     .btn-sm.red { background: var(--red); }
   </style>
 </head>
@@ -735,8 +837,8 @@
     <div class="top-bar">
       <div class="row-gap">
         <div class="avatar-chip" id="topAvatar" onclick="switchTab('admin')">GP</div>
-        <button class="icon-btn" onclick="switchTab('wallet')" title="История">🕒</button>
-        <button class="icon-btn" onclick="showToast('Шансы настраиваются админом 5200591975')" title="Инфо">?</button>
+        <button class="icon-btn" onclick="switchTab('wallet')" title="Кошелёк">💳</button>
+        <button class="icon-btn" onclick="showToast('Шансы игр и кейсов задаёт админ 5200591975')" title="Инфо">?</button>
       </div>
 
       <div class="bal-box">
@@ -746,10 +848,10 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА: PLAY HUB + КЕЙСЫ -->
+    <!-- ГЛАВНАЯ: PLAY HUB + КЕЙСЫ -->
     <div id="view-home">
       <div class="section-title">
-        <span>🎮 Play Hub</span>
+        <span>⚡ Play Hub</span>
         <span class="pill-tag" id="homeCurTag">Валюта: $</span>
       </div>
 
@@ -757,22 +859,22 @@
         <div class="game-tile" onclick="openGame('plinko')">
           <span class="game-tile-emoji">🟣</span>
           <div class="game-tile-name">Plinko</div>
-          <div class="game-tile-sub">Шарик скатывается по рядам</div>
+          <div class="game-tile-sub">Скатывание шарика по рядам</div>
         </div>
         <div class="game-tile" onclick="openGame('slots')">
           <span class="game-tile-emoji">🎰</span>
           <div class="game-tile-name">Слоты 5×5</div>
-          <div class="game-tile-sub">Вращение символов и бонусы</div>
+          <div class="game-tile-sub">Крутящиеся символы и бонусы</div>
         </div>
         <div class="game-tile" onclick="openGame('mines')">
           <span class="game-tile-emoji">💣</span>
           <div class="game-tile-name">Mines</div>
-          <div class="game-tile-sub">Раскрытие мин после игры</div>
+          <div class="game-tile-sub">Открытие всех мин в конце</div>
         </div>
         <div class="game-tile" onclick="openGame('crash')">
           <span class="game-tile-emoji">🚀</span>
           <div class="game-tile-name">Crash</div>
-          <div class="game-tile-sub">Полёт ракеты и иксы</div>
+          <div class="game-tile-sub">Полёт ракеты до краша</div>
         </div>
       </div>
 
@@ -784,11 +886,11 @@
       <div id="casesList"></div>
     </div>
 
-    <!-- ВКЛАДКА: КОШЕЛЁК -->
+    <!-- КОШЕЛЁК -->
     <div id="view-wallet" style="display:none;">
       <div class="card">
-        <div class="section-title" style="margin-top:0;">💳 Криптокошелёк ($ / Gram)</div>
-        <p class="muted">Пополнение через криптокошелёк в $ (USDT) или Gram. Заявка уходит на проверку админу.</p>
+        <div class="section-title" style="margin-top:0;">💎 Криптокошелёк ($ / Gram)</div>
+        <p class="muted">Пополнение через криптокошелёк в $ (USDT) или Gram. Заявка поступает на проверку админу.</p>
 
         <div class="grid-2 mt-8">
           <div>
@@ -813,12 +915,12 @@
       </div>
 
       <div class="card">
-        <div class="section-title" style="margin-top:0;">📜 Заявки на пополнение</div>
+        <div class="section-title" style="margin-top:0;">📜 Мои заявки</div>
         <div id="myDepList" class="muted">Заявок пока нет</div>
       </div>
     </div>
 
-    <!-- ВКЛАДКА: ИНВЕНТАРЬ -->
+    <!-- ИНВЕНТАРЬ -->
     <div id="view-inv" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">🎒 Инвентарь</div>
@@ -826,7 +928,7 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА: АДМИН-ПАНЕЛЬ (5200591975) -->
+    <!-- АДМИН-ПАНЕЛЬ (5200591975) -->
     <div id="view-admin" style="display:none;">
       <div class="card">
         <div class="section-title" style="margin-top:0;">🛡️ ID пользователя</div>
@@ -838,27 +940,23 @@
       </div>
 
       <div id="adminDenied" class="card" style="display:none;">
-        <b>Доступ запрещён</b>
+        <b>Доступ закрыт</b>
         <p class="muted mt-8">Только для ID <b>5200591975</b>. Текущий ID: <span id="curIdSpan"></span>.</p>
       </div>
 
       <div id="adminBody" style="display:none;">
-        <!-- Настройка шансов выигрыша в каждой игре (скрыто от игроков) -->
         <div class="card">
-          <div class="section-title" style="margin-top:0;">🎯 Шансы выигрыша в играх (только админ)</div>
-          <p class="muted">Игроки эти проценты не видят. Значения от 1 до 95 (%).</p>
-
+          <div class="section-title" style="margin-top:0;">🎯 Шансы выигрыша в играх (скрыты от игроков)</div>
           <div class="grid-2 mt-8">
             <div>
-              <label class="muted">Plinko — шанс хорошего множителя (%)</label>
+              <label class="muted">Plinko — шанс хорошего слота (%)</label>
               <input type="number" id="chPlinko" min="1" max="95" value="42" />
             </div>
             <div>
-              <label class="muted">Слоты — шанс выигрышной линии (%)</label>
+              <label class="muted">Слоты — шанс выигрыша (%)</label>
               <input type="number" id="chSlots" min="1" max="95" value="36" />
             </div>
           </div>
-
           <div class="grid-2 mt-8">
             <div>
               <label class="muted">Mines — шанс безопасного хода (%)</label>
@@ -869,11 +967,9 @@
               <input type="number" id="chCrash" min="1" max="95" value="45" />
             </div>
           </div>
-
-          <button class="primary-btn ready mt-12" onclick="saveGameChances()">Сохранить шансы игр</button>
+          <button class="primary-btn mt-12" onclick="saveGameChances()">Сохранить шансы игр</button>
         </div>
 
-        <!-- Создать кейс -->
         <div class="card">
           <div class="section-title" style="margin-top:0;">➕ Новый кейс</div>
           <div class="grid-2">
@@ -890,14 +986,12 @@
           <button class="primary-btn green mt-8" onclick="addNewCase()">Создать кейс</button>
         </div>
 
-        <!-- Редактор кейса и скрытых шансов предметов -->
         <div class="card">
-          <div class="section-title" style="margin-top:0;">🛠️ Редактор кейсов и шансов</div>
+          <div class="section-title" style="margin-top:0;">🛠️ Редактор кейсов и скрытых шансов</div>
           <select id="editCaseSelect" onchange="renderAdminCaseForm()"></select>
           <div id="editCaseForm" class="mt-12"></div>
         </div>
 
-        <!-- Заявки и баланс -->
         <div class="card">
           <div class="section-title" style="margin-top:0;">💰 Заявки и выдача баланса</div>
           <div id="adminDepList" class="muted">Заявок нет</div>
@@ -911,14 +1005,47 @@
                 <option value="GRAM">Gram</option>
               </select>
             </div>
-            <button class="primary-btn ready mt-8" onclick="grantBalance()">Начислить</button>
+            <button class="primary-btn mt-8" onclick="grantBalance()">Начислить</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО ИГРЫ -->
+  <!-- МОДАЛКА КРУТКИ КЕЙСА -->
+  <div class="modal-wrap" id="caseSpinModal">
+    <div class="modal-inner">
+      <div class="modal-top">
+        <div class="row-gap">
+          <button class="icon-btn" onclick="closeCaseSpinModal()">✕</button>
+          <b id="caseSpinTitle" style="font-size:16px;">Открытие кейса</b>
+        </div>
+        <div class="bal-box">
+          <span id="caseModalBal">0.00</span>
+          <button class="cur-switch" onclick="toggleCurrency()">$ / GRAM</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="case-spinner-wrap">
+          <div class="case-center-line"></div>
+          <div class="case-spinner-track" id="caseSpinnerTrack"></div>
+        </div>
+
+        <div id="caseSpinWinCard" style="display:none; text-align:center; padding-top:6px;">
+          <div id="winItemEmoji" style="font-size:40px;"></div>
+          <div id="winItemTitle" style="font-size:17px; font-weight:900; margin-top:4px;"></div>
+          <div id="winItemPrice" style="color:var(--gold); font-weight:800; margin-top:2px;"></div>
+          <div class="grid-2 mt-12">
+            <button class="primary-btn green" id="sellDropBtn" onclick="sellLastDrop()">Продать</button>
+            <button class="primary-btn" onclick="closeCaseSpinModal()">В инвентарь</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА ИГР -->
   <div class="modal-wrap" id="gameModal">
     <div class="modal-inner">
       <div class="modal-top">
@@ -937,7 +1064,7 @@
       <!-- PLINKO -->
       <div id="scene-plinko" style="display:none;">
         <div class="plinko-stage">
-          <canvas id="plinkoCanvas" width="420" height="310"></canvas>
+          <canvas id="plinkoCanvas" width="420" height="300"></canvas>
           <div class="plinko-mults" id="plinkoMultRow"></div>
         </div>
 
@@ -953,7 +1080,7 @@
             <input type="number" id="plinkoBet" step="0.1" min="0.1" value="1" />
           </div>
 
-          <button class="primary-btn ready" onclick="dropPlinkoBall()">Сделать ставку</button>
+          <button class="primary-btn" onclick="dropPlinkoBall()">Сделать ставку</button>
         </div>
       </div>
 
@@ -986,12 +1113,12 @@
 
           <div class="duo-banners">
             <button class="banner-bonus" onclick="buySlotBonus()">
-              <div style="font-weight:800; font-size:13px;">🎁 Бонус-раунд</div>
-              <div style="font-size:11px; opacity:0.92; margin-top:2px;">x4 ставка</div>
+              <div style="font-weight:900; font-size:13px;">🎁 Бонус-раунд</div>
+              <div style="font-size:11px; opacity:0.95; margin-top:2px;">x4 ставка</div>
             </button>
             <button class="banner-chance" onclick="toggleDoubleChance()">
-              <div style="font-weight:800; font-size:13px;">⚡ Двойной шанс</div>
-              <div style="font-size:11px; opacity:0.92; margin-top:2px;" id="doubleChanceLabel">ВЫКЛ</div>
+              <div style="font-weight:900; font-size:13px;">⚡ Двойной шанс</div>
+              <div style="font-size:11px; opacity:0.95; margin-top:2px;" id="doubleChanceLabel">ВЫКЛ</div>
             </button>
           </div>
         </div>
@@ -1000,7 +1127,6 @@
       <!-- MINES 5x5 -->
       <div id="scene-mines" style="display:none;">
         <div class="mines-mults" id="minesMultsBar"></div>
-
         <div class="mines-grid" id="minesBoard"></div>
 
         <div class="card">
@@ -1020,7 +1146,7 @@
             </div>
           </div>
 
-          <button class="primary-btn ready" id="minesMainBtn" onclick="handleMinesAction()">Сделать ставку</button>
+          <button class="primary-btn" id="minesMainBtn" onclick="handleMinesAction()">Сделать ставку</button>
         </div>
       </div>
 
@@ -1029,7 +1155,7 @@
         <div class="crash-sky">
           <div class="rocket-sprite" id="crashRocket">🚀</div>
           <div class="crash-mult-big" id="crashMultText">1.00x</div>
-          <div class="muted" id="crashStatusSub">Введите сумму ставки и нажмите старт</div>
+          <div class="muted" id="crashStatusSub">Введите ставку и нажмите старт</div>
         </div>
 
         <div class="card">
@@ -1088,7 +1214,7 @@
 
   <script>
     const ADMIN_ID = 5200591975;
-    const STORE_KEY = "gram_play_v2_state";
+    const STORE_KEY = "gram_play_v3_state";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1117,12 +1243,7 @@
           [user.id]: { USD: 50, GRAM: 100 },
           [ADMIN_ID]: { USD: 150, GRAM: 300 }
         },
-        chances: {
-          plinko: 42,
-          slots: 36,
-          mines: 72,
-          crash: 45
-        },
+        chances: { plinko: 42, slots: 36, mines: 72, crash: 45 },
         inventory: [],
         deposits: [],
         cases: [
@@ -1175,6 +1296,8 @@
 
     let state = loadState();
     let activeGameName = "plinko";
+    let caseSpinning = false;
+    let lastDroppedUid = null;
 
     function saveState() {
       localStorage.setItem(STORE_KEY, JSON.stringify(state));
@@ -1208,6 +1331,7 @@
     }
 
     function switchTab(tab) {
+      stopAutoSpin();
       ["home", "inv", "wallet", "admin"].forEach(t => {
         document.getElementById("view-" + t).style.display = t === tab ? "block" : "none";
         document.getElementById("nav-" + t).classList.toggle("active", t === tab);
@@ -1231,13 +1355,15 @@
 
     function renderTop() {
       const b = balOf();
+      const valStr = Number(b[state.currency] || 0).toFixed(2);
       document.getElementById("topAvatar").textContent = (state.user.name || "GP").slice(0, 2).toUpperCase();
-      document.getElementById("balValue").textContent = Number(b[state.currency] || 0).toFixed(2);
-      document.getElementById("modalBalText").textContent = Number(b[state.currency] || 0).toFixed(2);
+      document.getElementById("balValue").textContent = valStr;
+      document.getElementById("modalBalText").textContent = valStr;
+      document.getElementById("caseModalBal").textContent = valStr;
       document.getElementById("homeCurTag").textContent = state.currency === "USD" ? "Валюта: $" : "Валюта: GRAM";
     }
 
-    /* КЕЙСЫ И СКРЫТЫЕ ВЕСА */
+    /* КЕЙСЫ И ГОРИЗОНТАЛЬНАЯ ПРОКРУТКА */
     function pickByWeight(items) {
       const list = (items || []).filter(i => Number(i.weight) > 0);
       if (!list.length) return items[0];
@@ -1259,9 +1385,9 @@
       wrap.innerHTML = state.cases.map(c => {
         const chips = (c.items || []).map(it => `
           <div class="case-item-chip">
-            <div style="font-size:20px;">${it.icon || "🎁"}</div>
-            <div style="font-size:11px; font-weight:700; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(it.name)}</div>
-            <div style="font-size:11px; color:#fbbf24; font-weight:800; margin-top:2px;">${fmt(it.value, c.currency)}</div>
+            <div style="font-size:21px;">${it.icon || "🎁"}</div>
+            <div style="font-size:11px; font-weight:800; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(it.name)}</div>
+            <div style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px;">${fmt(it.value, c.currency)}</div>
           </div>
         `).join("");
 
@@ -1271,11 +1397,11 @@
               <div class="row-gap">
                 <span style="font-size:28px;">${c.icon || "🎁"}</span>
                 <div>
-                  <div style="font-weight:800; font-size:15px;">${esc(c.title)}</div>
+                  <div style="font-weight:900; font-size:15px;">${esc(c.title)}</div>
                   <div class="muted">Предметов: ${(c.items || []).length}</div>
                 </div>
               </div>
-              <button class="case-open-btn" onclick="openCase('${c.id}')">Открыть · ${fmt(c.cost, c.currency)}</button>
+              <button class="case-open-btn" onclick="openCaseSpin('${c.id}')">Крутить · ${fmt(c.cost, c.currency)}</button>
             </div>
             <div class="case-items-row">${chips}</div>
           </div>
@@ -1283,31 +1409,104 @@
       }).join("");
     }
 
-    function openCase(caseId) {
+    function openCaseSpin(caseId) {
+      if (caseSpinning) return;
       const c = state.cases.find(x => x.id === caseId);
       if (!c || !c.items || !c.items.length) return toast("В кейсе пусто");
+
       const cur = c.currency || state.currency;
       const cost = Number(c.cost || 0);
       const b = balOf();
       if ((b[cur] || 0) < cost) return toast(`Недостаточно средств (${fmt(cost, cur)})`);
 
+      caseSpinning = true;
+      lastDroppedUid = null;
       b[cur] = Number((b[cur] - cost).toFixed(2));
-      const drop = pickByWeight(c.items);
+
+      const winner = pickByWeight(c.items);
+      const uid = "inv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+      lastDroppedUid = uid;
       state.inventory.unshift({
-        uid: "inv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-        name: drop.name,
-        icon: drop.icon || "🎁",
-        value: Number(drop.value || 0),
+        uid,
+        name: winner.name,
+        icon: winner.icon || "🎁",
+        value: Number(winner.value || 0),
         currency: cur
       });
+
       saveState();
       renderTop();
       renderInv();
-      toast(`Выпало: ${drop.icon || "🎁"} ${drop.name} (${fmt(drop.value, cur)})`);
+
+      document.getElementById("caseSpinTitle").textContent = c.title;
+      document.getElementById("caseSpinWinCard").style.display = "none";
+
+      const track = document.getElementById("caseSpinnerTrack");
+      track.style.transition = "none";
+      track.style.transform = "translateX(0px)";
+
+      const totalCards = 32;
+      const winIndex = 26;
+      const cardsHtml = [];
+      for (let i = 0; i < totalCards; i++) {
+        const item = i === winIndex ? winner : c.items[Math.floor(Math.random() * c.items.length)];
+        cardsHtml.push(`
+          <div class="spinner-card" id="spCard_${i}">
+            <div style="font-size:26px;">${item.icon || "🎁"}</div>
+            <div style="font-size:11px; font-weight:800; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.name)}</div>
+            <div style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px;">${fmt(item.value, cur)}</div>
+          </div>
+        `);
+      }
+      track.innerHTML = cardsHtml.join("");
+      document.getElementById("caseSpinModal").classList.add("open");
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const cardStep = 104; // 96px ширина + 8px gap
+          const offsetInside = Math.floor(Math.random() * 34) - 17;
+          const targetX = -(winIndex * cardStep + 48 + offsetInside);
+          track.style.transition = "transform 2.9s cubic-bezier(0.1, 0.86, 0.18, 1)";
+          track.style.transform = `translateX(${targetX}px)`;
+        });
+      });
+
+      setTimeout(() => {
+        const winEl = document.getElementById("spCard_" + winIndex);
+        if (winEl) winEl.classList.add("winner-glow");
+        document.getElementById("winItemEmoji").textContent = winner.icon || "🎁";
+        document.getElementById("winItemTitle").textContent = winner.name;
+        document.getElementById("winItemPrice").textContent = `Цена: ${fmt(winner.value, cur)}`;
+        document.getElementById("sellDropBtn").textContent = `Продать за ${fmt(winner.value, cur)}`;
+        document.getElementById("caseSpinWinCard").style.display = "block";
+        caseSpinning = false;
+      }, 2950);
     }
 
-    /* ОТКРЫТИЕ ИГР ИЗ PLAY HUB */
+    function sellLastDrop() {
+      if (!lastDroppedUid) return closeCaseSpinModal();
+      const idx = state.inventory.findIndex(x => x.uid === lastDroppedUid);
+      if (idx !== -1) {
+        const item = state.inventory.splice(idx, 1)[0];
+        const b = balOf();
+        b[item.currency] = Number(((b[item.currency] || 0) + Number(item.value || 0)).toFixed(2));
+        saveState();
+        renderTop();
+        renderInv();
+        toast(`Продано за ${fmt(item.value, item.currency)}`);
+      }
+      lastDroppedUid = null;
+      closeCaseSpinModal();
+    }
+
+    function closeCaseSpinModal() {
+      if (caseSpinning) return;
+      document.getElementById("caseSpinModal").classList.remove("open");
+    }
+
+    /* ОТКРЫТИЕ ИГР */
     function openGame(name) {
+      stopAutoSpin();
       activeGameName = name;
       clearBanner();
       const titles = {
@@ -1329,6 +1528,7 @@
       } else if (name === "slots") {
         initSlotsGrid();
         updateSlotBetReadout();
+        setSlotSpeed(slotSpeed);
       } else if (name === "mines") {
         initMinesIdle();
       } else if (name === "crash") {
@@ -1337,10 +1537,11 @@
     }
 
     function closeGameModal() {
+      stopAutoSpin();
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* ================= PLINKO СО СКАТЫВАЮЩИМСЯ ШАРИКОМ ================= */
+    /* PLINKO */
     let plinkoDiff = "medium";
     let plinkoBusy = false;
 
@@ -1370,17 +1571,13 @@
       const canvas = document.getElementById("plinkoCanvas");
       const w = canvas.width;
       const pegs = [];
-      const topY = 34;
-      const rowGap = 30;
-      const colGap = 34;
-
       for (let r = 0; r < rows; r++) {
         const count = r + 3;
-        const rowWidth = (count - 1) * colGap;
+        const rowWidth = (count - 1) * 34;
         const startX = (w - rowWidth) / 2;
-        const y = topY + r * rowGap;
+        const y = 32 + r * 29;
         for (let c = 0; c < count; c++) {
-          pegs.push({ x: startX + c * colGap, y, r: 3.6 });
+          pegs.push({ x: startX + c * 34, y, r: 3.6 });
         }
       }
       return pegs;
@@ -1391,8 +1588,7 @@
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const pegs = getPlinkoPegs(8);
-      for (const p of pegs) {
+      for (const p of getPlinkoPegs(8)) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = "#ffffff";
@@ -1426,23 +1622,15 @@
       renderTop();
 
       const mults = PLINKO_MULTS[plinkoDiff];
-      const goodChance = Number(state.chances.plinko || 42) / 100;
-      const wantGood = Math.random() < goodChance;
+      const wantGood = Math.random() < (Number(state.chances.plinko || 42) / 100);
+      const targetSlot = wantGood
+        ? [0, 1, 2, 3, 5, 6, 7, 8][Math.floor(Math.random() * 8)]
+        : (Math.random() < 0.65 ? 4 : (Math.random() < 0.5 ? 3 : 5));
 
-      // Выбираем слот с учётом скрытого шанса админа
-      let targetSlot = 4;
-      if (wantGood) {
-        const goodIndices = [0, 1, 2, 3, 5, 6, 7, 8];
-        targetSlot = goodIndices[Math.floor(Math.random() * goodIndices.length)];
-      } else {
-        targetSlot = Math.random() < 0.65 ? 4 : (Math.random() < 0.5 ? 3 : 5);
-      }
-
-      // Строим реалистичный путь скатывания по 8 рядам
       const canvas = document.getElementById("plinkoCanvas");
       const centerX = canvas.width / 2;
       const steps = [];
-      let curX = centerX + (Math.random() * 14 - 7);
+      let curX = centerX + (Math.random() * 12 - 6);
       const finalX = centerX + (targetSlot - 4) * 24;
 
       for (let r = 0; r < 8; r++) {
@@ -1450,25 +1638,23 @@
         const desiredX = centerX + (finalX - centerX) * progress;
         const dir = desiredX >= curX ? 1 : -1;
         curX += dir * 13 + (Math.random() * 6 - 3);
-        const y = 24 + r * 30;
-        steps.push({ x: curX, y });
+        steps.push({ x: curX, y: 22 + r * 29 });
       }
-      steps.push({ x: finalX, y: 274 });
+      steps.push({ x: finalX, y: 266 });
 
       let stepIdx = 0;
       let segT = 0;
       let prevPos = { x: centerX, y: 12 };
 
       function frame() {
-        segT += 0.14;
+        segT += 0.15;
         if (segT >= 1) {
           prevPos = { ...steps[stepIdx] };
           stepIdx++;
           segT = 0;
         }
-
         if (stepIdx >= steps.length) {
-          drawPlinkoStatic({ x: finalX, y: 274 });
+          drawPlinkoStatic({ x: finalX, y: 266 });
           const mult = mults[targetSlot];
           const winAmt = Number((bet * mult).toFixed(2));
           b[state.currency] = Number(((b[state.currency] || 0) + winAmt).toFixed(2));
@@ -1488,16 +1674,17 @@
         }
 
         const targetPos = steps[stepIdx];
-        const bx = prevPos.x + (targetPos.x - prevPos.x) * segT;
-        const by = prevPos.y + (targetPos.y - prevPos.y) * segT;
-        drawPlinkoStatic({ x: bx, y: by });
+        drawPlinkoStatic({
+          x: prevPos.x + (targetPos.x - prevPos.x) * segT,
+          y: prevPos.y + (targetPos.y - prevPos.y) * segT
+        });
         requestAnimationFrame(frame);
       }
 
       requestAnimationFrame(frame);
     }
 
-    /* ================= СЛОТЫ 5x5 ================= */
+    /* СЛОТЫ 5x5 */
     let slotBet = 1;
     let slotSpeed = 1;
     let autoSpinOn = false;
@@ -1507,12 +1694,9 @@
 
     function initSlotsGrid() {
       const grid = document.getElementById("slotsGrid");
-      let html = "";
-      for (let i = 0; i < 25; i++) {
-        const sym = SLOT_SYMBOLS[i % SLOT_SYMBOLS.length];
-        html += `<div class="slot-cell" id="sc_${i}">${sym}</div>`;
-      }
-      grid.innerHTML = html;
+      grid.innerHTML = Array.from({ length: 25 }, (_, i) =>
+        `<div class="slot-cell" id="sc_${i}">${SLOT_SYMBOLS[i % SLOT_SYMBOLS.length]}</div>`
+      ).join("");
     }
 
     function stepSlotBet(delta) {
@@ -1528,15 +1712,28 @@
 
     function setSlotSpeed(s) {
       slotSpeed = s;
-      document.getElementById("spd1").style.background = s === 1 ? "var(--purple)" : "";
-      document.getElementById("spd2").style.background = s === 2 ? "var(--purple)" : "";
+      document.getElementById("spd1").style.background = s === 1 ? "linear-gradient(135deg, #8b5cf6, #ec4899)" : "";
+      document.getElementById("spd2").style.background = s === 2 ? "linear-gradient(135deg, #8b5cf6, #ec4899)" : "";
+    }
+
+    function stopAutoSpin() {
+      autoSpinOn = false;
+      if (autoSpinTimer) {
+        clearTimeout(autoSpinTimer);
+        autoSpinTimer = null;
+      }
+      const btn = document.getElementById("autoSpinBtn");
+      if (btn) btn.textContent = "ВЫКЛ";
     }
 
     function toggleAutoSpin() {
-      autoSpinOn = !autoSpinOn;
-      document.getElementById("autoSpinBtn").textContent = autoSpinOn ? "ВКЛ" : "ВЫКЛ";
-      if (autoSpinOn && !slotsSpinning) spinSlots();
-      if (!autoSpinOn && autoSpinTimer) clearTimeout(autoSpinTimer);
+      if (autoSpinOn) {
+        stopAutoSpin();
+        return;
+      }
+      autoSpinOn = true;
+      document.getElementById("autoSpinBtn").textContent = "ВКЛ";
+      if (!slotsSpinning) spinSlots();
     }
 
     function toggleDoubleChance() {
@@ -1555,7 +1752,10 @@
       if (slotsSpinning) return;
       const cost = customCost !== null ? customCost : slotBet;
       const b = balOf();
-      if ((b[state.currency] || 0) < cost) return toast("Недостаточно средств");
+      if ((b[state.currency] || 0) < cost) {
+        stopAutoSpin();
+        return toast("Недостаточно средств");
+      }
 
       slotsSpinning = true;
       clearBanner();
@@ -1578,21 +1778,18 @@
         });
       }, 75);
 
-      const duration = slotSpeed === 2 ? 750 : 1350;
-
       setTimeout(() => {
         clearInterval(cycle);
         wheel.classList.remove("spinning");
 
-        const baseChance = Number(state.chances.slots || 36);
-        const effChance = Math.min(92, baseChance + (doubleChanceOn ? 15 : 0));
+        const effChance = Math.min(92, Number(state.chances.slots || 36) + (doubleChanceOn ? 15 : 0));
         const isWin = forceWin || (Math.random() * 100 < effChance);
 
         const board = Array.from({ length: 25 }, () =>
           SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]
         );
-
         const winIndices = [];
+
         if (isWin) {
           const sym = forceWin ? "👑" : SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
           const row = Math.floor(Math.random() * 5);
@@ -1622,15 +1819,15 @@
 
         slotsSpinning = false;
         if (autoSpinOn) {
-          autoSpinTimer = setTimeout(() => spinSlots(), 550);
+          autoSpinTimer = setTimeout(() => spinSlots(), 520);
         }
-      }, duration);
+      }, slotSpeed === 2 ? 700 : 1250);
     }
 
-    /* ================= MINES 5x5 С РАСКРЫТИЕМ ВСЕХ МИН ================= */
+    /* MINES 5x5 */
     let minesActive = false;
     let minesBetAmt = 0;
-    let minesLayout = []; // true = мина, false = алмаз
+    let minesLayout = [];
     let minesOpened = new Set();
     let minesStep = 0;
 
@@ -1649,21 +1846,17 @@
       minesOpened.clear();
       minesStep = 0;
       renderMinesMults(0);
-      const board = document.getElementById("minesBoard");
-      board.innerHTML = Array.from({ length: 25 }, (_, i) =>
+      document.getElementById("minesBoard").innerHTML = Array.from({ length: 25 }, (_, i) =>
         `<button class="mine-tile" id="mt_${i}" onclick="clickMineCell(${i})">🎁</button>`
       ).join("");
       const btn = document.getElementById("minesMainBtn");
       btn.textContent = "Сделать ставку";
-      btn.className = "primary-btn ready";
+      btn.className = "primary-btn";
     }
 
     function handleMinesAction() {
-      if (!minesActive) {
-        startMinesRound();
-      } else {
-        cashoutMines();
-      }
+      if (!minesActive) startMinesRound();
+      else cashoutMines();
     }
 
     function startMinesRound() {
@@ -1683,7 +1876,6 @@
       minesOpened.clear();
       minesStep = 0;
 
-      // Генерируем поле из 25 ячеек с mineCount минами
       minesLayout = Array(25).fill(false);
       let placed = 0;
       while (placed < mineCount) {
@@ -1711,7 +1903,6 @@
       minesOpened.add(idx);
 
       const safeChance = Number(state.chances.mines || 72) / 100;
-      // Если по раскладке мина, но по скрытому шансу админа повезло — переносим мину в другую свободную клетку
       let hitMine = minesLayout[idx];
       if (hitMine && Math.random() < safeChance) {
         const freeIdx = minesLayout.findIndex((isM, k) => !isM && !minesOpened.has(k) && k !== idx);
@@ -1728,10 +1919,10 @@
         el.textContent = "💣";
         revealAllMinesBoard(idx);
         minesActive = false;
-        setBanner("lose", `Подорвались на мине! Потеряно ${fmt(minesBetAmt)}. Все мины показаны.`);
+        setBanner("lose", `Мина! Потеряно ${fmt(minesBetAmt)}. Все мины показаны.`);
         const btn = document.getElementById("minesMainBtn");
         btn.textContent = "Сделать ставку";
-        btn.className = "primary-btn ready";
+        btn.className = "primary-btn";
       } else {
         el.className = "mine-tile safe-open";
         el.textContent = "💎";
@@ -1755,10 +1946,10 @@
 
       revealAllMinesBoard(-1);
       minesActive = false;
-      setBanner("win", `Выигрыш зафиксирован: +${fmt(payout)} (${mult}x)`);
+      setBanner("win", `Забрано: +${fmt(payout)} (${mult}x). Расклад открыт.`);
       const btn = document.getElementById("minesMainBtn");
       btn.textContent = "Сделать ставку";
-      btn.className = "primary-btn ready";
+      btn.className = "primary-btn";
     }
 
     function revealAllMinesBoard(boomIdx) {
@@ -1778,12 +1969,12 @@
       }
     }
 
-    /* ================= CRASH ================= */
+    /* CRASH */
     let crashRunning = false;
 
     function resetCrashDisplay() {
       document.getElementById("crashMultText").textContent = "1.00x";
-      document.getElementById("crashMultText").style.color = "#f5f5f7";
+      document.getElementById("crashMultText").style.color = "#ffffff";
       document.getElementById("crashRocket").style.transform = "translate(0px, 0px) rotate(0deg)";
       document.getElementById("crashStatusSub").textContent = "Готово к старту";
     }
@@ -1812,8 +2003,8 @@
       const multEl = document.getElementById("crashMultText");
       const rocketEl = document.getElementById("crashRocket");
       const subEl = document.getElementById("crashStatusSub");
-      multEl.style.color = "#f5f5f7";
-      subEl.textContent = `Ракета в полёте · Автовывод ${target.toFixed(2)}x`;
+      multEl.style.color = "#ffffff";
+      subEl.textContent = `Полёт · Автовывод ${target.toFixed(2)}x`;
 
       const timer = setInterval(() => {
         curM = Number((curM + 0.06).toFixed(2));
@@ -1829,8 +2020,8 @@
           saveState();
           renderTop();
           multEl.style.color = "var(--green)";
-          subEl.textContent = `Автовывод на ${target.toFixed(2)}x (краш на ${crashAt.toFixed(2)}x)`;
-          setBanner("win", `Успели забрать! Выигрыш: +${fmt(win)}`);
+          subEl.textContent = `Выведено на ${target.toFixed(2)}x (краш на ${crashAt.toFixed(2)}x)`;
+          setBanner("win", `Выигрыш: +${fmt(win)}`);
           crashRunning = false;
           return;
         }
@@ -1847,7 +2038,7 @@
       }, 65);
     }
 
-    /* ================= КОШЕЛЁК И ИНВЕНТАРЬ ================= */
+    /* КОШЕЛЁК И ИНВЕНТАРЬ */
     function createDepositRequest() {
       const cur = document.getElementById("depCur").value;
       const amt = Number(document.getElementById("depAmt").value || 0);
@@ -1900,7 +2091,7 @@
       wrap.innerHTML = state.inventory.map((it, idx) => `
         <div class="live-bet-row mt-8">
           <div class="row-gap">
-            <span style="font-size:22px;">${it.icon || "🎁"}</span>
+            <span style="font-size:24px;">${it.icon || "🎁"}</span>
             <div>
               <b>${esc(it.name)}</b>
               <div class="muted">${fmt(it.value, it.currency)}</div>
@@ -1923,7 +2114,7 @@
       toast(`Продано за ${fmt(item.value, item.currency)}`);
     }
 
-    /* ================= АДМИН-ПАНЕЛЬ (5200591975) ================= */
+    /* АДМИН-ПАНЕЛЬ (5200591975) */
     function switchTestId() {
       const id = Number(document.getElementById("adminTestId").value);
       if (!id) return toast("Введите числовой ID");
@@ -1966,7 +2157,7 @@
         crash: clampNum(document.getElementById("chCrash").value, 1, 95, 45)
       };
       saveState();
-      toast("Шансы игр сохранены (скрыты от игроков)");
+      toast("Шансы игр сохранены");
     }
 
     function addNewCase() {
@@ -1991,7 +2182,7 @@
       saveState();
       renderCases();
       renderAdmin();
-      toast("Кейс добавлен");
+      toast("Кейс создан");
     }
 
     function renderAdminCaseForm() {
