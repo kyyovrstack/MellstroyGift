@@ -2025,10 +2025,10 @@
   const HOUSE_RTP = 0.85;
   const NANO = 1_000_000_000;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-  const SAVE_KEY = "mellstroy_gift_fast_v12";
-  const CATALOG_KEY = "mellstroy_gift_catalog_v12";
+  const SAVE_KEY = "mellstroy_gift_fast_v13";
+  const CATALOG_KEY = "mellstroy_gift_catalog_v13";
   const SUPABASE_URL = "https://ztjmebmpxmxtofnlboyo.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "Sb_publishable_tuZ8DhQusariwnue3dIwGg_MsfnMHCj";
+  const SUPABASE_PUBLISHABLE_KEY = "Sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
   const CASE_SPIN_DURATION_MS = 3000;
 
@@ -2267,11 +2267,15 @@
   }
 
   function sbHeaders() {
-    return {
+    const key = String(SUPABASE_PUBLISHABLE_KEY || "").trim();
+    const headers = {
       "Content-Type": "application/json",
-      apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+      "apikey": key
     };
+    if (key.startsWith("eyJ")) {
+      headers["Authorization"] = `Bearer ${key}`;
+    }
+    return headers;
   }
 
   async function logTxEventToSupabase(direction, amountGram, nftAddress = null, txHash = null) {
@@ -2331,7 +2335,12 @@
         if (el) el.textContent = "Сохранено в Supabase (общий доступ)";
         return true;
       } else {
-        if (el) el.textContent = `Ошибка сервера (${res.status})`;
+        let detail = "";
+        try {
+          const errJson = await res.json();
+          detail = errJson && errJson.message ? ` — ${errJson.message}` : "";
+        } catch (err) {}
+        if (el) el.textContent = `Ошибка сервера (${res.status})${detail}`;
         return false;
       }
     } catch (e) {
@@ -2345,7 +2354,7 @@
     appState.lastUpdatedAt = Date.now();
     saveLocal();
     const ok = await pushCasesToSupabase();
-    if (!ok) showToast("Сохранено локально, проверь сеть/Supabase");
+    if (!ok) showToast("Сохранено локально, проверь ключ/Supabase");
     return ok;
   }
 
