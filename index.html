@@ -1,227 +1,1501 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#17122f">
-<title>MellstroyGift — игровая платформа</title>
-<style>
-:root{
-  --bg:#17122f;--panel:#211b43;--panel2:#292251;--line:#393064;
-  --text:#f7f3ff;--muted:#aaa2cf;--purple:#8e65ff;--pink:#e65bc8;
-  --cyan:#57c9ff;--green:#28d879;--gold:#ffcf62;
-}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 50% -20%,#493078 0%,var(--bg) 48%);color:var(--text);font:14px/1.45 Inter,Arial,sans-serif;min-height:100vh}
-button,input{font:inherit}
-button{cursor:pointer;color:inherit}
-.app{min-height:100vh;display:grid;grid-template-columns:235px minmax(0,1fr) 270px;max-width:1600px;margin:auto;background:rgba(17,13,39,.45);border-inline:1px solid #302752}
-.sidebar{padding:22px 15px;border-right:1px solid var(--line);background:rgba(22,17,48,.85);display:flex;flex-direction:column;gap:22px}
-.brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:900;letter-spacing:.3px}
-.brand-mark{width:37px;height:37px;border-radius:12px;background:linear-gradient(135deg,#ffbd54,#f05dbd 55%,#7c65ff);display:grid;place-items:center;box-shadow:0 5px 22px #bd55cf55;font-size:20px}
-.brand span:last-child{color:#d8b8ff}
-.user-mini{display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
-.avatar{width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,#ffb84d,#c35bff);display:grid;place-items:center;font-size:18px}
-.user-mini small,.muted{color:var(--muted)}
-.nav-title{font-size:10px;letter-spacing:1.5px;color:#8178aa;text-transform:uppercase;margin:4px 8px}
-.nav{display:grid;gap:6px}
-.nav button{width:100%;text-align:left;border:0;border-radius:11px;padding:11px 12px;background:transparent;color:#c5bedf;display:flex;gap:11px;align-items:center}
-.nav button:hover,.nav button.active{background:linear-gradient(90deg,#6548b6,#453476);color:white}
-.nav .ico{width:20px;text-align:center;font-size:16px}
-.sidebar-foot{margin-top:auto;color:#777096;font-size:11px;padding:8px}
-main{padding:22px;min-width:0}
-.topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px}
-.search{flex:1;position:relative}
-.search input{width:100%;background:#211b43;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 40px;color:white;outline:none}
-.search:before{content:"⌕";position:absolute;left:14px;top:7px;font-size:23px;color:#a89bd5}
-.top-actions{display:flex;align-items:center;gap:9px}
-.balance{background:#292251;border:1px solid #4a3c7b;border-radius:12px;padding:10px 13px;color:var(--gold);font-weight:800;white-space:nowrap}
-.icon-btn{width:39px;height:39px;border:1px solid var(--line);border-radius:12px;background:#292251;font-size:17px}
-.page{display:none}.page.active{display:block}
-.hero-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-bottom:25px}
-.hero{min-height:128px;border-radius:18px;padding:17px;position:relative;overflow:hidden;border:1px solid #ffffff20;display:flex;flex-direction:column;justify-content:space-between}
-.hero h3{margin:0 0 5px;font-size:17px;max-width:160px}
-.hero p{margin:0;color:#ffffffc9;font-size:11px;max-width:165px}
-.hero .art{position:absolute;right:9px;bottom:2px;font-size:58px;filter:drop-shadow(0 8px 8px #0005)}
-.hero.pink{background:linear-gradient(120deg,#7441b8,#dc55ad)}
-.hero.blue{background:linear-gradient(120deg,#277bb6,#4cc8dc)}
-.hero.violet{background:linear-gradient(120deg,#6633a4,#a84fda)}
-.section-head{display:flex;align-items:center;justify-content:space-between;margin:20px 0 12px}
-.section-head h2{margin:0;font-size:17px}
-.section-head small{color:var(--muted)}
-.game-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.game-card{border:1px solid #ffffff16;border-radius:16px;min-height:125px;padding:13px;text-align:left;position:relative;overflow:hidden;background:linear-gradient(145deg,#373066,#211b43);transition:.18s}
-.game-card:hover{transform:translateY(-3px);border-color:#a88bff;box-shadow:0 10px 25px #0003}
-.game-card .game-art{position:absolute;right:7px;top:9px;font-size:43px;filter:drop-shadow(0 5px 5px #0005)}
-.game-card strong{position:absolute;left:13px;bottom:13px;font-size:14px}
-.game-card small{position:absolute;left:13px;bottom:34px;color:#c5b9e8;font-size:10px}
-.activity{background:var(--panel);border:1px solid var(--line);border-radius:15px;overflow:hidden}
-.activity-row{display:grid;grid-template-columns:1.1fr 1.2fr 1fr 1fr;gap:8px;padding:12px 15px;border-bottom:1px solid #ffffff0b;color:#d9d2ee;font-size:12px}
-.activity-row:last-child{border:0}.activity-row.head{color:#9289b8;font-size:10px;text-transform:uppercase}
-.rightbar{border-left:1px solid var(--line);background:rgba(22,17,48,.8);padding:20px 14px;display:flex;flex-direction:column;min-height:100vh}
-.chat-head{display:flex;justify-content:space-between;align-items:center;padding:8px 5px 16px}
-.online{font-size:11px;color:#74e6ae}
-.chat-list{display:grid;gap:10px}
-.chat-msg{background:#272149;border:1px solid #ffffff0b;border-radius:13px;padding:11px;font-size:11px;color:#d7d0ed}
-.chat-msg b{display:block;color:#e5b7ff;margin-bottom:4px}
-.chat-msg small{display:block;color:#8179a5;margin-top:5px}
-.chat-compose{margin-top:auto;padding-top:18px}
-.chat-compose input{width:100%;background:#292251;border:1px solid var(--line);border-radius:11px;padding:12px;color:white}
-.note{font-size:10px;color:#80779f;margin-top:10px}
-.primary{border:0;border-radius:11px;background:linear-gradient(90deg,#8b5cff,#c04fd6);padding:11px 16px;font-weight:800;color:white}
-.secondary{border:1px solid var(--line);border-radius:10px;background:#302856;padding:9px 13px;color:#ddd5f7}
-.plinko-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(240px,.7fr);gap:15px}
-.plinko-board{background:linear-gradient(180deg,#0d1d49,#111936);border:1px solid #354579;border-radius:18px;padding:18px;min-height:480px}
-.pegs{display:flex;flex-direction:column;align-items:center;gap:13px;padding:25px 0}
-.peg-row{display:flex;justify-content:center;gap:clamp(9px,2vw,20px)}
-.peg{width:10px;height:10px;border-radius:50%;background:#bc69f3;box-shadow:0 0 10px #b75aff}
-.slots{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin-top:15px}
-.slot{background:#e84e80;border-radius:7px;padding:8px 6px;font-size:10px;font-weight:bold}
-.slot:nth-child(3n){background:#f29b39}.slot:nth-child(3n+2){background:#a75ce9}
-.controls{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
-.controls label{display:block;color:var(--muted);font-size:12px;margin:15px 0 6px}
-.controls input{width:100%;padding:11px;border:1px solid var(--line);background:#17122f;border-radius:10px;color:white}
-.controls .primary{width:100%;margin-top:16px}
-.result{padding:13px;border-radius:12px;background:#17122f;margin-top:13px;color:#d9caff;min-height:48px}
-@media(max-width:1100px){.app{grid-template-columns:205px minmax(0,1fr)}.rightbar{display:none}}
-@media(max-width:720px){.app{display:block}.sidebar{padding:12px;border-right:0;border-bottom:1px solid var(--line)}.sidebar .nav{display:flex;overflow:auto}.nav button{white-space:nowrap;width:auto}.nav-title,.user-mini,.sidebar-foot{display:none}main{padding:14px}.hero-grid{grid-template-columns:1fr}.hero{min-height:105px}.game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.plinko-layout{grid-template-columns:1fr}.topbar{flex-wrap:wrap}.search{min-width:100%;order:2}.activity-row{grid-template-columns:1fr 1fr}.activity-row span:nth-child(3),.activity-row span:nth-child(4){display:none}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>GRAM PLAY — Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-main: #090714;
+      --bg-card: #141029;
+      --bg-card-2: #1c1638;
+      --border: rgba(168, 85, 247, 0.24);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #8b5cf6;
+      --accent-2: #ec4899;
+      --green: #10b981;
+      --danger: #ef4444;
+      --gold: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100dvh;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(139, 92, 246, 0.22), transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(236, 72, 153, 0.16), transparent 40%),
+        var(--bg-main);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      padding: 12px 14px 92px;
+    }
+
+    /* Верхняя панель */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(13, 10, 28, 0.88);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 14px;
+    }
+
+    .user-box {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .user-meta {
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-id {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .balance-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .bal-pill {
+      background: var(--bg-card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bal-pill.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.35);
+    }
+
+    .btn-plus {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--green), #059669);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Заголовки секций */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 2px 10px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.2);
+      color: #d8b4fe;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+
+    /* Play Hub */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .hub-card {
+      position: relative;
+      background: linear-gradient(160deg, var(--bg-card-2), var(--bg-card));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      overflow: hidden;
+    }
+
+    .hub-card:active {
+      transform: scale(0.98);
+    }
+
+    .hub-icon {
+      font-size: 26px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .hub-name {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .hub-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Кейсы */
+    .cases-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .case-card {
+      background: linear-gradient(150deg, rgba(28, 22, 56, 0.96), rgba(16, 12, 34, 0.98));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+    }
+
+    .case-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .case-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .case-emoji {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(139, 92, 246, 0.18);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+    }
+
+    .case-name {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .case-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .case-price-btn {
+      border: none;
+      border-radius: 13px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .case-price-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Предметы кейса (без шансов!) */
+    .items-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .items-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mini-item {
+      min-width: 96px;
+      background: var(--bg-main);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 13px;
+      padding: 8px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .mini-item-icon {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .mini-item-name {
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-item-val {
+      font-size: 11px;
+      color: var(--gold);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* Нижнее меню */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: rgba(11, 8, 24, 0.94);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    }
+
+    .bottom-nav-inner {
+      max-width: 520px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 13px;
+      padding: 7px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: #fff;
+    }
+
+    /* Вкладки и карточки */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      width: 100%;
+      background: var(--bg-main);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .btn-green { background: var(--green); }
+    .btn-red { background: var(--danger); }
+    .btn-gold { background: var(--gold); color: #111; }
+    .btn-ghost { background: var(--bg-card-2); border: 1px solid var(--border); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .small-muted { font-size: 12px; color: var(--muted); }
+
+    /* Модалка открытия кейса / игры */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(4, 3, 10, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 460px;
+      max-height: 88dvh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 16px;
+    }
+
+    .roulette-window {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      padding: 12px 0;
+      margin: 12px 0;
+    }
+
+    .roulette-pointer {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--gold);
+      transform: translateX(-50%);
+      z-index: 5;
+    }
+
+    .roulette-track {
+      display: flex;
+      gap: 8px;
+      padding-left: 50%;
+      transition: transform 2.8s cubic-bezier(0.12, 0.85, 0.2, 1);
+    }
+
+    .reel-card {
+      min-width: 96px;
+      background: var(--bg-card-2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      background: #1e163d;
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      display: none;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .toast.show {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-<aside class="sidebar">
-  <div class="brand"><div class="brand-mark">🎁</div><div>MELLSTROY<span>GIFT</span></div></div>
-  <div class="user-mini"><div class="avatar">👑</div><div><b>Игрок</b><br><small>Добро пожаловать!</small></div></div>
-  <div><div class="nav-title">Меню</div><nav class="nav">
-    <button class="active" data-page="home"><span class="ico">⌂</span>Главная</button>
-    <button data-page="games"><span class="ico">🎮</span>Все игры</button>
-    <button data-page="plinko"><span class="ico">🔮</span>Plinko</button>
-    <button data-page="cases"><span class="ico">🎁</span>Кейсы</button>
-    <button data-page="profile"><span class="ico">👤</span>Профиль</button>
-  </nav></div>
-  <div><div class="nav-title">Информация</div><nav class="nav">
-    <button data-page="about"><span class="ico">ⓘ</span>О проекте</button>
-  </nav></div>
-  <div class="sidebar-foot">MellstroyGift · Демо-версия<br>Только виртуальные очки</div>
-</aside>
+  <div class="toast" id="toast"></div>
 
-<main>
-  <div class="topbar">
-    <div class="search"><input id="search" placeholder="Поиск игр..." oninput="searchGames(this.value)"></div>
-    <div class="top-actions"><button class="icon-btn" title="Уведомления">♢</button><button class="icon-btn" title="Подарки">＋</button><div class="balance">⭐ <span id="balance">1 000</span></div></div>
+  <div class="app">
+    <!-- Верхняя панель -->
+    <header class="topbar">
+      <div class="user-box">
+        <div class="avatar" id="userAvatar">GP</div>
+        <div class="user-meta">
+          <div class="user-name" id="userName">Игрок</div>
+          <div class="user-id" id="userIdLabel">ID: —</div>
+        </div>
+      </div>
+
+      <div class="balance-wrap">
+        <div class="bal-pill active" id="pillUSD" onclick="setCurrency('USD')">$ <span id="balUSD">0.00</span></div>
+        <div class="bal-pill" id="pillGRAM" onclick="setCurrency('GRAM')">💎 <span id="balGRAM">0.00</span></div>
+        <button class="btn-plus" onclick="openDepositModal()" title="Пополнить">+</button>
+      </div>
+    </header>
+
+    <!-- ВКЛАДКА 1: ГЛАВНАЯ (PLAY HUB + КЕЙСЫ) -->
+    <main id="tab-home">
+      <div class="section-head">
+        <div class="section-title">🎮 Play Hub</div>
+        <span class="badge" id="activeCurBadge">Валюта: $</span>
+      </div>
+
+      <div class="hub-grid">
+        <div class="hub-card" onclick="openGameModal('plinko')">
+          <span class="hub-icon">🟢</span>
+          <div class="hub-name">Plinko</div>
+          <div class="hub-desc">Множители до 10x</div>
+        </div>
+        <div class="hub-card" onclick="openGameModal('crash')">
+          <span class="hub-icon">🚀</span>
+          <div class="hub-name">Crash</div>
+          <div class="hub-desc">Забери икс вовремя</div>
+        </div>
+        <div class="hub-card" onclick="openGameModal('mines')">
+          <span class="hub-icon">💣</span>
+          <div class="hub-name">Mines</div>
+          <div class="hub-desc">Открывай безопасные ячейки</div>
+        </div>
+        <div class="hub-card" onclick="openGameModal('roulette')">
+          <span class="hub-icon">🎡</span>
+          <div class="hub-name">Рулетка</div>
+          <div class="hub-desc">2x / 3x / 14x секторы</div>
+        </div>
+      </div>
+
+      <div class="section-head mt-12">
+        <div class="section-title">📦 Кейсы</div>
+        <span class="badge">Шансы скрыты</span>
+      </div>
+
+      <div class="cases-list" id="casesContainer"></div>
+    </main>
+
+    <!-- ВКЛАДКА 2: КОШЕЛЁК -->
+    <section id="tab-wallet" style="display:none;">
+      <div class="panel">
+        <div class="section-title">💳 Криптокошелёк ($ / Gram)</div>
+        <p class="small-muted mt-8">
+          Пополнение через криптокошелёк в валюте <b>$ (USDT)</b> или <b>Gram</b>. Заявка попадает в очередь проверки — после подтверждения баланс зачисляется на счёт.
+        </p>
+
+        <div class="grid-2 mt-8">
+          <div>
+            <label class="small-muted">Валюта</label>
+            <select id="depCurrency">
+              <option value="USD">$ (USDT)</option>
+              <option value="GRAM">Gram</option>
+            </select>
+          </div>
+          <div>
+            <label class="small-muted">Сумма</label>
+            <input type="number" id="depAmount" min="1" step="0.1" value="10" />
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <label class="small-muted">Адрес кошелька / TXID перевода</label>
+          <input type="text" id="depTx" placeholder="Вставьте хэш транзакции или ваш адрес" />
+        </div>
+
+        <button class="btn btn-green mt-12" style="width:100%;" onclick="submitDeposit()">
+          Отправить заявку на пополнение
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">📜 Мои заявки</div>
+        <div id="myDepositsList" class="mt-8 small-muted">Заявок пока нет</div>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА 3: ИНВЕНТАРЬ -->
+    <section id="tab-inv" style="display:none;">
+      <div class="panel">
+        <div class="section-title">🎒 Инвентарь</div>
+        <p class="small-muted mt-8">Выбитые из кейсов предметы можно продать за текущую валюту или оставить.</p>
+        <div id="inventoryList" class="mt-12 small-muted">Инвентарь пуст</div>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА 4: АДМИН-ПАНЕЛЬ (ID 5200591975) -->
+    <section id="tab-admin" style="display:none;">
+      <div class="panel">
+        <div class="section-title">🛡️ Тест ID пользователя</div>
+        <p class="small-muted mt-8">
+          В Telegram ID берётся автоматически из <code>initDataUnsafe.user.id</code>. Для теста в браузере можно переключить ID (админский ID: <b>5200591975</b>).
+        </p>
+        <div class="row mt-8">
+          <input type="number" id="testIdInput" value="5200591975" />
+          <button class="btn" onclick="applyTestUserId()">Применить ID</button>
+        </div>
+      </div>
+
+      <div id="adminRestrictedBox" class="panel" style="display:none;">
+        <div class="section-title">⛔ Доступ закрыт</div>
+        <p class="small-muted mt-8">
+          Админ-панель доступна только для ID <b>5200591975</b>. Текущий ID: <span id="deniedIdText"></span>.
+        </p>
+      </div>
+
+      <div id="adminPanelContent" style="display:none;">
+        <!-- Создать кейс -->
+        <div class="panel">
+          <div class="section-title">➕ Создать кейс</div>
+          <div class="grid-2 mt-8">
+            <input type="text" id="newCaseName" placeholder="Название кейса" />
+            <input type="text" id="newCaseEmoji" placeholder="Эмодзи (например 🔥)" value="🎁" />
+          </div>
+          <div class="grid-2 mt-8">
+            <input type="number" id="newCasePrice" placeholder="Цена" step="0.1" value="5" />
+            <select id="newCaseCurrency">
+              <option value="USD">$ (USD)</option>
+              <option value="GRAM">Gram</option>
+            </select>
+          </div>
+          <button class="btn btn-green mt-8" style="width:100%;" onclick="createCase()">Добавить кейс</button>
+        </div>
+
+        <!-- Редактирование кейсов и предметов (включая скрытый шанс weight) -->
+        <div class="panel">
+          <div class="section-title">🛠️ Редактор кейсов и предметов</div>
+          <div class="mt-8">
+            <label class="small-muted">Выберите кейс</label>
+            <select id="adminCaseSelect" onchange="renderAdminCaseEditor()"></select>
+          </div>
+          <div id="adminCaseEditor" class="mt-12"></div>
+        </div>
+
+        <!-- Заявки на крипто-пополнение и выдача баланса -->
+        <div class="panel">
+          <div class="section-title">💰 Заявки на пополнение и баланс</div>
+          <div id="adminDepositsList" class="mt-8 small-muted">Нет активных заявок</div>
+
+          <div class="mt-12">
+            <div class="small-muted">Начислить баланс вручную (по текущему ID или указанному)</div>
+            <div class="grid-2 mt-8">
+              <input type="number" id="adminGrantAmount" placeholder="Сумма" step="0.1" value="50" />
+              <select id="adminGrantCur">
+                <option value="USD">$ (USD)</option>
+                <option value="GRAM">Gram</option>
+              </select>
+            </div>
+            <button class="btn btn-gold mt-8" style="width:100%;" onclick="grantBalanceToCurrent()">
+              Начислить на текущий аккаунт
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <section class="page active" id="home">
-    <div class="hero-grid">
-      <div class="hero pink"><div><h3>Подарки для игроков</h3><p>Открывай виртуальные кейсы и собирай коллекцию</p></div><div class="art">🎁</div></div>
-      <div class="hero blue"><div><h3>Играй каждый день</h3><p>Пробуй мини-игры в демо-режиме</p></div><div class="art">🕹️</div></div>
-      <div class="hero violet"><div><h3>Приглашай друзей</h3><p>Исследуй платформу вместе</p></div><div class="art">🚀</div></div>
+  <!-- Нижняя навигация -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
+        <span>🎮</span>
+        <span>Хаб и кейсы</span>
+      </button>
+      <button class="nav-btn" id="nav-wallet" onclick="switchTab('wallet')">
+        <span>💳</span>
+        <span>Кошелёк</span>
+      </button>
+      <button class="nav-btn" id="nav-inv" onclick="switchTab('inv')">
+        <span>🎒</span>
+        <span>Инвентарь</span>
+      </button>
+      <button class="nav-btn" id="nav-admin" onclick="switchTab('admin')">
+        <span>⚙️</span>
+        <span>Админ</span>
+      </button>
     </div>
-    <div class="section-head"><h2>✨ Популярные игры</h2><small>Выбери игру</small></div>
-    <div class="game-grid" id="homeGames">
-      <button class="game-card" data-name="Plinko" onclick="go('plinko')"><span class="game-art">🔮</span><small>Мини-игра</small><strong>Plinko</strong></button>
-      <button class="game-card" data-name="Mines" onclick="demoGame('Mines')"><span class="game-art">💣</span><small>Мини-игра</small><strong>Mines</strong></button>
-      <button class="game-card" data-name="Upgrade" onclick="demoGame('Upgrade')"><span class="game-art">⬆️</span><small>Мини-игра</small><strong>Upgrade</strong></button>
-      <button class="game-card" data-name="Колесо" onclick="demoGame('Колесо')"><span class="game-art">🎡</span><small>Мини-игра</small><strong>Колесо</strong></button>
-      <button class="game-card" data-name="Слоты" onclick="demoGame('Слоты')"><span class="game-art">🎰</span><small>Мини-игра</small><strong>Слоты</strong></button>
-      <button class="game-card" data-name="Кости" onclick="demoGame('Кости')"><span class="game-art">🎲</span><small>Мини-игра</small><strong>Кости</strong></button>
-      <button class="game-card" data-name="Карты" onclick="demoGame('Карты')"><span class="game-art">🃏</span><small>Мини-игра</small><strong>Карты</strong></button>
-      <button class="game-card" data-name="Кристалл" onclick="demoGame('Кристалл')"><span class="game-art">💎</span><small>Мини-игра</small><strong>Кристалл</strong></button>
-    </div>
-    <div class="section-head"><h2>🏆 Последняя активность</h2><small>Демо-данные</small></div>
-    <div class="activity">
-      <div class="activity-row head"><span>Игра</span><span>Игрок</span><span>Результат</span><span>Статус</span></div>
-      <div class="activity-row"><span>🔮 Plinko</span><span>Игрок_01</span><span>+20 ⭐</span><span>Завершено</span></div>
-      <div class="activity-row"><span>🎁 Кейсы</span><span>Игрок_07</span><span>Подарок</span><span>Завершено</span></div>
-      <div class="activity-row"><span>🎲 Кости</span><span>Игрок_12</span><span>+10 ⭐</span><span>Завершено</span></div>
-    </div>
-  </section>
+  </nav>
 
-  <section class="page" id="games">
-    <div class="section-head"><h2>🎮 Все игры</h2></div>
-    <div class="game-grid">
-      <button class="game-card" onclick="go('plinko')"><span class="game-art">🔮</span><small>Мини-игра</small><strong>Plinko</strong></button>
-      <button class="game-card" onclick="demoGame('Mines')"><span class="game-art">💣</span><small>Мини-игра</small><strong>Mines</strong></button>
-      <button class="game-card" onclick="demoGame('Upgrade')"><span class="game-art">⬆️</span><small>Мини-игра</small><strong>Upgrade</strong></button>
-      <button class="game-card" onclick="demoGame('Колесо')"><span class="game-art">🎡</span><small>Мини-игра</small><strong>Колесо</strong></button>
-    </div>
-  </section>
-
-  <section class="page" id="plinko">
-    <div class="section-head"><h2>🔮 Plinko</h2><small>Демо-режим · без денежных ставок</small></div>
-    <div class="plinko-layout">
-      <div class="plinko-board">
-        <div class="pegs" id="pegs"></div>
-        <div class="slots"><span class="slot">1.5×</span><span class="slot">2×</span><span class="slot">3×</span><span class="slot">5×</span><span class="slot">3×</span><span class="slot">2×</span><span class="slot">1.5×</span></div>
+  <!-- Модалка открытия кейса -->
+  <div class="modal-backdrop" id="caseModal">
+    <div class="modal-card">
+      <div class="row" style="justify-content:space-between;">
+        <div class="section-title" id="caseModalTitle">Кейс</div>
+        <button class="btn btn-ghost" onclick="closeModal('caseModal')">✕</button>
       </div>
-      <div class="controls">
-        <h3>Настройки игры</h3>
-        <label>Количество виртуальных очков</label>
-        <input id="plinkoAmount" type="number" min="1" max="100" value="10">
-        <label>Сложность</label>
-        <select id="plinkoMode"><option>Лёгкая</option><option>Обычная</option><option>Сложная</option></select>
-        <button class="primary" onclick="dropBall()">Запустить шарик</button>
-        <div class="result" id="plinkoResult">Нажми кнопку, чтобы запустить шарик.</div>
-        <p class="note">Результат случайный и используется только для демонстрации механики. Очки не обмениваются на деньги.</p>
+
+      <div class="roulette-window">
+        <div class="roulette-pointer"></div>
+        <div class="roulette-track" id="rouletteTrack"></div>
+      </div>
+
+      <div id="caseDropResult" class="panel" style="display:none; text-align:center;">
+        <div id="dropEmoji" style="font-size:36px;"></div>
+        <div id="dropName" style="font-size:16px; font-weight:800; margin-top:6px;"></div>
+        <div id="dropPrice" style="color:var(--gold); font-weight:700; margin-top:2px;"></div>
+        <div class="row mt-12" style="justify-content:center;">
+          <button class="btn btn-green" onclick="sellDroppedItem()">Продать</button>
+          <button class="btn btn-ghost" onclick="closeModal('caseModal')">Оставить</button>
+        </div>
       </div>
     </div>
-  </section>
-
-  <section class="page" id="cases">
-    <div class="section-head"><h2>🎁 Витрина подарков</h2></div>
-    <div class="game-grid">
-      <div class="game-card"><span class="game-art">💜</span><small>Коллекция</small><strong>Аметист</strong></div>
-      <div class="game-card"><span class="game-art">👑</span><small>Коллекция</small><strong>Корона</strong></div>
-      <div class="game-card"><span class="game-art">🚀</span><small>Коллекция</small><strong>Ракета</strong></div>
-      <div class="game-card"><span class="game-art">💎</span><small>Коллекция</small><strong>Кристалл</strong></div>
-    </div>
-  </section>
-
-  <section class="page" id="profile">
-    <div class="section-head"><h2>👤 Профиль игрока</h2></div>
-    <div class="controls"><div class="avatar">👑</div><h3>Игрок MellstroyGift</h3><p>Виртуальный баланс: <b id="profileBalance">1 000 ⭐</b></p><p class="muted">Это локальная демо-версия интерфейса.</p></div>
-  </section>
-
-  <section class="page" id="about">
-    <div class="controls"><h2>О MellstroyGift</h2><p>Игровой интерфейс с мини-играми и коллекцией виртуальных подарков.</p><p class="muted">Данная версия — визуальный прототип. В ней нет реальных платежей, вывода средств или денежных ставок.</p></div>
-  </section>
-</main>
-
-<aside class="rightbar">
-  <div class="chat-head"><b>💬 Общий чат</b><span class="online">● Онлайн: демо</span></div>
-  <div class="chat-list">
-    <div class="chat-msg"><b>Игрок_Аметист</b>Всем привет! 👋<small>только что</small></div>
-    <div class="chat-msg"><b>GiftFan</b>Как вам новый дизайн?<small>2 мин назад</small></div>
-    <div class="chat-msg"><b>Player_77</b>Plinko выглядит классно ✨<small>5 мин назад</small></div>
-    <div class="chat-msg"><b>MellstroyGift</b>Добро пожаловать на платформу!<small>10 мин назад</small></div>
   </div>
-  <div class="chat-compose"><input placeholder="Чат пока демонстрационный" disabled><div class="note">Сообщения не отправляются в этой версии.</div></div>
-</aside>
-</div>
-<script>
-let points=Number(localStorage.getItem('mg_demo_points')||1000);
-function fmt(n){return n.toLocaleString('ru-RU')}
-function updateBalance(){document.getElementById('balance').textContent=fmt(points);document.getElementById('profileBalance').textContent=fmt(points)+' ⭐';localStorage.setItem('mg_demo_points',points)}
-function go(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'})}
-document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
-function demoGame(name){alert(name+': это демонстрационный экран. Здесь используются только виртуальные очки.')}
-function searchGames(q){document.querySelectorAll('#homeGames .game-card').forEach(card=>{card.style.display=card.dataset.name.toLowerCase().includes(q.toLowerCase())?'block':'none'})}
-const pegs=document.getElementById('pegs');
-for(let r=0;r<9;r++){const row=document.createElement('div');row.className='peg-row';for(let c=0;c<=r+2;c++){const peg=document.createElement('span');peg.className='peg';row.appendChild(peg)}pegs.appendChild(row)}
-function dropBall(){
- const input=document.getElementById('plinkoAmount'),amount=Math.floor(Number(input.value));
- const out=document.getElementById('plinkoResult');
- if(!Number.isFinite(amount)||amount<1||amount>100){out.textContent='Укажи число от 1 до 100.';return}
- if(points<amount){out.textContent='Недостаточно виртуальных очков.';return}
- points-=amount;
- const multipliers=[0.5,1,1.5,2,3,2,1.5,1,0.5];
- const mult=multipliers[Math.floor(Math.random()*multipliers.length)];
- const reward=Math.floor(amount*mult);
- points+=reward;updateBalance();
- out.textContent='Шарик попал в ячейку '+mult+'×. Демонстрационный результат: '+(reward-amount>=0?'+':'')+(reward-amount)+' ⭐';
- const ball=document.createElement('div');ball.textContent='🟢';ball.style.cssText='position:fixed;z-index:10;left:50%;top:20%;font-size:24px;pointer-events:none;transition:top .7s ease, left .7s ease';document.body.appendChild(ball);setTimeout(()=>{ball.style.top='70%';ball.style.left=(35+Math.random()*30)+'%';},30);setTimeout(()=>ball.remove(),850);
-}
-updateBalance();
-</script>
+
+  <!-- Модалка мини-игр Play Hub -->
+  <div class="modal-backdrop" id="gameModal">
+    <div class="modal-card">
+      <div class="row" style="justify-content:space-between;">
+        <div class="section-title" id="gameModalTitle">Игра</div>
+        <button class="btn btn-ghost" onclick="closeModal('gameModal')">✕</button>
+      </div>
+
+      <div class="mt-12">
+        <label class="small-muted">Ставка (<span id="gameBetCur">$</span>)</label>
+        <input type="number" id="gameBetInput" min="0.1" step="0.1" value="1" />
+      </div>
+
+      <div id="gameDynamicArea" class="mt-12"></div>
+
+      <button class="btn btn-green mt-12" style="width:100%;" id="gamePlayBtn" onclick="playCurrentGame()">
+        Сыграть
+      </button>
+      <div id="gameResultBox" class="panel mt-12" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Модалка быстрого пополнения -->
+  <div class="modal-backdrop" id="depositModal">
+    <div class="modal-card">
+      <div class="row" style="justify-content:space-between;">
+        <div class="section-title">💎 Пополнение баланса</div>
+        <button class="btn btn-ghost" onclick="closeModal('depositModal')">✕</button>
+      </div>
+      <p class="small-muted mt-8">
+        Переведите средства в <b>$ (USDT)</b> или <b>Gram</b> на ваш криптокошелёк, затем перейдите в раздел «Кошелёк» для отправки хэша/заявки или используйте «Админ» для теста.
+      </p>
+      <div class="row mt-12">
+        <button class="btn btn-green" style="flex:1;" onclick="closeModal('depositModal'); switchTab('wallet');">
+          Перейти в кошелёк
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_ID = 5200591975;
+    const STORAGE_KEY = "gram_play_casino_v1";
+
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    function detectInitialUser() {
+      const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+      if (tgUser && tgUser.id) {
+        return {
+          id: Number(tgUser.id),
+          name: [tgUser.first_name, tgUser.last_name].filter(Boolean).join(" ") || tgUser.username || "Игрок"
+        };
+      }
+      return {
+        id: ADMIN_ID,
+        name: "Владелец (Тест)"
+      };
+    }
+
+    function defaultState() {
+      const initUser = detectInitialUser();
+      return {
+        currency: "USD",
+        user: initUser,
+        balancesByUser: {
+          [initUser.id]: { USD: 25, GRAM: 50 },
+          [ADMIN_ID]: { USD: 100, GRAM: 250 }
+        },
+        inventory: [],
+        deposits: [],
+        cases: [
+          {
+            id: "case-start",
+            name: "Стартовый кейс",
+            emoji: "📦",
+            price: 2,
+            currency: "USD",
+            items: [
+              { id: "i1", name: "Бронзовый чип", emoji: "🪙", value: 0.8, weight: 50 },
+              { id: "i2", name: "Неоновый ствол", emoji: "🔫", value: 2.5, weight: 30 },
+              { id: "i3", name: "Кристалл Gram", emoji: "💎", value: 6.0, weight: 15 },
+              { id: "i4", name: "Корона Джекпота", emoji: "👑", value: 20.0, weight: 5 }
+            ]
+          },
+          {
+            id: "case-gram",
+            name: "Gram Vault",
+            emoji: "💎",
+            price: 10,
+            currency: "GRAM",
+            items: [
+              { id: "i5", name: "Осколок Gram", emoji: "🔹", value: 5, weight: 45 },
+              { id: "i6", name: "Кибер-перчатка", emoji: "🥊", value: 14, weight: 35 },
+              { id: "i7", name: "Ракета x3", emoji: "🚀", value: 35, weight: 15 },
+              { id: "i8", name: "Золотой багет", emoji: "🏆", value: 90, weight: 5 }
+            ]
+          }
+        ]
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+        const parsed = JSON.parse(raw);
+        const base = defaultState();
+        return { ...base, ...parsed, user: parsed.user || base.user };
+      } catch {
+        return defaultState();
+      }
+    }
+
+    let state = loadState();
+    let currentGame = "plinko";
+    let lastDroppedItem = null;
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function showToast(text) {
+      const el = document.getElementById("toast");
+      el.textContent = text;
+      el.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("show"), 2400);
+    }
+
+    function getUserBalance(userId = state.user.id) {
+      if (!state.balancesByUser[userId]) {
+        state.balancesByUser[userId] = { USD: 0, GRAM: 0 };
+      }
+      return state.balancesByUser[userId];
+    }
+
+    function formatAmount(val, cur) {
+      const n = Number(val || 0).toFixed(2);
+      return cur === "USD" ? `$${n}` : `${n} Gram`;
+    }
+
+    function setCurrency(cur) {
+      state.currency = cur;
+      saveState();
+      renderAll();
+    }
+
+    function switchTab(tab) {
+      ["home", "wallet", "inv", "admin"].forEach(t => {
+        document.getElementById("tab-" + t).style.display = t === tab ? "block" : "none";
+        document.getElementById("nav-" + t).classList.toggle("active", t === tab);
+      });
+      if (tab === "admin") renderAdmin();
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    /* Скрытый выбор предмета по весу (weight) — игрок веса нигде не видит */
+    function pickWeightedItem(items) {
+      const valid = items.filter(it => Number(it.weight) > 0);
+      if (!valid.length) return items[0] || null;
+      const total = valid.reduce((sum, it) => sum + Number(it.weight), 0);
+      let r = Math.random() * total;
+      for (const it of valid) {
+        r -= Number(it.weight);
+        if (r <= 0) return it;
+      }
+      return valid[valid.length - 1];
+    }
+
+    function renderHeader() {
+      const bal = getUserBalance();
+      const initials = (state.user.name || "GP").slice(0, 2).toUpperCase();
+      document.getElementById("userAvatar").textContent = initials;
+      document.getElementById("userName").textContent = state.user.name;
+      document.getElementById("userIdLabel").textContent = `ID: ${state.user.id}`;
+      document.getElementById("balUSD").textContent = Number(bal.USD).toFixed(2);
+      document.getElementById("balGRAM").textContent = Number(bal.GRAM).toFixed(2);
+      document.getElementById("pillUSD").classList.toggle("active", state.currency === "USD");
+      document.getElementById("pillGRAM").classList.toggle("active", state.currency === "GRAM");
+      document.getElementById("activeCurBadge").textContent =
+        state.currency === "USD" ? "Валюта: $ (USD)" : "Валюта: Gram";
+    }
+
+    function renderCases() {
+      const wrap = document.getElementById("casesContainer");
+      if (!state.cases.length) {
+        wrap.innerHTML = `<div class="panel small-muted">Кейсов пока нет. Добавьте их в админ-панели.</div>`;
+        return;
+      }
+
+      wrap.innerHTML = state.cases.map(c => {
+        const itemsHtml = (c.items || []).map(it => `
+          <div class="mini-item">
+            <span class="mini-item-icon">${it.emoji || "🎁"}</span>
+            <div class="mini-item-name">${escapeHtml(it.name)}</div>
+            <div class="mini-item-val">${formatAmount(it.value, c.currency)}</div>
+          </div>
+        `).join("");
+
+        return `
+          <div class="case-card">
+            <div class="case-top">
+              <div class="case-title-wrap">
+                <div class="case-emoji">${c.emoji || "📦"}</div>
+                <div>
+                  <div class="case-name">${escapeHtml(c.name)}</div>
+                  <div class="case-sub">Предметов: ${(c.items || []).length}</div>
+                </div>
+              </div>
+              <button class="case-price-btn" onclick="openCaseRoulette('${c.id}')">
+                Открыть · ${formatAmount(c.price, c.currency)}
+              </button>
+            </div>
+            <div class="items-strip">${itemsHtml || '<span class="small-muted">Нет предметов</span>'}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openCaseRoulette(caseId) {
+      const c = state.cases.find(x => x.id === caseId);
+      if (!c || !c.items || !c.items.length) {
+        return showToast("В этом кейсе нет предметов");
+      }
+
+      const bal = getUserBalance();
+      const cur = c.currency || state.currency;
+      const price = Number(c.price || 0);
+      if ((bal[cur] || 0) < price) {
+        return showToast(`Недостаточно средств (${formatAmount(price, cur)})`);
+      }
+
+      bal[cur] = Number((bal[cur] - price).toFixed(2));
+      const winner = pickWeightedItem(c.items);
+      lastDroppedItem = { ...winner, currency: cur };
+      state.inventory.unshift({
+        uid: "inv_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        name: winner.name,
+        emoji: winner.emoji || "🎁",
+        value: Number(winner.value || 0),
+        currency: cur
+      });
+      saveState();
+      renderHeader();
+      renderInventory();
+
+      document.getElementById("caseModalTitle").textContent = c.name;
+      document.getElementById("caseDropResult").style.display = "none";
+
+      const track = document.getElementById("rouletteTrack");
+      track.style.transition = "none";
+      track.style.transform = "translateX(0px)";
+
+      const reelCount = 28;
+      const winIndex = 22;
+      const cards = [];
+      for (let i = 0; i < reelCount; i++) {
+        const item = i === winIndex ? winner : c.items[Math.floor(Math.random() * c.items.length)];
+        cards.push(`
+          <div class="reel-card">
+            <div style="font-size:24px;">${item.emoji || "🎁"}</div>
+            <div style="font-size:11px; font-weight:700; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(item.name)}</div>
+            <div style="font-size:11px; color:var(--gold); font-weight:700; margin-top:2px;">${formatAmount(item.value, cur)}</div>
+          </div>
+        `);
+      }
+      track.innerHTML = cards.join("");
+      openModal("caseModal");
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const cardWidth = 104;
+          const jitter = Math.floor(Math.random() * 44) - 22;
+          const offset = -(winIndex * cardWidth + 48 + jitter);
+          track.style.transition = "transform 2.7s cubic-bezier(0.12, 0.85, 0.2, 1)";
+          track.style.transform = `translateX(${offset}px)`;
+        });
+      });
+
+      setTimeout(() => {
+        document.getElementById("dropEmoji").textContent = winner.emoji || "🎁";
+        document.getElementById("dropName").textContent = winner.name;
+        document.getElementById("dropPrice").textContent = `Стоимость: ${formatAmount(winner.value, cur)}`;
+        document.getElementById("caseDropResult").style.display = "block";
+      }, 2800);
+    }
+
+    function sellDroppedItem() {
+      if (!lastDroppedItem) return;
+      const idx = state.inventory.findIndex(
+        x => x.name === lastDroppedItem.name && Number(x.value) === Number(lastDroppedItem.value)
+      );
+      if (idx !== -1) {
+        const sold = state.inventory.splice(idx, 1)[0];
+        const bal = getUserBalance();
+        bal[sold.currency] = Number(((bal[sold.currency] || 0) + Number(sold.value || 0)).toFixed(2));
+        saveState();
+        renderHeader();
+        renderInventory();
+        showToast(`Продано за ${formatAmount(sold.value, sold.currency)}`);
+      }
+      lastDroppedItem = null;
+      closeModal("caseModal");
+    }
+
+    /* Мини-игры Play Hub */
+    function openGameModal(game) {
+      currentGame = game;
+      const titles = {
+        plinko: "🟢 Plinko",
+        crash: "🚀 Crash",
+        mines: "💣 Mines",
+        roulette: "🎡 Рулетка"
+      };
+      const descs = {
+        plinko: "Шарик падает через пины — множители от 0.2x до 10x.",
+        crash: "Ракета летит до случайного краша — фиксируем целевой множитель.",
+        mines: "Симуляция открытия ячейки с минами (шанс победы зависит от риска).",
+        roulette: "Выберите сектор рулетки: 2x, 3x или 14x."
+      };
+
+      document.getElementById("gameModalTitle").textContent = titles[game] || "Игра";
+      document.getElementById("gameBetCur").textContent = state.currency === "USD" ? "$" : "Gram";
+      document.getElementById("gameResultBox").style.display = "none";
+
+      const dyn = document.getElementById("gameDynamicArea");
+      if (game === "roulette") {
+        dyn.innerHTML = `
+          <label class="small-muted">Сектор</label>
+          <select id="rouletteMultSelect">
+            <option value="2">2x (частый сектор)</option>
+            <option value="3">3x (средний сектор)</option>
+            <option value="14">14x (редкий сектор)</option>
+          </select>
+        `;
+      } else if (game === "crash") {
+        dyn.innerHTML = `
+          <label class="small-muted">Автовывод на множителе</label>
+          <input type="number" id="crashTargetInput" step="0.1" min="1.1" value="1.8" />
+        `;
+      } else {
+        dyn.innerHTML = `<div class="small-muted">${descs[game]}</div>`;
+      }
+
+      openModal("gameModal");
+    }
+
+    function playCurrentGame() {
+      const bet = Number(document.getElementById("gameBetInput").value || 0);
+      const cur = state.currency;
+      const bal = getUserBalance();
+
+      if (bet <= 0 || isNaN(bet)) return showToast("Введите корректную ставку");
+      if ((bal[cur] || 0) < bet) return showToast("Недостаточно средств");
+
+      bal[cur] = Number((bal[cur] - bet).toFixed(2));
+
+      let mult = 0;
+      let infoText = "";
+
+      if (currentGame === "plinko") {
+        const pool = [0.2, 0.5, 1.0, 1.5, 2.0, 4.0, 10.0];
+        const weights = [24, 24, 22, 14, 9, 5, 2];
+        mult = weightedChoice(pool, weights);
+        infoText = `Выпал слот ${mult}x`;
+      } else if (currentGame === "crash") {
+        const target = Math.max(1.1, Number(document.getElementById("crashTargetInput")?.value || 1.8));
+        const crashPoint = Number((1 + Math.random() * 3.5).toFixed(2));
+        mult = crashPoint >= target ? target : 0;
+        infoText = `Ракета улетела на ${crashPoint}x · Цель: ${target}x`;
+      } else if (currentGame === "mines") {
+        const win = Math.random() < 0.52;
+        mult = win ? 1.85 : 0;
+        infoText = win ? "Безопасная клетка открыта (1.85x)" : "Попали на мину";
+      } else if (currentGame === "roulette") {
+        const chosen = Number(document.getElementById("rouletteMultSelect")?.value || 2);
+        const chanceMap = { 2: 0.45, 3: 0.28, 14: 0.06 };
+        const win = Math.random() < (chanceMap[chosen] || 0.3);
+        mult = win ? chosen : 0;
+        infoText = win ? `Сыграл сектор ${chosen}x` : `Сектор ${chosen}x не выпал`;
+      }
+
+      const payout = Number((bet * mult).toFixed(2));
+      bal[cur] = Number((bal[cur] + payout).toFixed(2));
+      saveState();
+      renderHeader();
+
+      const box = document.getElementById("gameResultBox");
+      box.style.display = "block";
+      box.innerHTML = `
+        <div style="font-weight:800; color:${payout > 0 ? "var(--green)" : "var(--danger)"};">
+          ${payout > 0 ? `Выигрыш: +${formatAmount(payout, cur)}` : `Проигрыш: -${formatAmount(bet, cur)}`}
+        </div>
+        <div class="small-muted mt-8">${infoText}</div>
+      `;
+    }
+
+    function weightedChoice(values, weights) {
+      const total = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * total;
+      for (let i = 0; i < values.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return values[i];
+      }
+      return values[values.length - 1];
+    }
+
+    /* Кошелёк и заявки на пополнение */
+    function submitDeposit() {
+      const cur = document.getElementById("depCurrency").value;
+      const amount = Number(document.getElementById("depAmount").value || 0);
+      const tx = document.getElementById("depTx").value.trim();
+
+      if (amount <= 0) return showToast("Укажите сумму пополнения");
+      if (!tx) return showToast("Укажите TXID или адрес кошелька");
+
+      state.deposits.unshift({
+        id: "dep_" + Date.now(),
+        userId: state.user.id,
+        userName: state.user.name,
+        currency: cur,
+        amount,
+        tx,
+        status: "pending",
+        createdAt: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
+      });
+
+      document.getElementById("depTx").value = "";
+      saveState();
+      renderWallet();
+      showToast("Заявка на пополнение создана");
+    }
+
+    function renderWallet() {
+      const myList = document.getElementById("myDepositsList");
+      const mine = state.deposits.filter(d => Number(d.userId) === Number(state.user.id));
+      if (!mine.length) {
+        myList.innerHTML = "Заявок пока нет";
+        return;
+      }
+      myList.innerHTML = mine.map(d => {
+        const st = d.status === "approved"
+          ? `<span style="color:var(--green); font-weight:700;">Подтверждена</span>`
+          : d.status === "rejected"
+          ? `<span style="color:var(--danger); font-weight:700;">Отклонена</span>`
+          : `<span style="color:var(--gold); font-weight:700;">На проверке</span>`;
+        return `
+          <div class="panel mt-8" style="padding:10px;">
+            <div class="row" style="justify-content:space-between;">
+              <b>${formatAmount(d.amount, d.currency)}</b>
+              ${st}
+            </div>
+            <div class="small-muted mt-8">TX: ${escapeHtml(d.tx)} · ${d.createdAt}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    /* Инвентарь */
+    function renderInventory() {
+      const wrap = document.getElementById("inventoryList");
+      if (!state.inventory.length) {
+        wrap.innerHTML = "Инвентарь пуст";
+        return;
+      }
+      wrap.innerHTML = state.inventory.map((it, idx) => `
+        <div class="panel mt-8" style="padding:10px;">
+          <div class="row" style="justify-content:space-between;">
+            <div class="row">
+              <span style="font-size:22px;">${it.emoji || "🎁"}</span>
+              <div>
+                <div style="font-weight:700;">${escapeHtml(it.name)}</div>
+                <div class="small-muted">${formatAmount(it.value, it.currency)}</div>
+              </div>
+            </div>
+            <button class="btn btn-green" onclick="sellInventoryItem(${idx})">Продать</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function sellInventoryItem(idx) {
+      const item = state.inventory[idx];
+      if (!item) return;
+      state.inventory.splice(idx, 1);
+      const bal = getUserBalance();
+      bal[item.currency] = Number(((bal[item.currency] || 0) + Number(item.value || 0)).toFixed(2));
+      saveState();
+      renderHeader();
+      renderInventory();
+      showToast(`Начислено ${formatAmount(item.value, item.currency)}`);
+    }
+
+    /* Админ-панель (ID 5200591975) */
+    function applyTestUserId() {
+      const val = Number(document.getElementById("testIdInput").value);
+      if (!val) return showToast("Введите корректный числовой ID");
+      state.user.id = val;
+      state.user.name = val === ADMIN_ID ? "Админ (5200591975)" : `Игрок #${val}`;
+      getUserBalance(val);
+      saveState();
+      renderAll();
+      renderAdmin();
+      showToast(`Активирован ID ${val}`);
+    }
+
+    function renderAdmin() {
+      document.getElementById("testIdInput").value = state.user.id;
+      const isAdmin = Number(state.user.id) === ADMIN_ID;
+      document.getElementById("adminRestrictedBox").style.display = isAdmin ? "none" : "block";
+      document.getElementById("adminPanelContent").style.display = isAdmin ? "block" : "none";
+      document.getElementById("deniedIdText").textContent = state.user.id;
+
+      if (!isAdmin) return;
+
+      const sel = document.getElementById("adminCaseSelect");
+      const prevSelected = sel.value;
+      sel.innerHTML = state.cases.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${formatAmount(c.price, c.currency)})</option>`).join("");
+      if (prevSelected && state.cases.some(c => c.id === prevSelected)) {
+        sel.value = prevSelected;
+      }
+
+      renderAdminCaseEditor();
+      renderAdminDeposits();
+    }
+
+    function createCase() {
+      const name = document.getElementById("newCaseName").value.trim();
+      const emoji = document.getElementById("newCaseEmoji").value.trim() || "🎁";
+      const price = Math.max(0, Number(document.getElementById("newCasePrice").value || 0));
+      const currency = document.getElementById("newCaseCurrency").value;
+
+      if (!name) return showToast("Введите название кейса");
+
+      const newCase = {
+        id: "case_" + Date.now(),
+        name,
+        emoji,
+        price,
+        currency,
+        items: [
+          { id: "it_" + Date.now(), name: "Базовый дроп", emoji: "🔹", value: Number((price * 0.5).toFixed(2)), weight: 70 },
+          { id: "it_" + (Date.now() + 1), name: "Редкий дроп", emoji: "🔥", value: Number((price * 2.5).toFixed(2)), weight: 30 }
+        ]
+      };
+
+      state.cases.push(newCase);
+      document.getElementById("newCaseName").value = "";
+      saveState();
+      renderCases();
+      renderAdmin();
+      showToast("Кейс создан");
+    }
+
+    function renderAdminCaseEditor() {
+      const box = document.getElementById("adminCaseEditor");
+      const caseId = document.getElementById("adminCaseSelect").value;
+      const c = state.cases.find(x => x.id === caseId);
+      if (!c) {
+        box.innerHTML = `<div class="small-muted">Нет кейса для редактирования</div>`;
+        return;
+      }
+
+      const itemsRows = (c.items || []).map(it => `
+        <div class="panel mt-8" style="padding:10px; background:var(--bg-main);">
+          <div class="grid-2">
+            <input type="text" id="it-name-${it.id}" value="${escapeAttr(it.name)}" placeholder="Название" />
+            <input type="text" id="it-emoji-${it.id}" value="${escapeAttr(it.emoji || "🎁")}" placeholder="Эмодзи" />
+          </div>
+          <div class="grid-2 mt-8">
+            <div>
+              <label class="small-muted">Цена предмета</label>
+              <input type="number" step="0.1" id="it-val-${it.id}" value="${it.value}" />
+            </div>
+            <div>
+              <label class="small-muted">Скрытый шанс (вес)</label>
+              <input type="number" step="1" min="0" id="it-w-${it.id}" value="${it.weight}" />
+            </div>
+          </div>
+          <div class="row mt-8">
+            <button class="btn btn-green" onclick="saveCaseItem('${c.id}', '${it.id}')">Сохранить</button>
+            <button class="btn btn-red" onclick="deleteCaseItem('${c.id}', '${it.id}')">Удалить</button>
+          </div>
+        </div>
+      `).join("");
+
+      box.innerHTML = `
+        <div class="grid-2">
+          <div>
+            <label class="small-muted">Название кейса</label>
+            <input type="text" id="editCaseName" value="${escapeAttr(c.name)}" />
+          </div>
+          <div>
+            <label class="small-muted">Цена кейса</label>
+            <input type="number" step="0.1" id="editCasePrice" value="${c.price}" />
+          </div>
+        </div>
+        <div class="row mt-8">
+          <button class="btn" onclick="saveCaseMeta('${c.id}')">Сохранить кейс</button>
+          <button class="btn btn-red" onclick="deleteCase('${c.id}')">Удалить кейс</button>
+        </div>
+
+        <div class="mt-12">
+          <div class="section-title" style="font-size:14px;">Добавить предмет в кейс</div>
+          <div class="grid-2 mt-8">
+            <input type="text" id="addItemName" placeholder="Название предмета" />
+            <input type="text" id="addItemEmoji" placeholder="Эмодзи" value="⚡" />
+          </div>
+          <div class="grid-2 mt-8">
+            <input type="number" step="0.1" id="addItemVal" placeholder="Цена" value="3" />
+            <input type="number" step="1" min="0" id="addItemWeight" placeholder="Шанс (вес)" value="20" />
+          </div>
+          <button class="btn btn-green mt-8" style="width:100%;" onclick="addCaseItem('${c.id}')">
+            + Добавить предмет
+          </button>
+        </div>
+
+        <div class="mt-12">
+          <div class="section-title" style="font-size:14px;">Содержимое кейса (видят только админы)</div>
+          ${itemsRows}
+        </div>
+      `;
+    }
+
+    function saveCaseMeta(caseId) {
+      const c = state.cases.find(x => x.id === caseId);
+      if (!c) return;
+      c.name = document.getElementById("editCaseName").value.trim() || c.name;
+      c.price = Math.max(0, Number(document.getElementById("editCasePrice").value || 0));
+      saveState();
+      renderCases();
+      renderAdmin();
+      showToast("Кейс обновлён");
+    }
+
+    function deleteCase(caseId) {
+      state.cases = state.cases.filter(x => x.id !== caseId);
+      saveState();
+      renderCases();
+      renderAdmin();
+      showToast("Кейс удалён");
+    }
+
+    function addCaseItem(caseId) {
+      const c = state.cases.find(x => x.id === caseId);
+      if (!c) return;
+      const name = document.getElementById("addItemName").value.trim();
+      const emoji = document.getElementById("addItemEmoji").value.trim() || "🎁";
+      const value = Math.max(0, Number(document.getElementById("addItemVal").value || 0));
+      const weight = Math.max(0, Number(document.getElementById("addItemWeight").value || 0));
+
+      if (!name) return showToast("Введите название предмета");
+      c.items.push({
+        id: "it_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
+        name,
+        emoji,
+        value,
+        weight
+      });
+      saveState();
+      renderCases();
+      renderAdminCaseEditor();
+      showToast("Предмет добавлен");
+    }
+
+    function saveCaseItem(caseId, itemId) {
+      const c = state.cases.find(x => x.id === caseId);
+      if (!c) return;
+      const it = c.items.find(x => x.id === itemId);
+      if (!it) return;
+
+      it.name = document.getElementById("it-name-" + itemId).value.trim() || it.name;
+      it.emoji = document.getElementById("it-emoji-" + itemId).value.trim() || "🎁";
+      it.value = Math.max(0, Number(document.getElementById("it-val-" + itemId).value || 0));
+      it.weight = Math.max(0, Number(document.getElementById("it-w-" + itemId).value || 0));
+
+      saveState();
+      renderCases();
+      showToast("Предмет сохранён");
+    }
+
+    function deleteCaseItem(caseId, itemId) {
+      const c = state.cases.find(x => x.id === caseId);
+      if (!c) return;
+      c.items = c.items.filter(x => x.id !== itemId);
+      saveState();
+      renderCases();
+      renderAdminCaseEditor();
+      showToast("Предмет удалён");
+    }
+
+    function renderAdminDeposits() {
+      const box = document.getElementById("adminDepositsList");
+      if (!state.deposits.length) {
+        box.innerHTML = `<div class="small-muted">Заявок пока нет</div>`;
+        return;
+      }
+      box.innerHTML = state.deposits.map(d => `
+        <div class="panel mt-8" style="padding:10px; background:var(--bg-main);">
+          <div><b>${escapeHtml(d.userName)}</b> (ID: ${d.userId}) · <b>${formatAmount(d.amount, d.currency)}</b></div>
+          <div class="small-muted mt-8">TX: ${escapeHtml(d.tx)} · Статус: ${d.status}</div>
+          ${d.status === "pending" ? `
+            <div class="row mt-8">
+              <button class="btn btn-green" onclick="approveDeposit('${d.id}')">Зачислить</button>
+              <button class="btn btn-red" onclick="rejectDeposit('${d.id}')">Отклонить</button>
+            </div>
+          ` : ""}
+        </div>
+      `).join("");
+    }
+
+    function approveDeposit(depId) {
+      const d = state.deposits.find(x => x.id === depId);
+      if (!d || d.status !== "pending") return;
+      d.status = "approved";
+      const bal = getUserBalance(d.userId);
+      bal[d.currency] = Number(((bal[d.currency] || 0) + Number(d.amount || 0)).toFixed(2));
+      saveState();
+      renderHeader();
+      renderWallet();
+      renderAdminDeposits();
+      showToast("Пополнение зачислено");
+    }
+
+    function rejectDeposit(depId) {
+      const d = state.deposits.find(x => x.id === depId);
+      if (!d || d.status !== "pending") return;
+      d.status = "rejected";
+      saveState();
+      renderWallet();
+      renderAdminDeposits();
+      showToast("Заявка отклонена");
+    }
+
+    function grantBalanceToCurrent() {
+      const amt = Number(document.getElementById("adminGrantAmount").value || 0);
+      const cur = document.getElementById("adminGrantCur").value;
+      if (amt <= 0) return showToast("Введите сумму");
+      const bal = getUserBalance(state.user.id);
+      bal[cur] = Number(((bal[cur] || 0) + amt).toFixed(2));
+      saveState();
+      renderHeader();
+      showToast(`Начислено ${formatAmount(amt, cur)}`);
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, "&#39;");
+    }
+
+    function renderAll() {
+      renderHeader();
+      renderCases();
+      renderWallet();
+      renderInventory();
+    }
+
+    renderAll();
+  </script>
 </body>
 </html>
