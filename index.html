@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GRAM PLAY — Casino Mini App</title>
+  <title>Mellstroy Gift — Casino Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     :root {
       --bg: #080614;
@@ -18,7 +19,6 @@
       --purple: #8b5cf6;
       --purple-bright: #a855f7;
       --pink: #ec4899;
-      --cyan: #22d3ee;
       --green: #10b981;
       --red: #f43f5e;
       --gold: #fbbf24;
@@ -37,7 +37,6 @@
       background:
         radial-gradient(circle at 12% 0%, rgba(168, 85, 247, 0.34), transparent 45%),
         radial-gradient(circle at 88% 12%, rgba(236, 72, 153, 0.24), transparent 42%),
-        radial-gradient(circle at 50% 100%, rgba(34, 211, 238, 0.12), transparent 50%),
         var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
@@ -51,7 +50,6 @@
       padding: 12px 12px 92px;
     }
 
-    /* Верхняя панель */
     .top-bar {
       position: sticky;
       top: 8px;
@@ -140,7 +138,6 @@
       cursor: pointer;
     }
 
-    /* Заголовки и карточки */
     .section-title {
       font-size: 16px;
       font-weight: 900;
@@ -169,7 +166,6 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
     }
 
-    /* Play Hub */
     .hub-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -184,19 +180,7 @@
       padding: 14px;
       cursor: pointer;
       overflow: hidden;
-      transition: transform 0.14s ease, box-shadow 0.14s ease;
-    }
-
-    .game-tile::after {
-      content: "";
-      position: absolute;
-      width: 84px;
-      height: 84px;
-      right: -18px;
-      top: -18px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.36), transparent 70%);
-      pointer-events: none;
+      transition: transform 0.14s ease;
     }
 
     .game-tile:active {
@@ -220,14 +204,12 @@
       margin-top: 2px;
     }
 
-    /* Кейсы */
     .case-box {
       background: linear-gradient(150deg, rgba(38, 29, 84, 0.95), rgba(18, 13, 44, 0.98));
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 14px;
       margin-bottom: 12px;
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
     }
 
     .case-head {
@@ -246,13 +228,8 @@
       color: #fff;
       font-weight: 900;
       font-size: 12px;
-      box-shadow: 0 0 18px rgba(236, 72, 153, 0.35);
       cursor: pointer;
       white-space: nowrap;
-    }
-
-    .case-open-btn:active {
-      transform: scale(0.97);
     }
 
     .case-items-row {
@@ -276,7 +253,6 @@
       flex-shrink: 0;
     }
 
-    /* Горизонтальная рулетка открытия кейса */
     .case-spinner-wrap {
       position: relative;
       overflow: hidden;
@@ -296,7 +272,6 @@
       background: linear-gradient(180deg, var(--gold), var(--pink));
       transform: translateX(-50%);
       z-index: 6;
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
     }
 
     .case-spinner-track {
@@ -322,7 +297,6 @@
       box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
     }
 
-    /* Элементы управления */
     .seg-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -347,7 +321,6 @@
     .seg-btn.active {
       background: linear-gradient(135deg, var(--purple), var(--purple-bright));
       color: #fff;
-      box-shadow: 0 0 14px rgba(139, 92, 246, 0.45);
     }
 
     .bet-bar {
@@ -395,13 +368,10 @@
 
     .primary-btn.blue {
       background: linear-gradient(135deg, #3b82f6, #6366f1);
-      box-shadow: 0 6px 22px rgba(59, 130, 246, 0.38);
     }
 
     .primary-btn.green {
       background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff;
-      box-shadow: 0 6px 22px rgba(16, 185, 129, 0.38);
     }
 
     .primary-btn:active {
@@ -419,7 +389,7 @@
 
     #plinkoCanvas {
       width: 100%;
-      height: 300px;
+      height: 310px;
       display: block;
     }
 
@@ -434,7 +404,7 @@
       background: linear-gradient(180deg, #6d28d9, #4c1d95);
       color: #fff;
       border-radius: 7px;
-      padding: 5px 2px;
+      padding: 6px 2px;
       text-align: center;
       font-size: 10px;
       font-weight: 900;
@@ -444,11 +414,11 @@
     .plinko-mult.hit {
       background: linear-gradient(135deg, #10b981, #34d399);
       color: #052e16;
-      transform: scale(1.1);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.7);
+      transform: scale(1.08);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.75);
     }
 
-    /* Слоты 5x5 */
+    /* Плавная прокрутка слотов 5x5 */
     .slots-board {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -460,32 +430,35 @@
       margin-bottom: 10px;
     }
 
-    .slot-cell {
-      aspect-ratio: 1 / 1;
+    .slot-reel-col {
+      height: 54px;
       border-radius: 12px;
       background: linear-gradient(160deg, var(--card-2), var(--card));
       border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slot-reel-strip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      will-change: transform;
+    }
+
+    .slot-symbol-item {
+      height: 54px;
+      width: 100%;
       display: grid;
       place-items: center;
       font-size: 24px;
-      transition: transform 0.14s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
     }
 
-    .slot-cell.spinning {
-      animation: slotBlur 0.13s infinite linear;
-    }
-
-    .slot-cell.win-cell {
+    .slot-reel-col.win-cell {
       border-color: var(--gold);
-      background: linear-gradient(160deg, rgba(251, 191, 36, 0.28), rgba(168, 85, 247, 0.25));
       box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
-      transform: scale(1.05);
-    }
-
-    @keyframes slotBlur {
-      0% { transform: translateY(-2px); }
-      50% { transform: translateY(2px); }
-      100% { transform: translateY(-2px); }
+      background: linear-gradient(160deg, rgba(251, 191, 36, 0.25), rgba(168, 85, 247, 0.25));
     }
 
     .slots-controls-row {
@@ -535,7 +508,7 @@
     }
 
     .spin-wheel-btn.spinning {
-      animation: spinRot 0.65s linear infinite;
+      animation: spinRot 0.7s linear infinite;
     }
 
     @keyframes spinRot {
@@ -626,24 +599,17 @@
       display: grid;
       place-items: center;
       cursor: pointer;
-      transition: transform 0.1s ease;
-    }
-
-    .mine-tile:active {
-      transform: scale(0.95);
     }
 
     .mine-tile.safe-open {
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.25));
       border-color: var(--green);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
       color: #fff;
     }
 
     .mine-tile.mine-boom {
       background: linear-gradient(135deg, rgba(244, 63, 94, 0.45), rgba(190, 18, 60, 0.35));
       border-color: var(--red);
-      box-shadow: 0 0 16px rgba(244, 63, 94, 0.55);
       color: #fff;
     }
 
@@ -669,7 +635,6 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 10px;
-      overflow: hidden;
     }
 
     .rocket-sprite {
@@ -735,7 +700,6 @@
       color: #fff;
     }
 
-    /* Модалки */
     .modal-wrap {
       position: fixed;
       inset: 0;
@@ -801,7 +765,6 @@
       border-radius: 13px;
       font-size: 12px;
       font-weight: 800;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       display: none;
       max-width: 90%;
       text-align: center;
@@ -833,10 +796,9 @@
   <div class="toast" id="toast"></div>
 
   <div class="app">
-    <!-- Верхняя панель -->
     <div class="top-bar">
       <div class="row-gap">
-        <div class="avatar-chip" id="topAvatar" onclick="switchTab('admin')">GP</div>
+        <div class="avatar-chip" id="topAvatar" onclick="switchTab('admin')">MG</div>
         <button class="icon-btn" onclick="switchTab('wallet')" title="Кошелёк">💳</button>
         <button class="icon-btn" onclick="showToast('Шансы игр и кейсов задаёт админ 5200591975')" title="Инфо">?</button>
       </div>
@@ -848,28 +810,28 @@
       </div>
     </div>
 
-    <!-- ГЛАВНАЯ: PLAY HUB + КЕЙСЫ -->
+    <!-- ГЛАВНАЯ -->
     <div id="view-home">
       <div class="section-title">
         <span>⚡ Play Hub</span>
-        <span class="pill-tag" id="homeCurTag">Валюта: $</span>
+        <span class="pill-tag" id="homeCurTag">Валюта: Доллары ($)</span>
       </div>
 
       <div class="hub-grid">
         <div class="game-tile" onclick="openGame('plinko')">
           <span class="game-tile-emoji">🟣</span>
           <div class="game-tile-name">Plinko</div>
-          <div class="game-tile-sub">Скатывание шарика по рядам</div>
+          <div class="game-tile-sub">Плавный спуск до слота</div>
         </div>
         <div class="game-tile" onclick="openGame('slots')">
           <span class="game-tile-emoji">🎰</span>
           <div class="game-tile-name">Слоты 5×5</div>
-          <div class="game-tile-sub">Крутящиеся символы и бонусы</div>
+          <div class="game-tile-sub">Плавная прокрутка рядов</div>
         </div>
         <div class="game-tile" onclick="openGame('mines')">
           <span class="game-tile-emoji">💣</span>
           <div class="game-tile-name">Mines</div>
-          <div class="game-tile-sub">Открытие всех мин в конце</div>
+          <div class="game-tile-sub">Раскрытие всех мин в конце</div>
         </div>
         <div class="game-tile" onclick="openGame('crash')">
           <span class="game-tile-emoji">🚀</span>
@@ -886,37 +848,47 @@
       <div id="casesList"></div>
     </div>
 
-    <!-- КОШЕЛЁК -->
+    <!-- КОШЕЛЁК + TON CONNECT -->
     <div id="view-wallet" style="display:none;">
       <div class="card">
-        <div class="section-title" style="margin-top:0;">💎 Криптокошелёк ($ / Gram)</div>
-        <p class="muted">Пополнение через криптокошелёк в $ (USDT) или Gram. Заявка поступает на проверку админу.</p>
+        <div class="section-title" style="margin-top:0;">💎 Подключение TON Connect</div>
+        <p class="muted">Подключите криптокошелёк TON, чтобы отправлять транзакции на пополнение в <b>Долларах ($)</b> или <b>GRAM</b>.</p>
+
+        <div class="mt-8" id="tonConnectMount"></div>
+
+        <div class="row-gap mt-8" style="justify-content:space-between;">
+          <span class="muted" id="walletConnStatus">Кошелёк не подключён</span>
+          <button class="btn-sm" id="walletConnBtn" onclick="toggleTonWallet()">Подключить TON</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">💰 Пополнение баланса</div>
 
         <div class="grid-2 mt-8">
           <div>
-            <label class="muted">Валюта</label>
-            <select id="depCur">
-              <option value="USD">$ (USDT)</option>
-              <option value="GRAM">Gram</option>
+            <label class="muted">Валюта депозита</label>
+            <select id="depCur" onchange="updateDepEquivalent()">
+              <option value="USD">Доллары ($)</option>
+              <option value="GRAM">GRAM</option>
             </select>
           </div>
           <div>
             <label class="muted">Сумма</label>
-            <input type="number" id="depAmt" step="0.1" min="0.1" value="10" />
+            <input type="number" id="depAmt" step="0.1" min="0.1" value="10" oninput="updateDepEquivalent()" />
           </div>
         </div>
 
-        <div class="mt-8">
-          <label class="muted">TXID или адрес кошелька</label>
-          <input type="text" id="depTx" placeholder="Вставьте хэш перевода" />
-        </div>
+        <div class="muted mt-8" id="depTonHint">К оплате через кошелёк: ≈ 2.00 TON</div>
 
-        <button class="primary-btn green mt-12" onclick="createDepositRequest()">Отправить заявку</button>
+        <button class="primary-btn green mt-12" id="payNowBtn" onclick="startCryptoDeposit()">
+          Пополнить
+        </button>
       </div>
 
       <div class="card">
-        <div class="section-title" style="margin-top:0;">📜 Мои заявки</div>
-        <div id="myDepList" class="muted">Заявок пока нет</div>
+        <div class="section-title" style="margin-top:0;">📜 История пополнений</div>
+        <div id="myDepList" class="muted">Пополнений пока нет</div>
       </div>
     </div>
 
@@ -945,6 +917,13 @@
       </div>
 
       <div id="adminBody" style="display:none;">
+        <div class="card">
+          <div class="section-title" style="margin-top:0;">🏦 Настройки приёма TON</div>
+          <label class="muted">TON-адрес получателя депозитов</label>
+          <input type="text" class="mt-8" id="adminTonAddress" />
+          <button class="primary-btn mt-8" onclick="saveTonAddress()">Сохранить адрес TON</button>
+        </div>
+
         <div class="card">
           <div class="section-title" style="margin-top:0;">🎯 Шансы выигрыша в играх (скрыты от игроков)</div>
           <div class="grid-2 mt-8">
@@ -979,8 +958,8 @@
           <div class="grid-2 mt-8">
             <input type="number" id="newCaseCost" step="0.1" value="5" placeholder="Цена" />
             <select id="newCaseCur">
-              <option value="USD">$ (USD)</option>
-              <option value="GRAM">Gram</option>
+              <option value="USD">Доллары ($)</option>
+              <option value="GRAM">GRAM</option>
             </select>
           </div>
           <button class="primary-btn green mt-8" onclick="addNewCase()">Создать кейс</button>
@@ -993,20 +972,15 @@
         </div>
 
         <div class="card">
-          <div class="section-title" style="margin-top:0;">💰 Заявки и выдача баланса</div>
-          <div id="adminDepList" class="muted">Заявок нет</div>
-
-          <div class="mt-12">
-            <label class="muted">Начислить баланс текущему аккаунту</label>
-            <div class="grid-2 mt-8">
-              <input type="number" id="grantAmt" step="0.1" value="50" />
-              <select id="grantCur">
-                <option value="USD">$ (USD)</option>
-                <option value="GRAM">Gram</option>
-              </select>
-            </div>
-            <button class="primary-btn mt-8" onclick="grantBalance()">Начислить</button>
+          <div class="section-title" style="margin-top:0;">💰 Выдача баланса</div>
+          <div class="grid-2 mt-8">
+            <input type="number" id="grantAmt" step="0.1" value="50" />
+            <select id="grantCur">
+              <option value="USD">Доллары ($)</option>
+              <option value="GRAM">GRAM</option>
+            </select>
           </div>
+          <button class="primary-btn mt-8" onclick="grantBalance()">Начислить</button>
         </div>
       </div>
     </div>
@@ -1064,7 +1038,7 @@
       <!-- PLINKO -->
       <div id="scene-plinko" style="display:none;">
         <div class="plinko-stage">
-          <canvas id="plinkoCanvas" width="420" height="300"></canvas>
+          <canvas id="plinkoCanvas" width="420" height="310"></canvas>
           <div class="plinko-mults" id="plinkoMultRow"></div>
         </div>
 
@@ -1084,7 +1058,7 @@
         </div>
       </div>
 
-      <!-- СЛОТЫ 5x5 -->
+      <!-- СЛОТЫ 5x5 С ПЛАВНОЙ ПРОКРУТКОЙ -->
       <div id="scene-slots" style="display:none;">
         <div class="card">
           <div class="slots-board" id="slotsGrid"></div>
@@ -1171,21 +1145,6 @@
           </div>
           <button class="primary-btn blue" id="crashBtn" onclick="runCrashRound()">Сделать ставку</button>
         </div>
-
-        <div class="live-bet-row">
-          <div>
-            <b>JORJ</b>
-            <div class="muted">1.64 ×1.20</div>
-          </div>
-          <div class="cur-switch">1.97</div>
-        </div>
-        <div class="live-bet-row">
-          <div>
-            <b>GG</b>
-            <div class="muted">0.10 ×1.20</div>
-          </div>
-          <div class="cur-switch">0.12</div>
-        </div>
       </div>
     </div>
   </div>
@@ -1214,7 +1173,7 @@
 
   <script>
     const ADMIN_ID = 5200591975;
-    const STORE_KEY = "gram_play_v3_state";
+    const STORE_KEY = "mellstroy_gift_casino_v4";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1238,6 +1197,7 @@
       const user = detectUser();
       return {
         currency: "USD",
+        tonReceiver: "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJK9",
         user,
         balances: {
           [user.id]: { USD: 50, GRAM: 100 },
@@ -1249,7 +1209,7 @@
         cases: [
           {
             id: "c_epic",
-            title: "Epic Gift Case",
+            title: "Mellstroy Case",
             icon: "🎁",
             cost: 3,
             currency: "USD",
@@ -1262,12 +1222,12 @@
           },
           {
             id: "c_gram",
-            title: "Gram Vault",
+            title: "GRAM Vault",
             icon: "💎",
             cost: 15,
             currency: "GRAM",
             items: [
-              { id: "i_5", name: "Gram Shard", icon: "🔹", value: 6, weight: 50 },
+              { id: "i_5", name: "GRAM Shard", icon: "🔹", value: 6, weight: 50 },
               { id: "i_6", name: "Neon Lollipop", icon: "🍭", value: 18, weight: 30 },
               { id: "i_7", name: "Turbo Core", icon: "⚡", value: 45, weight: 15 },
               { id: "i_8", name: "Grand Trophy", icon: "🏆", value: 120, weight: 5 }
@@ -1295,9 +1255,151 @@
     }
 
     let state = loadState();
-    let activeGameName = "plinko";
     let caseSpinning = false;
     let lastDroppedUid = null;
+
+    /* TON CONNECT ИНИЦИАЛИЗАЦИЯ */
+    let tonConnectUI = null;
+    let connectedWalletAddress = null;
+
+    function initTonConnect() {
+      if (window.TON_CONNECT_UI && window.TON_CONNECT_UI.TonConnectUI) {
+        try {
+          tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: `${window.location.origin}${window.location.pathname.replace(/\/[^/]*$/, "/") }tonconnect-manifest.json`
+          });
+          tonConnectUI.onStatusChange(wallet => {
+            if (wallet && wallet.account) {
+              connectedWalletAddress = wallet.account.address;
+            } else {
+              connectedWalletAddress = null;
+            }
+            renderWalletConnection();
+          });
+        } catch (e) {
+          tonConnectUI = null;
+        }
+      }
+      renderWalletConnection();
+    }
+
+    function renderWalletConnection() {
+      const statusEl = document.getElementById("walletConnStatus");
+      const btnEl = document.getElementById("walletConnBtn");
+      if (!statusEl || !btnEl) return;
+
+      if (connectedWalletAddress) {
+        const shortAddr = connectedWalletAddress.slice(0, 6) + "..." + connectedWalletAddress.slice(-4);
+        statusEl.textContent = `Подключён: ${shortAddr}`;
+        btnEl.textContent = "Отключить";
+      } else {
+        statusEl.textContent = "Кошелёк не подключён";
+        btnEl.textContent = "Подключить TON";
+      }
+    }
+
+    async function toggleTonWallet() {
+      if (tonConnectUI) {
+        try {
+          if (connectedWalletAddress) {
+            await tonConnectUI.disconnect();
+          } else {
+            await tonConnectUI.openModal();
+          }
+          return;
+        } catch (e) {
+          toast("Откройте ссылку в защищённом контексте HTTPS для TON Connect");
+          return;
+        }
+      }
+      // Резервный локальный тест подключения кошелька при открытии по file://
+      if (connectedWalletAddress) {
+        connectedWalletAddress = null;
+        toast("Кошелёк отключён");
+      } else {
+        connectedWalletAddress = "EQBvW8Z5huBkMJYdnfAEM5JqTNkuWX3diqYENkWsIL0XggGG";
+        toast("Тестовый TON-кошелёк подключён");
+      }
+      renderWalletConnection();
+    }
+
+    function updateDepEquivalent() {
+      const cur = document.getElementById("depCur").value;
+      const amt = Math.max(0, Number(document.getElementById("depAmt").value || 0));
+      const tonEquivalent = cur === "USD" ? (amt / 5).toFixed(3) : (amt / 20).toFixed(3);
+      document.getElementById("depTonHint").textContent =
+        `К оплате через кошелёк: ≈ ${tonEquivalent} TON (${fmt(amt, cur)})`;
+    }
+
+    async function startCryptoDeposit() {
+      const cur = document.getElementById("depCur").value;
+      const amt = Number(document.getElementById("depAmt").value || 0);
+      if (amt <= 0 || isNaN(amt)) return toast("Введите сумму пополнения");
+
+      if (!connectedWalletAddress) {
+        await toggleTonWallet();
+        if (!connectedWalletAddress) return;
+      }
+
+      const tonAmount = cur === "USD" ? (amt / 5) : (amt / 20);
+      const nanoTon = Math.max(1000000, Math.round(tonAmount * 1e9)).toString();
+      const txPayload = {
+        validUntil: Math.floor(Date.now() / 1000) + 300,
+        messages: [
+          {
+            address: state.tonReceiver,
+            amount: nanoTon
+          }
+        ]
+      };
+
+      try {
+        if (tonConnectUI && tonConnectUI.connected) {
+          await tonConnectUI.sendTransaction(txPayload);
+        } else {
+          // Открытие глубокой ссылки кошелька TON с суммой транзакции
+          const tonDeepLink = `https://app.tonkeeper.com/transfer/${encodeURIComponent(state.tonReceiver)}?amount=${nanoTon}&text=${encodeURIComponent(`Deposit ${amt} ${cur}`)}`;
+          if (tg && tg.openLink) {
+            tg.openLink(tonDeepLink);
+          } else {
+            window.open(tonDeepLink, "_blank");
+          }
+        }
+
+        const b = balOf();
+        b[cur] = Number(((b[cur] || 0) + amt).toFixed(2));
+        state.deposits.unshift({
+          id: "dep_" + Date.now(),
+          currency: cur,
+          amount: amt,
+          ton: Number(tonAmount.toFixed(3)),
+          status: "Оплачено через TON"
+        });
+        saveState();
+        renderTop();
+        renderWalletHistory();
+        toast(`Пополнено на ${fmt(amt, cur)}`);
+      } catch (err) {
+        toast("Транзакция отменена или не подтверждена");
+      }
+    }
+
+    function renderWalletHistory() {
+      const el = document.getElementById("myDepList");
+      if (!state.deposits.length) {
+        el.innerHTML = "Пополнений пока нет";
+        return;
+      }
+      el.innerHTML = state.deposits.map(d => `
+        <div class="live-bet-row mt-8">
+          <div>
+            <b>+${fmt(d.amount, d.currency)}</b>
+            <div class="muted">≈ ${d.ton} TON</div>
+          </div>
+          <span class="cur-switch">${esc(d.status)}</span>
+        </div>
+      `).join("");
+    }
 
     function saveState() {
       localStorage.setItem(STORE_KEY, JSON.stringify(state));
@@ -1308,7 +1410,7 @@
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove("show"), 2300);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2400);
     }
 
     function balOf(uid = state.user.id) {
@@ -1327,6 +1429,7 @@
       renderTop();
       renderCases();
       updateSlotBetReadout();
+      updateDepEquivalent();
       document.getElementById("plCurBadge").textContent = state.currency === "USD" ? "$" : "GRAM";
     }
 
@@ -1337,7 +1440,11 @@
         document.getElementById("nav-" + t).classList.toggle("active", t === tab);
       });
       if (tab === "admin") renderAdmin();
-      if (tab === "wallet") renderWallet();
+      if (tab === "wallet") {
+        renderWalletConnection();
+        updateDepEquivalent();
+        renderWalletHistory();
+      }
       if (tab === "inv") renderInv();
     }
 
@@ -1356,14 +1463,15 @@
     function renderTop() {
       const b = balOf();
       const valStr = Number(b[state.currency] || 0).toFixed(2);
-      document.getElementById("topAvatar").textContent = (state.user.name || "GP").slice(0, 2).toUpperCase();
+      document.getElementById("topAvatar").textContent = (state.user.name || "MG").slice(0, 2).toUpperCase();
       document.getElementById("balValue").textContent = valStr;
       document.getElementById("modalBalText").textContent = valStr;
       document.getElementById("caseModalBal").textContent = valStr;
-      document.getElementById("homeCurTag").textContent = state.currency === "USD" ? "Валюта: $" : "Валюта: GRAM";
+      document.getElementById("homeCurTag").textContent =
+        state.currency === "USD" ? "Валюта: Доллары ($)" : "Валюта: GRAM";
     }
 
-    /* КЕЙСЫ И ГОРИЗОНТАЛЬНАЯ ПРОКРУТКА */
+    /* КЕЙСЫ */
     function pickByWeight(items) {
       const list = (items || []).filter(i => Number(i.weight) > 0);
       if (!list.length) return items[0];
@@ -1463,8 +1571,8 @@
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          const cardStep = 104; // 96px ширина + 8px gap
-          const offsetInside = Math.floor(Math.random() * 34) - 17;
+          const cardStep = 104;
+          const offsetInside = Math.floor(Math.random() * 24) - 12;
           const targetX = -(winIndex * cardStep + 48 + offsetInside);
           track.style.transition = "transform 2.9s cubic-bezier(0.1, 0.86, 0.18, 1)";
           track.style.transform = `translateX(${targetX}px)`;
@@ -1504,10 +1612,9 @@
       document.getElementById("caseSpinModal").classList.remove("open");
     }
 
-    /* ОТКРЫТИЕ ИГР */
+    /* ИГРЫ */
     function openGame(name) {
       stopAutoSpin();
-      activeGameName = name;
       clearBanner();
       const titles = {
         plinko: "🟣 Plinko",
@@ -1524,9 +1631,9 @@
 
       if (name === "plinko") {
         renderPlinkoMults();
-        drawPlinkoStatic();
+        drawPlinkoFrame(null);
       } else if (name === "slots") {
-        initSlotsGrid();
+        initSlotsReels();
         updateSlotBetReadout();
         setSlotSpeed(slotSpeed);
       } else if (name === "mines") {
@@ -1541,7 +1648,7 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* PLINKO */
+    /* ================= PLINKO: ПЛАВНЫЙ СПУСК ДО КОНЦА И ТОЧНЫЙ МНОЖИТЕЛЬ ================= */
     let plinkoDiff = "medium";
     let plinkoBusy = false;
 
@@ -1557,7 +1664,7 @@
       document.getElementById("plDiffMed").classList.toggle("active", d === "medium");
       document.getElementById("plDiffHard").classList.toggle("active", d === "hard");
       renderPlinkoMults();
-      drawPlinkoStatic();
+      drawPlinkoFrame(null);
     }
 
     function renderPlinkoMults() {
@@ -1567,28 +1674,46 @@
         .join("");
     }
 
-    function getPlinkoPegs(rows = 8) {
+    function getPlinkoGeometry() {
       const canvas = document.getElementById("plinkoCanvas");
       const w = canvas.width;
+      const h = canvas.height;
+      const rows = 8;
+      const topY = 30;
+      const rowGap = 28;
+      const colGap = 34;
       const pegs = [];
+
       for (let r = 0; r < rows; r++) {
         const count = r + 3;
-        const rowWidth = (count - 1) * 34;
+        const rowWidth = (count - 1) * colGap;
         const startX = (w - rowWidth) / 2;
-        const y = 32 + r * 29;
+        const y = topY + r * rowGap;
         for (let c = 0; c < count; c++) {
-          pegs.push({ x: startX + c * 34, y, r: 3.6 });
+          pegs.push({ x: startX + c * colGap, y, r: 3.6 });
         }
       }
-      return pegs;
+
+      const slotCount = 9;
+      const slotGap = 4;
+      const totalPadding = 16;
+      const slotWidth = (w - totalPadding - slotGap * (slotCount - 1)) / slotCount;
+      const slotY = h - 22;
+
+      return { w, h, pegs, rows, topY, rowGap, slotCount, slotGap, totalPadding, slotWidth, slotY };
     }
 
-    function drawPlinkoStatic(ball = null) {
+    function getSlotCenterX(slotIdx, geom) {
+      return geom.totalPadding / 2 + slotIdx * (geom.slotWidth + geom.slotGap) + geom.slotWidth / 2;
+    }
+
+    function drawPlinkoFrame(ball) {
       const canvas = document.getElementById("plinkoCanvas");
       const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const geom = getPlinkoGeometry();
+      ctx.clearRect(0, 0, geom.w, geom.h);
 
-      for (const p of getPlinkoPegs(8)) {
+      for (const p of geom.pegs) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = "#ffffff";
@@ -1600,7 +1725,7 @@
         ctx.arc(ball.x, ball.y, 7.5, 0, Math.PI * 2);
         ctx.fillStyle = "#10b981";
         ctx.fill();
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.2;
         ctx.strokeStyle = "#ecfdf5";
         ctx.stroke();
       }
@@ -1621,70 +1746,89 @@
       saveState();
       renderTop();
 
+      const geom = getPlinkoGeometry();
       const mults = PLINKO_MULTS[plinkoDiff];
       const wantGood = Math.random() < (Number(state.chances.plinko || 42) / 100);
+
+      // Выбираем целевой слот 0..8
       const targetSlot = wantGood
         ? [0, 1, 2, 3, 5, 6, 7, 8][Math.floor(Math.random() * 8)]
         : (Math.random() < 0.65 ? 4 : (Math.random() < 0.5 ? 3 : 5));
 
-      const canvas = document.getElementById("plinkoCanvas");
-      const centerX = canvas.width / 2;
-      const steps = [];
-      let curX = centerX + (Math.random() * 12 - 6);
-      const finalX = centerX + (targetSlot - 4) * 24;
+      const finalX = getSlotCenterX(targetSlot, geom);
+      const finalY = geom.slotY;
+      const startX = geom.w / 2;
 
-      for (let r = 0; r < 8; r++) {
-        const progress = (r + 1) / 8;
-        const desiredX = centerX + (finalX - centerX) * progress;
-        const dir = desiredX >= curX ? 1 : -1;
-        curX += dir * 13 + (Math.random() * 6 - 3);
-        steps.push({ x: curX, y: 22 + r * 29 });
+      // Формируем контрольные точки строго до центра целевого слота внизу
+      const waypoints = [{ x: startX, y: 12 }];
+      for (let r = 0; r < geom.rows; r++) {
+        const t = (r + 1) / geom.rows;
+        const linearX = startX + (finalX - startX) * t;
+        const wiggle = (r < geom.rows - 1) ? Math.sin(r * 1.9 + targetSlot) * 8 : 0;
+        waypoints.push({
+          x: r === geom.rows - 1 ? finalX : linearX + wiggle,
+          y: geom.topY + r * geom.rowGap - 8
+        });
       }
-      steps.push({ x: finalX, y: 266 });
+      waypoints.push({ x: finalX, y: finalY });
 
-      let stepIdx = 0;
-      let segT = 0;
-      let prevPos = { x: centerX, y: 12 };
+      let segIndex = 0;
+      let segProgress = 0;
+      // Чуть более плавная и медленная скорость спуска
+      const stepSpeed = 0.075;
 
-      function frame() {
-        segT += 0.15;
-        if (segT >= 1) {
-          prevPos = { ...steps[stepIdx] };
-          stepIdx++;
-          segT = 0;
+      function animateDrop() {
+        segProgress += stepSpeed;
+        if (segProgress >= 1) {
+          segIndex++;
+          segProgress = 0;
         }
-        if (stepIdx >= steps.length) {
-          drawPlinkoStatic({ x: finalX, y: 266 });
-          const mult = mults[targetSlot];
-          const winAmt = Number((bet * mult).toFixed(2));
+
+        if (segIndex >= waypoints.length - 1) {
+          drawPlinkoFrame({ x: finalX, y: finalY });
+
+          // Вычисляем индекс слота по фактической конечной координате X шарика
+          const clampedX = Math.max(geom.totalPadding / 2, Math.min(geom.w - geom.totalPadding / 2 - 1, finalX));
+          const landedSlot = Math.max(
+            0,
+            Math.min(
+              geom.slotCount - 1,
+              Math.floor((clampedX - geom.totalPadding / 2) / (geom.slotWidth + geom.slotGap))
+            )
+          );
+
+          const exactMult = mults[landedSlot];
+          const winAmt = Number((bet * exactMult).toFixed(2));
           b[state.currency] = Number(((b[state.currency] || 0) + winAmt).toFixed(2));
           saveState();
           renderTop();
 
-          const hitEl = document.getElementById("pm_" + targetSlot);
-          if (hitEl) hitEl.classList.add("hit");
+          const hitCell = document.getElementById("pm_" + landedSlot);
+          if (hitCell) hitCell.classList.add("hit");
 
           if (winAmt >= bet) {
-            setBanner("win", `Слот ${mult}x! Выигрыш: +${fmt(winAmt)}`);
+            setBanner("win", `Слот ${exactMult}x! Выигрыш: +${fmt(winAmt)}`);
           } else {
-            setBanner("lose", `Слот ${mult}x. Возврат: +${fmt(winAmt)} (ставка ${fmt(bet)})`);
+            setBanner("lose", `Слот ${exactMult}x. Возврат: +${fmt(winAmt)} (ставка ${fmt(bet)})`);
           }
           plinkoBusy = false;
           return;
         }
 
-        const targetPos = steps[stepIdx];
-        drawPlinkoStatic({
-          x: prevPos.x + (targetPos.x - prevPos.x) * segT,
-          y: prevPos.y + (targetPos.y - prevPos.y) * segT
+        const p0 = waypoints[segIndex];
+        const p1 = waypoints[segIndex + 1];
+        const eased = 1 - Math.pow(1 - segProgress, 2);
+        drawPlinkoFrame({
+          x: p0.x + (p1.x - p0.x) * eased,
+          y: p0.y + (p1.y - p0.y) * eased
         });
-        requestAnimationFrame(frame);
+        requestAnimationFrame(animateDrop);
       }
 
-      requestAnimationFrame(frame);
+      requestAnimationFrame(animateDrop);
     }
 
-    /* СЛОТЫ 5x5 */
+    /* ================= СЛОТЫ 5x5: ПЛАВНАЯ ПРОКРУТКА БАРАБАНОВ ================= */
     let slotBet = 1;
     let slotSpeed = 1;
     let autoSpinOn = false;
@@ -1692,11 +1836,20 @@
     let slotsSpinning = false;
     let autoSpinTimer = null;
 
-    function initSlotsGrid() {
+    function initSlotsReels() {
       const grid = document.getElementById("slotsGrid");
-      grid.innerHTML = Array.from({ length: 25 }, (_, i) =>
-        `<div class="slot-cell" id="sc_${i}">${SLOT_SYMBOLS[i % SLOT_SYMBOLS.length]}</div>`
-      ).join("");
+      let html = "";
+      for (let col = 0; col < 5; col++) {
+        const initSym = SLOT_SYMBOLS[col % SLOT_SYMBOLS.length];
+        html += `
+          <div class="slot-reel-col" id="reelCol_${col}">
+            <div class="slot-reel-strip" id="reelStrip_${col}">
+              <div class="slot-symbol-item">${initSym}</div>
+            </div>
+          </div>
+        `;
+      }
+      grid.innerHTML = html;
     }
 
     function stepSlotBet(delta) {
@@ -1766,45 +1919,61 @@
       const wheel = document.getElementById("slotSpinBtn");
       wheel.classList.add("spinning");
 
-      const cells = Array.from(document.querySelectorAll(".slot-cell"));
-      cells.forEach(c => {
-        c.classList.remove("win-cell");
-        c.classList.add("spinning");
+      const effChance = Math.min(92, Number(state.chances.slots || 36) + (doubleChanceOn ? 15 : 0));
+      const isWin = forceWin || (Math.random() * 100 < effChance);
+      const winSym = forceWin ? "👑" : SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+
+      const finalSymbols = Array.from({ length: 5 }, (_, idx) => {
+        if (isWin && idx < 3) return winSym;
+        return SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
       });
 
-      const cycle = setInterval(() => {
-        cells.forEach(c => {
-          c.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+      const cellHeight = 54;
+      const itemsPerReel = 18;
+      const baseMs = slotSpeed === 2 ? 750 : 1250;
+
+      for (let col = 0; col < 5; col++) {
+        const colEl = document.getElementById("reelCol_" + col);
+        const stripEl = document.getElementById("reelStrip_" + col);
+        colEl.classList.remove("win-cell");
+
+        const currentSym = stripEl.lastElementChild ? stripEl.lastElementChild.textContent : "🐸";
+        const reelItems = [currentSym];
+        for (let k = 1; k < itemsPerReel - 1; k++) {
+          reelItems.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
+        }
+        reelItems.push(finalSymbols[col]);
+
+        stripEl.style.transition = "none";
+        stripEl.style.transform = "translateY(0px)";
+        stripEl.innerHTML = reelItems.map(s => `<div class="slot-symbol-item">${s}</div>`).join("");
+
+        const duration = baseMs + col * (slotSpeed === 2 ? 90 : 160);
+        const targetY = -((reelItems.length - 1) * cellHeight);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            stripEl.style.transition = `transform ${duration}ms cubic-bezier(0.12, 0.85, 0.22, 1)`;
+            stripEl.style.transform = `translateY(${targetY}px)`;
+          });
         });
-      }, 75);
+      }
+
+      const maxDuration = baseMs + 4 * (slotSpeed === 2 ? 90 : 160) + 120;
 
       setTimeout(() => {
-        clearInterval(cycle);
         wheel.classList.remove("spinning");
 
-        const effChance = Math.min(92, Number(state.chances.slots || 36) + (doubleChanceOn ? 15 : 0));
-        const isWin = forceWin || (Math.random() * 100 < effChance);
-
-        const board = Array.from({ length: 25 }, () =>
-          SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]
-        );
-        const winIndices = [];
-
-        if (isWin) {
-          const sym = forceWin ? "👑" : SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
-          const row = Math.floor(Math.random() * 5);
-          for (let col = 0; col < 5; col++) {
-            const idx = row * 5 + col;
-            board[idx] = sym;
-            winIndices.push(idx);
+        // Нормализуем полосу до финального символа без скачков
+        for (let col = 0; col < 5; col++) {
+          const stripEl = document.getElementById("reelStrip_" + col);
+          stripEl.style.transition = "none";
+          stripEl.style.transform = "translateY(0px)";
+          stripEl.innerHTML = `<div class="slot-symbol-item">${finalSymbols[col]}</div>`;
+          if (isWin && col < 3) {
+            document.getElementById("reelCol_" + col).classList.add("win-cell");
           }
         }
-
-        cells.forEach((c, idx) => {
-          c.classList.remove("spinning");
-          c.textContent = board[idx];
-          if (winIndices.includes(idx)) c.classList.add("win-cell");
-        });
 
         const mult = forceWin ? 5.0 : (isWin ? 2.4 : 0);
         const payout = Number((cost * mult).toFixed(2));
@@ -1812,19 +1981,19 @@
           b[state.currency] = Number(((b[state.currency] || 0) + payout).toFixed(2));
           saveState();
           renderTop();
-          setBanner("win", `Линия сыграла (${mult}x)! Выигрыш: +${fmt(payout)}`);
+          setBanner("win", `Комбинация сыграла (${mult}x)! Выигрыш: +${fmt(payout)}`);
         } else {
-          setBanner("lose", `Комбинация не собралась (-${fmt(cost)})`);
+          setBanner("lose", `Комбинация не выпала (-${fmt(cost)})`);
         }
 
         slotsSpinning = false;
         if (autoSpinOn) {
-          autoSpinTimer = setTimeout(() => spinSlots(), 520);
+          autoSpinTimer = setTimeout(() => spinSlots(), 550);
         }
-      }, slotSpeed === 2 ? 700 : 1250);
+      }, maxDuration);
     }
 
-    /* MINES 5x5 */
+    /* ================= MINES 5x5 ================= */
     let minesActive = false;
     let minesBetAmt = 0;
     let minesLayout = [];
@@ -1946,7 +2115,7 @@
 
       revealAllMinesBoard(-1);
       minesActive = false;
-      setBanner("win", `Забрано: +${fmt(payout)} (${mult}x). Расклад открыт.`);
+      setBanner("win", `Забрано: +${fmt(payout)} (${mult}x). Все мины открыты.`);
       const btn = document.getElementById("minesMainBtn");
       btn.textContent = "Сделать ставку";
       btn.className = "primary-btn";
@@ -1969,7 +2138,7 @@
       }
     }
 
-    /* CRASH */
+    /* ================= CRASH ================= */
     let crashRunning = false;
 
     function resetCrashDisplay() {
@@ -2038,50 +2207,7 @@
       }, 65);
     }
 
-    /* КОШЕЛЁК И ИНВЕНТАРЬ */
-    function createDepositRequest() {
-      const cur = document.getElementById("depCur").value;
-      const amt = Number(document.getElementById("depAmt").value || 0);
-      const tx = document.getElementById("depTx").value.trim();
-      if (amt <= 0) return toast("Укажите сумму");
-      if (!tx) return toast("Укажите TXID или кошелёк");
-
-      state.deposits.unshift({
-        id: "d_" + Date.now(),
-        userId: state.user.id,
-        userName: state.user.name,
-        currency: cur,
-        amount: amt,
-        tx,
-        status: "pending"
-      });
-      document.getElementById("depTx").value = "";
-      saveState();
-      renderWallet();
-      toast("Заявка отправлена");
-    }
-
-    function renderWallet() {
-      const list = document.getElementById("myDepList");
-      const mine = state.deposits.filter(d => Number(d.userId) === Number(state.user.id));
-      if (!mine.length) {
-        list.innerHTML = "Заявок пока нет";
-        return;
-      }
-      list.innerHTML = mine.map(d => {
-        const stText = d.status === "approved" ? "Подтверждена" : d.status === "rejected" ? "Отклонена" : "На проверке";
-        return `
-          <div class="live-bet-row mt-8">
-            <div>
-              <b>${fmt(d.amount, d.currency)}</b>
-              <div class="muted">TX: ${esc(d.tx)}</div>
-            </div>
-            <span class="cur-switch">${stText}</span>
-          </div>
-        `;
-      }).join("");
-    }
-
+    /* ИНВЕНТАРЬ */
     function renderInv() {
       const wrap = document.getElementById("invList");
       if (!state.inventory.length) {
@@ -2135,6 +2261,7 @@
       document.getElementById("curIdSpan").textContent = state.user.id;
       if (!ok) return;
 
+      document.getElementById("adminTonAddress").value = state.tonReceiver || "";
       document.getElementById("chPlinko").value = state.chances.plinko ?? 42;
       document.getElementById("chSlots").value = state.chances.slots ?? 36;
       document.getElementById("chMines").value = state.chances.mines ?? 72;
@@ -2146,7 +2273,14 @@
       if (prev && state.cases.some(c => c.id === prev)) sel.value = prev;
 
       renderAdminCaseForm();
-      renderAdminDeposits();
+    }
+
+    function saveTonAddress() {
+      const addr = document.getElementById("adminTonAddress").value.trim();
+      if (!addr) return toast("Введите адрес TON");
+      state.tonReceiver = addr;
+      saveState();
+      toast("TON-адрес сохранён");
     }
 
     function saveGameChances() {
@@ -2310,49 +2444,6 @@
       toast("Предмет удалён");
     }
 
-    function renderAdminDeposits() {
-      const box = document.getElementById("adminDepList");
-      if (!state.deposits.length) {
-        box.innerHTML = "Заявок нет";
-        return;
-      }
-      box.innerHTML = state.deposits.map(d => `
-        <div class="card mt-8" style="background:var(--bg); padding:10px;">
-          <div><b>${esc(d.userName)}</b> (ID: ${d.userId}) · <b>${fmt(d.amount, d.currency)}</b></div>
-          <div class="muted mt-8">TX: ${esc(d.tx)} · ${d.status}</div>
-          ${d.status === "pending" ? `
-            <div class="row-gap mt-8">
-              <button class="btn-sm green" onclick="approveDep('${d.id}')">Зачислить</button>
-              <button class="btn-sm red" onclick="rejectDep('${d.id}')">Отклонить</button>
-            </div>
-          ` : ""}
-        </div>
-      `).join("");
-    }
-
-    function approveDep(id) {
-      const d = state.deposits.find(x => x.id === id);
-      if (!d || d.status !== "pending") return;
-      d.status = "approved";
-      const b = balOf(d.userId);
-      b[d.currency] = Number(((b[d.currency] || 0) + Number(d.amount || 0)).toFixed(2));
-      saveState();
-      renderTop();
-      renderWallet();
-      renderAdminDeposits();
-      toast("Баланс зачислен");
-    }
-
-    function rejectDep(id) {
-      const d = state.deposits.find(x => x.id === id);
-      if (!d || d.status !== "pending") return;
-      d.status = "rejected";
-      saveState();
-      renderWallet();
-      renderAdminDeposits();
-      toast("Заявка отклонена");
-    }
-
     function grantBalance() {
       const amt = Number(document.getElementById("grantAmt").value || 0);
       const cur = document.getElementById("grantCur").value;
@@ -2380,10 +2471,10 @@
 
     renderTop();
     renderCases();
-    renderWallet();
     renderInv();
     renderPlinkoMults();
-    drawPlinkoStatic();
+    drawPlinkoFrame(null);
+    initTonConnect();
   </script>
 </body>
 </html>
