@@ -251,35 +251,42 @@
     }
 
     .case-hero-icon {
-      font-size: 36px;
+      font-size: 38px;
       line-height: 1.1;
       display: inline-block;
       filter: drop-shadow(0 6px 14px rgba(168, 85, 247, 0.5));
     }
 
     .case-hero-img {
-      width: 68px;
-      height: 68px;
+      width: 74px;
+      height: 74px;
       object-fit: cover;
-      border-radius: 14px;
+      border-radius: 15px;
       display: inline-block;
       border: 1px solid rgba(255, 255, 255, 0.14);
       box-shadow: 0 6px 14px rgba(168, 85, 247, 0.45);
     }
 
     .item-thumb-img {
-      width: 36px;
-      height: 36px;
+      width: 48px;
+      height: 48px;
       object-fit: cover;
-      border-radius: 9px;
+      border-radius: 12px;
       display: inline-block;
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.16);
     }
 
-    .item-thumb-img.lg {
+    .item-thumb-img.spin-lg {
       width: 56px;
       height: 56px;
-      border-radius: 12px;
+      border-radius: 13px;
+    }
+
+    .item-thumb-img.win-xl {
+      width: 78px;
+      height: 78px;
+      border-radius: 18px;
+      box-shadow: 0 8px 22px rgba(251, 191, 36, 0.35);
     }
 
     .case-title-v2 {
@@ -299,14 +306,14 @@
     }
 
     .case-loot-dot {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 9px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(168, 85, 247, 0.25);
       display: grid;
       place-items: center;
-      font-size: 14px;
+      font-size: 15px;
       overflow: hidden;
     }
 
@@ -351,7 +358,7 @@
       background: var(--bg);
       border: 1px solid rgba(168, 85, 247, 0.45);
       border-radius: 18px;
-      padding: 14px 0;
+      padding: 16px 0;
       margin: 12px 0;
     }
 
@@ -368,18 +375,18 @@
 
     .case-spinner-track {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       padding-left: 50%;
       will-change: transform;
     }
 
     .spinner-card {
-      width: 96px;
-      min-width: 96px;
+      width: 112px;
+      min-width: 112px;
       background: linear-gradient(160deg, var(--card-3), var(--card));
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      padding: 10px 6px;
+      border-radius: 16px;
+      padding: 12px 6px;
       text-align: center;
       flex-shrink: 0;
     }
@@ -1044,7 +1051,7 @@
             </div>
           </div>
           <div class="row-gap mt-8" id="newCaseImgPreviewWrap" style="display:none;">
-            <img id="newCaseImgPreview" class="item-thumb-img lg" alt="" />
+            <img id="newCaseImgPreview" class="item-thumb-img" alt="" />
             <span class="muted">Фото выбрано</span>
             <button class="btn-sm red" type="button" onclick="clearNewCaseImg()">Убрать</button>
           </div>
@@ -1119,7 +1126,7 @@
         </div>
 
         <div id="caseSpinWinCard" style="display:none; text-align:center; padding-top:6px;">
-          <div id="winItemVisual" style="display:flex; justify-content:center; margin-bottom:4px;"></div>
+          <div id="winItemVisual" style="display:flex; justify-content:center; margin-bottom:6px;"></div>
           <div id="winItemTitle" style="font-size:17px; font-weight:900; margin-top:4px;"></div>
           <div id="winItemPrice" style="color:var(--gold); font-weight:800; margin-top:2px;"></div>
           <div class="grid-2 mt-12">
@@ -1282,7 +1289,7 @@
     const ADMIN_ID = 5200591975;
     const DEFAULT_PLAYER_ID = 1000001;
     const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
-    const STORE_KEY = "mellstroy_gift_gram_v3";
+    const STORE_KEY = "mellstroy_gift_gram_v4";
     const SLOT_SYMBOLS = ["🐸", "🚀", "🍇", "💎", "🍭", "🧱", "👑", "⚡"];
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1389,7 +1396,7 @@
     let addItemPickedImg = "";
     const editItemPickedImgs = {};
 
-    function readGalleryImageAsDataUrl(file, maxSide = 360) {
+    function readGalleryImageAsDataUrl(file, maxSide = 420) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith("image/")) {
           return reject(new Error("not_image"));
@@ -1412,7 +1419,7 @@
             canvas.height = h;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.82));
+            resolve(canvas.toDataURL("image/jpeg", 0.85));
           };
           img.onerror = reject;
           img.src = reader.result;
@@ -1422,11 +1429,13 @@
       });
     }
 
-    function renderVisualHtml(entry, sizeClass = "") {
+    function renderVisualHtml(entry, mode = "list") {
       if (entry && entry.img) {
-        return `<img src="${entry.img}" class="item-thumb-img ${sizeClass}" alt="" />`;
+        const cls = mode === "spin" ? "item-thumb-img spin-lg" : (mode === "win" ? "item-thumb-img win-xl" : "item-thumb-img");
+        return `<img src="${entry.img}" class="${cls}" alt="" />`;
       }
-      return `<span style="font-size:${sizeClass === "lg" ? "34px" : "24px"}; line-height:1;">${entry && entry.icon ? entry.icon : "🎁"}</span>`;
+      const px = mode === "spin" ? 38 : (mode === "win" ? 56 : 30);
+      return `<span style="font-size:${px}px; line-height:1;">${entry && entry.icon ? entry.icon : "🎁"}</span>`;
     }
 
     function applyAdminVisibility() {
@@ -1696,8 +1705,8 @@
       document.getElementById("caseContentsName").textContent = c.title;
       document.getElementById("caseContentsMeta").textContent = `Цена открытия: ${fmt(c.cost)} · Предметов: ${(c.items || []).length}`;
       document.getElementById("caseContentsHeroWrap").innerHTML = c.img
-        ? `<img src="${c.img}" class="item-thumb-img lg" alt="" />`
-        : `<div style="font-size:36px;">${c.icon || "🎁"}</div>`;
+        ? `<img src="${c.img}" class="case-hero-img" style="width:62px; height:62px;" alt="" />`
+        : `<div style="font-size:40px;">${c.icon || "🎁"}</div>`;
 
       const items = c.items || [];
       const totalW = items.reduce((s, x) => s + Math.max(0, Number(x.weight || 0)), 0);
@@ -1709,7 +1718,7 @@
             return `
               <div class="content-item-row">
                 <div class="row-gap">
-                  ${renderVisualHtml(it, "")}
+                  ${renderVisualHtml(it, "list")}
                   <div>
                     <b>${esc(it.name)}</b>
                     <div class="muted">Шанс: ${pct}%</div>
@@ -1768,17 +1777,21 @@
 
       const track = document.getElementById("caseSpinnerTrack");
       track.style.transition = "none";
-      track.style.transform = "translateX(0px)";
+      track.style.transform = "translate3d(0px, 0, 0)";
 
-      const totalCards = 36;
-      const winIndex = 30;
+      const totalCards = 38;
+      const winIndex = 31;
+      const cardWidth = 112;
+      const cardGap = 10;
+      const cardStep = cardWidth + cardGap;
+
       const cardsHtml = [];
       for (let i = 0; i < totalCards; i++) {
         const item = i === winIndex ? winner : c.items[Math.floor(Math.random() * c.items.length)];
         cardsHtml.push(`
           <div class="spinner-card" id="spCard_${i}">
-            <div style="height:40px; display:grid; place-items:center;">${renderVisualHtml(item, "")}</div>
-            <div style="font-size:11px; font-weight:800; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.name)}</div>
+            <div style="height:60px; display:grid; place-items:center;">${renderVisualHtml(item, "spin")}</div>
+            <div style="font-size:12px; font-weight:800; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(item.name)}</div>
             <div style="font-size:11px; color:var(--gold); font-weight:800; margin-top:2px;">${fmt(item.value)}</div>
           </div>
         `);
@@ -1786,26 +1799,41 @@
       track.innerHTML = cardsHtml.join("");
       document.getElementById("caseSpinModal").classList.add("open");
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const cardStep = 104;
-          const offsetInside = Math.floor(Math.random() * 20) - 10;
-          const targetX = -(winIndex * cardStep + 48 + offsetInside);
-          track.style.transition = "transform 2.7s cubic-bezier(0.05, 0.92, 0.14, 1)";
-          track.style.transform = `translateX(${targetX}px)`;
-        });
-      });
+      const offsetInside = Math.floor(Math.random() * 16) - 8;
+      const targetX = -(winIndex * cardStep + cardWidth / 2 + offsetInside);
+      const durationMs = 2700;
+      const startTime = performance.now();
 
-      setTimeout(() => {
-        const winEl = document.getElementById("spCard_" + winIndex);
-        if (winEl) winEl.classList.add("winner-glow");
-        document.getElementById("winItemVisual").innerHTML = renderVisualHtml(winner, "lg");
-        document.getElementById("winItemTitle").textContent = winner.name;
-        document.getElementById("winItemPrice").textContent = `Цена: ${fmt(winner.value)}`;
-        document.getElementById("sellDropBtn").textContent = `Продать за ${fmt(winner.value)}`;
-        document.getElementById("caseSpinWinCard").style.display = "block";
-        caseSpinning = false;
-      }, 2740);
+      // Плавное замедление (quintic ease-out) на 2.7 секунды
+      function easeOutQuint(t) {
+        return 1 - Math.pow(1 - t, 5);
+      }
+
+      function stepSpin(now) {
+        const elapsed = now - startTime;
+        const rawT = Math.min(1, elapsed / durationMs);
+        const eased = easeOutQuint(rawT);
+        const curX = targetX * eased;
+        track.style.transform = `translate3d(${curX.toFixed(2)}px, 0, 0)`;
+
+        if (rawT < 1) {
+          requestAnimationFrame(stepSpin);
+        } else {
+          track.style.transform = `translate3d(${targetX}px, 0, 0)`;
+          const winEl = document.getElementById("spCard_" + winIndex);
+          if (winEl) winEl.classList.add("winner-glow");
+          document.getElementById("winItemVisual").innerHTML = renderVisualHtml(winner, "win");
+          document.getElementById("winItemTitle").textContent = winner.name;
+          document.getElementById("winItemPrice").textContent = `Цена: ${fmt(winner.value)}`;
+          document.getElementById("sellDropBtn").textContent = `Продать за ${fmt(winner.value)}`;
+          document.getElementById("caseSpinWinCard").style.display = "block";
+          caseSpinning = false;
+        }
+      }
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(stepSpin);
+      });
     }
 
     function sellLastDrop() {
@@ -2424,7 +2452,7 @@
       wrap.innerHTML = state.inventory.map((it, idx) => `
         <div class="live-bet-row mt-8">
           <div class="row-gap">
-            ${renderVisualHtml(it, "")}
+            ${renderVisualHtml(it, "list")}
             <div>
               <b>${esc(it.name)}</b>
               <div class="muted">${fmt(it.value)}</div>
@@ -2451,7 +2479,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        newCasePickedImg = await readGalleryImageAsDataUrl(f, 360);
+        newCasePickedImg = await readGalleryImageAsDataUrl(f, 420);
         document.getElementById("newCaseImgPreview").src = newCasePickedImg;
         document.getElementById("newCaseImgPreviewWrap").style.display = "flex";
       } catch {
@@ -2470,7 +2498,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        editCasePickedImg = await readGalleryImageAsDataUrl(f, 360);
+        editCasePickedImg = await readGalleryImageAsDataUrl(f, 420);
         const prev = document.getElementById("editCaseImgPreview");
         if (prev) {
           prev.src = editCasePickedImg;
@@ -2493,7 +2521,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        addItemPickedImg = await readGalleryImageAsDataUrl(f, 300);
+        addItemPickedImg = await readGalleryImageAsDataUrl(f, 380);
         const prev = document.getElementById("addItemImgPreview");
         if (prev) {
           prev.src = addItemPickedImg;
@@ -2508,7 +2536,7 @@
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
       try {
-        editItemPickedImgs[iid] = await readGalleryImageAsDataUrl(f, 300);
+        editItemPickedImgs[iid] = await readGalleryImageAsDataUrl(f, 380);
         const prev = document.getElementById("iprev_" + iid);
         if (prev) {
           prev.src = editItemPickedImgs[iid];
@@ -2602,7 +2630,7 @@
         return `
           <div class="card mt-8" style="background:var(--bg); padding:10px;">
             <div class="row-gap" style="margin-bottom:8px;">
-              <img id="iprev_${it.id}" src="${curItImg}" class="item-thumb-img lg" style="display:${curItImg ? "inline-block" : "none"};" alt="" />
+              <img id="iprev_${it.id}" src="${curItImg}" class="item-thumb-img" style="display:${curItImg ? "inline-block" : "none"};" alt="" />
               <div style="flex:1;">
                 <label class="muted">Фото предмета из галереи</label>
                 <input type="file" accept="image/*" onchange="onEditItemImgSelected('${it.id}', event)" />
@@ -2642,7 +2670,7 @@
           </div>
         </div>
         <div class="row-gap mt-8">
-          <img id="editCaseImgPreview" src="${activeCaseImg}" class="item-thumb-img lg" style="display:${activeCaseImg ? "inline-block" : "none"};" alt="" />
+          <img id="editCaseImgPreview" src="${activeCaseImg}" class="item-thumb-img" style="display:${activeCaseImg ? "inline-block" : "none"};" alt="" />
           <div style="flex:1;">
             <label class="muted">Фото кейса из галереи</label>
             <input type="file" id="ecImgFile" accept="image/*" onchange="onEditCaseImgSelected(event)" />
@@ -2665,7 +2693,7 @@
             <input type="number" min="0" id="addItW" placeholder="Вес" value="20" />
           </div>
           <div class="row-gap mt-8">
-            <img id="addItemImgPreview" src="" class="item-thumb-img lg" style="display:none;" alt="" />
+            <img id="addItemImgPreview" src="" class="item-thumb-img" style="display:none;" alt="" />
             <div style="flex:1;">
               <label class="muted">Фото предмета</label>
               <input type="file" id="addItImgFile" accept="image/*" onchange="onAddItemImgSelected(event)" />
