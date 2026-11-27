@@ -117,8 +117,8 @@
     }
 
     .ava-circle {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--violet), var(--cyan));
       display: flex;
@@ -136,15 +136,26 @@
       font-weight: 700;
     }
 
-    .bal-amount-row {
+    .bal-inline-row {
       display: flex;
       align-items: center;
-      gap: 5px;
-      margin-top: 2px;
+      gap: 8px;
+      margin-top: 3px;
+      flex-wrap: wrap;
+    }
+
+    .bal-amount-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(8, 11, 24, 0.8);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      padding: 4px 9px;
+      border-radius: 10px;
     }
 
     .bal-num {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 900;
       color: #fff;
     }
@@ -155,22 +166,22 @@
       color: var(--cyan);
     }
 
+    .btn-topup-inline {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border: none;
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 900;
+      padding: 6px 11px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
     .bal-btns {
       display: flex;
       align-items: center;
       gap: 5px;
       flex-shrink: 0;
-    }
-
-    .btn-topup {
-      background: linear-gradient(135deg, var(--purple), var(--blue));
-      border: none;
-      color: #fff;
-      font-size: 11.5px;
-      font-weight: 800;
-      padding: 8px 11px;
-      border-radius: 12px;
-      cursor: pointer;
     }
 
     .btn-wd-sm {
@@ -1436,22 +1447,24 @@
     <button class="wallet-mini" onclick="onWalletBtn()">Кошелёк</button>
   </div>
 
-  <!-- Balance Strip (Shown only for ADMIN_ID 5200591975) -->
+  <!-- Balance + Topup Strip (ADMIN ONLY) -->
   <div class="bal-header" id="balHeaderAdmin">
     <div class="bal-left">
       <div class="ava-circle" id="avaText">MG</div>
       <div>
         <div class="bal-caption" id="userLabel">Админ</div>
-        <div class="bal-amount-row">
-          <span style="color:var(--cyan);font-size:12px;font-weight:900;">◆</span>
-          <span class="bal-num" id="balNum">0.00</span>
-          <span class="bal-unit">GRAM</span>
+        <div class="bal-inline-row">
+          <div class="bal-amount-box">
+            <span style="color:var(--cyan);font-size:12px;font-weight:900;">◆</span>
+            <span class="bal-num" id="balNum">0.00</span>
+            <span class="bal-unit">GRAM</span>
+          </div>
+          <button class="btn-topup-inline" onclick="openDepositModal()">+ Пополнить</button>
         </div>
       </div>
     </div>
     <div class="bal-btns">
       <button class="btn-vis-sm" id="visBtn" onclick="openVisModal()">+ Визуал</button>
-      <button class="btn-topup" onclick="openDepositModal()">+ Пополнить</button>
       <button class="btn-wd-sm" onclick="openWithdrawModal()">Вывод</button>
     </div>
   </div>
@@ -1764,7 +1777,7 @@
     <div class="card">
       <div class="card-title">🗄️ Автосинхронизация каталога</div>
       <div class="info-line" style="margin-bottom:0;">
-        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Авто (Supabase)</b></span>
+        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Мгновенно (кэш + Supabase)</b></span>
       </div>
     </div>
 
@@ -1938,11 +1951,11 @@
 <div class="modal-bg" id="visModal">
   <div class="modal-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <b>💎 Визуальный баланс</b>
+      <b>💎 Визуальный баланс (тест админа)</b>
       <button class="wallet-mini" onclick="closeModal('visModal')">✕</button>
     </div>
     <div class="fg">
-      <label>Сколько GRAM добавить</label>
+      <label>Сколько GRAM добавить визуально</label>
       <input class="inp" id="visAmtInp" type="number" step="0.01" min="0.01" value="50.00" />
     </div>
     <div class="row4">
@@ -1980,8 +1993,9 @@
   const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_nft_all_v5";
-  const CATALOG_CACHE_KEY = "mellstroy_gift_catalog_cache_v5";
+  const SAVE_KEY = "mellstroy_gift_nft_all_v6";
+  const CATALOG_CACHE_KEY = "mellstroy_gift_catalog_cache_v6";
+  const CATALOG_INSTANT_STR_KEY = "mellstroy_gift_catalog_str_v6";
   const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
   const STATE_ROW_ID = "mellstroy_gift_global_state";
@@ -2062,7 +2076,7 @@
     editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
-    dbStatus: "Авто (Supabase)",
+    dbStatus: "Мгновенно (кэш + Supabase)",
     lastUpdatedAt: 0,
     /* Rocket */
     rocketPhase: "countdown",
@@ -2114,6 +2128,12 @@
 
   function isAdminUser() {
     return Number(appState.userId) === ADMIN_ID;
+  }
+
+  function enforceZeroBalanceForPlayers() {
+    if (!isAdminUser()) {
+      appState.balance = 0.00;
+    }
   }
 
   function setDbBadge(text) {
@@ -2188,18 +2208,21 @@
 
   function saveCatalogCache() {
     try {
-      localStorage.setItem(CATALOG_CACHE_KEY, JSON.stringify({
+      const payload = JSON.stringify({
         cases: appState.cases,
         updatedAt: appState.lastUpdatedAt
-      }));
+      });
+      localStorage.setItem(CATALOG_CACHE_KEY, payload);
+      localStorage.setItem(CATALOG_INSTANT_STR_KEY, payload);
     } catch (e) {}
   }
 
   function saveApp() {
+    enforceZeroBalanceForPlayers();
     try {
       const profileKey = `${SAVE_KEY}_u_${appState.userId || "guest"}`;
       localStorage.setItem(profileKey, JSON.stringify({
-        balance: appState.balance,
+        balance: isAdminUser() ? appState.balance : 0,
         inventory: appState.inventory
       }));
       saveCatalogCache();
@@ -2212,10 +2235,13 @@
     let loadedUpdatedAt = 0;
 
     try {
-      const catRaw = JSON.parse(localStorage.getItem(CATALOG_CACHE_KEY));
-      if (catRaw && Array.isArray(catRaw.cases) && catRaw.cases.length) {
-        loadedCases = normalizeCases(catRaw.cases);
-        loadedUpdatedAt = Number(catRaw.updatedAt) || 0;
+      const rawStr = localStorage.getItem(CATALOG_INSTANT_STR_KEY) || localStorage.getItem(CATALOG_CACHE_KEY);
+      if (rawStr) {
+        const catRaw = JSON.parse(rawStr);
+        if (catRaw && Array.isArray(catRaw.cases) && catRaw.cases.length) {
+          loadedCases = normalizeCases(catRaw.cases);
+          loadedUpdatedAt = Number(catRaw.updatedAt) || 0;
+        }
       }
     } catch (e) {}
 
@@ -2228,10 +2254,12 @@
       const profileKey = `${SAVE_KEY}_u_${appState.userId || "guest"}`;
       const raw = JSON.parse(localStorage.getItem(profileKey));
       if (raw) {
-        appState.balance = Number(raw.balance) || 0;
+        appState.balance = isAdminUser() ? (Number(raw.balance) || 0) : 0.00;
         appState.inventory = Array.isArray(raw.inventory) ? raw.inventory : [];
       }
     } catch (e) {}
+
+    enforceZeroBalanceForPlayers();
   }
 
   function autoSaveCatalog() {
@@ -2240,7 +2268,7 @@
     clearTimeout(pushDebounceTimer);
     pushDebounceTimer = setTimeout(() => {
       pushRemoteState();
-    }, 60);
+    }, 40);
   }
 
   function fetchWithTimeout(url, options = {}, timeoutMs = 2500) {
@@ -2304,7 +2332,7 @@
           if (isAdminUser()) {
             renderAdminUI();
           }
-          setDbBadge("Авто (онлайн)");
+          setDbBadge("Онлайн (Supabase)");
           return;
         }
       }
@@ -2313,7 +2341,7 @@
         await pushRemoteState();
       }
     } catch (err) {
-      setDbBadge("Авто (кэш)");
+      setDbBadge("Кэш (мгновенно)");
     }
   }
 
@@ -2340,9 +2368,9 @@
         }])
       }, 2500);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDbBadge("Авто (онлайн)");
+      setDbBadge("Онлайн (Supabase)");
     } catch (err) {
-      setDbBadge("Авто (кэш)");
+      setDbBadge("Кэш (мгновенно)");
     }
   }
 
@@ -2363,6 +2391,7 @@
       if (Number(q.get("admin")) === ADMIN_ID) uid = ADMIN_ID;
     }
     appState.userId = uid;
+    enforceZeroBalanceForPlayers();
 
     const initials = appState.username.replace(/^@/, "").slice(0, 2).toUpperCase() || "MG";
     document.getElementById("avaText").textContent = initials;
@@ -2434,6 +2463,7 @@
   }
 
   function renderBalance() {
+    enforceZeroBalanceForPlayers();
     if (!isAdminUser()) return;
     document.getElementById("balNum").textContent = fmt(appState.balance);
   }
@@ -2473,7 +2503,7 @@
     renderBalance();
     updateCaseButtonText();
     closeModal("visModal");
-    showToast(`Добавлено +${fmt(v)} GRAM`);
+    showToast(`Визуально добавлено +${fmt(v)} GRAM`);
   }
 
   /* Deposit & Withdraw (Admin only) */
@@ -2871,6 +2901,8 @@
     if (isAdminUser()) {
       appState.balance = Math.max(0, Math.round((appState.balance - Number(c.price)) * 100) / 100);
       document.getElementById("balNum").textContent = fmt(appState.balance);
+    } else {
+      appState.balance = 0.00;
     }
 
     const winIdx = 30;
@@ -3038,14 +3070,16 @@
       syncAutoUpgradeTarget();
     }
 
-    if (price > 0) {
+    if (isAdminUser() && price > 0) {
       appState.balance = Math.round((appState.balance + price) * 100) / 100;
+    } else {
+      appState.balance = 0.00;
     }
 
     saveApp();
     renderBalance();
     renderInventoryUI();
-    showToast(`Продано: ${soldRow.gift?.name || "NFT"} (+${fmt(price)} GRAM)`);
+    showToast(`Продано: ${soldRow.gift?.name || "NFT"}${isAdminUser() ? ` (+${fmt(price)} GRAM)` : ""}`);
   }
 
   function pickNftFromInvToUpgrader(uid) {
@@ -3286,6 +3320,8 @@
       appState.balance = Math.round((appState.balance - bet) * 100) / 100;
       saveApp();
       renderBalance();
+    } else {
+      appState.balance = 0.00;
     }
 
     if (appState.rocketPhase === "countdown") {
@@ -3452,6 +3488,8 @@
         if (amt > appState.balance) { showToast("Недостаточно GRAM"); return; }
         appState.balance = Math.round((appState.balance - amt) * 100) / 100;
         renderBalance();
+      } else {
+        appState.balance = 0.00;
       }
     } else {
       const idx = appState.inventory.findIndex(x => x.uid === appState.upgSource.uid);
@@ -3513,6 +3551,8 @@
       if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
       appState.balance = Math.round((appState.balance - bet) * 100) / 100;
       renderBalance();
+    } else {
+      appState.balance = 0.00;
     }
     saveApp();
 
@@ -3596,6 +3636,8 @@
       if (bet > appState.balance) { showToast("Недостаточно GRAM"); return; }
       appState.balance = Math.round((appState.balance - bet) * 100) / 100;
       renderBalance();
+    } else {
+      appState.balance = 0.00;
     }
     saveApp();
 
@@ -3734,6 +3776,8 @@
       }
       appState.balance = Math.round((appState.balance - cost) * 100) / 100;
       renderBalance();
+    } else {
+      appState.balance = 0.00;
     }
     saveApp();
 
@@ -3791,7 +3835,7 @@
     playSlots(true);
   }
 
-  /* Instant boot + automatic background sync */
+  /* Instant synchronous boot from cache */
   initTG();
   loadApp();
   renderBalance();
