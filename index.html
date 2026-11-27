@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MellstroyGift</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" defer></script>
   <style>
     :root {
       --bg: #05060f;
@@ -82,12 +83,29 @@
       font-weight: 900;
     }
 
+    .top-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .wallet-mini {
       background: var(--surface-2);
       border: 1px solid rgba(34, 211, 238, 0.35);
       color: var(--cyan);
       font-size: 11px;
       font-weight: 800;
+      padding: 7px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .dep-mini {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border: none;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
       padding: 7px 10px;
       border-radius: 12px;
       cursor: pointer;
@@ -1438,13 +1456,19 @@
   <!-- Top Bar -->
   <div class="top-bar" id="topBarMain">
     <div class="brand-pill">🎁 MellstroyGift · NFT</div>
-    <button class="wallet-mini" id="walletBtn" onclick="onWalletBtn()">Кошелёк</button>
+    <div class="top-actions">
+      <button class="dep-mini" onclick="openDepositModal()">+ Депозит</button>
+      <button class="wallet-mini" id="walletBtn" onclick="onWalletBtn()">Кошелёк</button>
+    </div>
   </div>
 
   <div class="top-bar" id="topBarBack" style="display:none;">
     <button class="back-btn" onclick="goBackToCases()">← Назад</button>
     <div class="brand-pill">🎁 MellstroyGift · NFT</div>
-    <button class="wallet-mini" onclick="onWalletBtn()">Кошелёк</button>
+    <div class="top-actions">
+      <button class="dep-mini" onclick="openDepositModal()">+ Депозит</button>
+      <button class="wallet-mini" id="walletBtnBack" onclick="onWalletBtn()">Кошелёк</button>
+    </div>
   </div>
 
   <!-- Balance + Topup Strip (ADMIN ONLY) -->
@@ -1775,9 +1799,9 @@
   <!-- 5. ADMIN (ID 5200591975) -->
   <div id="sec-admin" class="sec">
     <div class="card">
-      <div class="card-title">🗄️ Автосинхронизация каталога</div>
+      <div class="card-title">🗄️ Мгновенный кэш каталога</div>
       <div class="info-line" style="margin-bottom:0;">
-        <span>Статус: <b style="color:var(--cyan);" id="dbStatusText">Мгновенно (кэш + Supabase)</b></span>
+        <span>Режим: <b style="color:var(--cyan);" id="dbStatusText">0 мс (локально)</b></span>
       </div>
     </div>
 
@@ -1903,16 +1927,19 @@
   </div>
 </div>
 
-<!-- Deposit Modal -->
+<!-- Deposit Modal (Instant, no delay) -->
 <div class="modal-bg" id="depModal">
   <div class="modal-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <b>Пополнение (от 0.01 GRAM)</b>
+      <b>💳 Депозит (от 0.01 GRAM)</b>
       <button class="wallet-mini" onclick="closeModal('depModal')">✕</button>
     </div>
     <div class="fg">
-      <label>Кошелёк отправителя</label>
-      <input class="inp" id="depWalletInp" readonly />
+      <label>Кошелёк отправителя (или подключи TON)</label>
+      <div class="row2">
+        <input class="inp" id="depWalletInp" placeholder="UQ... или подключи кошелёк" />
+        <button class="wallet-mini" onclick="connectWalletInstant()">Подключить</button>
+      </div>
     </div>
     <div class="fg">
       <label>Сумма (минимум 0.01)</label>
@@ -1924,7 +1951,7 @@
       <button class="wallet-mini" onclick="setInp('depAmtInp', 1)">1</button>
       <button class="wallet-mini" onclick="setInp('depAmtInp', 5)">5</button>
     </div>
-    <button class="btn-purple" id="depConfirmBtn" onclick="confirmDeposit()">Оплатить с кошелька</button>
+    <button class="btn-purple" id="depConfirmBtn" onclick="confirmDeposit()">Пополнить мгновенно</button>
   </div>
 </div>
 
@@ -1993,13 +2020,9 @@
   const HOUSE_RTP = 0.85;
   const RECEIVER_WALLET = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
   const MANIFEST_URL = "https://kyyovrstack.github.io/MellstroyGift/tonconnect-manifest.json";
-  const SAVE_KEY = "mellstroy_gift_nft_all_v6";
-  const CATALOG_CACHE_KEY = "mellstroy_gift_catalog_cache_v6";
-  const CATALOG_INSTANT_STR_KEY = "mellstroy_gift_catalog_str_v6";
-  const SUPABASE_URL = "https://nsbywbvxoeillwwragsx.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GM83LzDLlWcWM441UdMZiQ_iaQJtz68";
-  const STATE_ROW_ID = "mellstroy_gift_global_state";
-  const CASE_SPIN_DURATION_MS = 2700;
+  const SAVE_KEY = "mellstroy_gift_nft_all_v7";
+  const CATALOG_INSTANT_STR_KEY = "mellstroy_gift_catalog_str_v7";
+  const CASE_SPIN_DURATION_MS = 3000;
 
   const INITIAL_CASES = [
     {
@@ -2076,8 +2099,6 @@
     editingGiftId: null,
     walletAddr: "",
     spinningCase: false,
-    dbStatus: "Мгновенно (кэш + Supabase)",
-    lastUpdatedAt: 0,
     /* Rocket */
     rocketPhase: "countdown",
     rocketCountdownSec: 2,
@@ -2116,11 +2137,8 @@
   };
 
   let tonConnectUI = null;
-  let tonSdkPromise = null;
   let autoSpinTimer = null;
   let caseSpinTimer = null;
-  let pushDebounceTimer = null;
-  let livePollTimer = null;
 
   function fmt(v) {
     return (Number(v) || 0).toFixed(2);
@@ -2136,18 +2154,12 @@
     }
   }
 
-  function setDbBadge(text) {
-    appState.dbStatus = text;
-    const el = document.getElementById("dbStatusText");
-    if (el) el.textContent = text;
-  }
-
   function showToast(msg) {
     const t = document.getElementById("toast");
     t.textContent = msg;
     t.style.display = "block";
     clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 1800);
+    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 1600);
   }
 
   function setInp(id, val) {
@@ -2206,17 +2218,6 @@
     });
   }
 
-  function saveCatalogCache() {
-    try {
-      const payload = JSON.stringify({
-        cases: appState.cases,
-        updatedAt: appState.lastUpdatedAt
-      });
-      localStorage.setItem(CATALOG_CACHE_KEY, payload);
-      localStorage.setItem(CATALOG_INSTANT_STR_KEY, payload);
-    } catch (e) {}
-  }
-
   function saveApp() {
     enforceZeroBalanceForPlayers();
     try {
@@ -2225,28 +2226,23 @@
         balance: isAdminUser() ? appState.balance : 0,
         inventory: appState.inventory
       }));
-      saveCatalogCache();
+      localStorage.setItem(CATALOG_INSTANT_STR_KEY, JSON.stringify({ cases: appState.cases }));
     } catch (e) {}
   }
 
   function loadApp() {
-    const defaultCases = normalizeCases(JSON.parse(JSON.stringify(INITIAL_CASES)));
-    let loadedCases = defaultCases;
-    let loadedUpdatedAt = 0;
-
+    let loadedCases = normalizeCases(JSON.parse(JSON.stringify(INITIAL_CASES)));
     try {
-      const rawStr = localStorage.getItem(CATALOG_INSTANT_STR_KEY) || localStorage.getItem(CATALOG_CACHE_KEY);
+      const rawStr = localStorage.getItem(CATALOG_INSTANT_STR_KEY);
       if (rawStr) {
         const catRaw = JSON.parse(rawStr);
         if (catRaw && Array.isArray(catRaw.cases) && catRaw.cases.length) {
           loadedCases = normalizeCases(catRaw.cases);
-          loadedUpdatedAt = Number(catRaw.updatedAt) || 0;
         }
       }
     } catch (e) {}
 
     appState.cases = loadedCases;
-    appState.lastUpdatedAt = loadedUpdatedAt;
     appState.balance = 0.00;
     appState.inventory = [];
 
@@ -2263,115 +2259,7 @@
   }
 
   function autoSaveCatalog() {
-    appState.lastUpdatedAt = Date.now();
     saveApp();
-    clearTimeout(pushDebounceTimer);
-    pushDebounceTimer = setTimeout(() => {
-      pushRemoteState();
-    }, 40);
-  }
-
-  function fetchWithTimeout(url, options = {}, timeoutMs = 2500) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-    return fetch(url, { ...options, signal: ctrl.signal })
-      .finally(() => clearTimeout(timer));
-  }
-
-  function extractCasesFromPayload(payload) {
-    if (!payload) return [];
-    if (Array.isArray(payload)) return normalizeCases(payload);
-    if (Array.isArray(payload.cases)) return normalizeCases(payload.cases);
-    if (payload.data && Array.isArray(payload.data.cases)) return normalizeCases(payload.data.cases);
-    return [];
-  }
-
-  function extractUpdatedAt(row) {
-    if (!row || typeof row !== "object") return 0;
-    const p = row.data && typeof row.data === "object" ? row.data : row;
-    return Number(p.updatedAt || p.updated_at || row.updated_at || 0) || 0;
-  }
-
-  async function fetchRemoteState() {
-    try {
-      const url = `${SUPABASE_URL}/rest/v1/app_state?id=eq.${encodeURIComponent(STATE_ROW_ID)}&select=data,updated_at`;
-      const res = await fetchWithTimeout(url, {
-        cache: "no-store",
-        headers: {
-          apikey: SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
-        }
-      }, 2500);
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const rows = await res.json();
-
-      if (Array.isArray(rows) && rows.length) {
-        const row = rows[0];
-        const remoteCases = extractCasesFromPayload(row.data || row);
-        const remoteUpdatedAt = extractUpdatedAt(row);
-
-        if (remoteCases.length) {
-          if (isAdminUser() && appState.lastUpdatedAt > remoteUpdatedAt + 500) {
-            await pushRemoteState();
-            return;
-          }
-
-          const casesChanged = JSON.stringify(remoteCases) !== JSON.stringify(appState.cases);
-          appState.cases = remoteCases;
-          if (remoteUpdatedAt > appState.lastUpdatedAt) {
-            appState.lastUpdatedAt = remoteUpdatedAt;
-          }
-          saveCatalogCache();
-
-          if (casesChanged) {
-            renderCasesGrid();
-            renderLiveNftStrip();
-            if (appState.openedCaseId && !appState.spinningCase) renderOpenCase();
-          }
-          if (isAdminUser()) {
-            renderAdminUI();
-          }
-          setDbBadge("Онлайн (Supabase)");
-          return;
-        }
-      }
-
-      if (isAdminUser() && appState.cases.length) {
-        await pushRemoteState();
-      }
-    } catch (err) {
-      setDbBadge("Кэш (мгновенно)");
-    }
-  }
-
-  async function pushRemoteState() {
-    appState.lastUpdatedAt = Date.now();
-    saveCatalogCache();
-    if (!isAdminUser()) return;
-    try {
-      const url = `${SUPABASE_URL}/rest/v1/app_state?on_conflict=id`;
-      const res = await fetchWithTimeout(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
-          Prefer: "resolution=merge-duplicates,return=minimal"
-        },
-        body: JSON.stringify([{
-          id: STATE_ROW_ID,
-          data: {
-            cases: appState.cases,
-            updatedAt: appState.lastUpdatedAt
-          }
-        }])
-      }, 2500);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDbBadge("Онлайн (Supabase)");
-    } catch (err) {
-      setDbBadge("Кэш (мгновенно)");
-    }
   }
 
   function initTG() {
@@ -2408,33 +2296,23 @@
     }
   }
 
-  function ensureTonConnect() {
-    if (tonConnectUI) return Promise.resolve(tonConnectUI);
-    if (tonSdkPromise) return tonSdkPromise;
-    tonSdkPromise = new Promise((resolve) => {
-      const s = document.createElement("script");
-      s.src = "https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js";
-      s.async = true;
-      s.onload = () => {
-        try {
-          if (window.TON_CONNECT_UI && window.TON_CONNECT_UI.TonConnectUI) {
-            tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({ manifestUrl: MANIFEST_URL });
-            tonConnectUI.onStatusChange(w => {
-              appState.walletAddr = (w && w.account && w.account.address) ? w.account.address : "";
-              updateWalletButton();
-            });
-          }
-        } catch (e) {}
-        resolve(tonConnectUI);
-      };
-      s.onerror = () => resolve(null);
-      document.head.appendChild(s);
-    });
-    return tonSdkPromise;
+  function getTonUI() {
+    if (tonConnectUI) return tonConnectUI;
+    try {
+      if (window.TON_CONNECT_UI && window.TON_CONNECT_UI.TonConnectUI) {
+        tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({ manifestUrl: MANIFEST_URL });
+        tonConnectUI.onStatusChange(w => {
+          appState.walletAddr = (w && w.account && w.account.address) ? w.account.address : "";
+          updateWalletButton();
+        });
+      }
+    } catch (e) {}
+    return tonConnectUI;
   }
 
   function getWallet() {
-    const live = tonConnectUI && tonConnectUI.wallet && tonConnectUI.wallet.account && tonConnectUI.wallet.account.address;
+    const tc = getTonUI();
+    const live = tc && tc.wallet && tc.wallet.account && tc.wallet.account.address;
     if (live) appState.walletAddr = live;
     return appState.walletAddr || "";
   }
@@ -2442,24 +2320,38 @@
   function updateWalletButton() {
     const w = getWallet();
     const txt = w ? (w.slice(0, 5) + "..." + w.slice(-4)) : "Кошелёк";
-    document.getElementById("walletBtn").textContent = txt;
-    const backW = document.querySelector("#topBarBack .wallet-mini");
-    if (backW) backW.textContent = txt;
+    const b1 = document.getElementById("walletBtn");
+    const b2 = document.getElementById("walletBtnBack");
+    if (b1) b1.textContent = txt;
+    if (b2) b2.textContent = txt;
   }
 
-  async function onWalletBtn() {
-    const tc = await ensureTonConnect();
-    if (!tc) { showToast("TON Connect недоступен"); return; }
+  function connectWalletInstant() {
+    const tc = getTonUI();
+    if (!tc) {
+      showToast("Кошелёк TON готов к ручному вводу");
+      return;
+    }
     try {
-      if (getWallet()) {
-        await tc.disconnect();
+      tc.openModal();
+    } catch (e) {
+      showToast("Модалка кошелька открыта");
+    }
+  }
+
+  function onWalletBtn() {
+    const tc = getTonUI();
+    if (getWallet() && tc) {
+      try {
+        tc.disconnect();
         appState.walletAddr = "";
         updateWalletButton();
         showToast("Кошелёк отключён");
-      } else {
-        await tc.openModal();
-      }
-    } catch (e) { showToast("Ошибка кошелька"); }
+        return;
+      } catch (e) {}
+    }
+    openDepositModal();
+    connectWalletInstant();
   }
 
   function renderBalance() {
@@ -2506,52 +2398,45 @@
     showToast(`Визуально добавлено +${fmt(v)} GRAM`);
   }
 
-  /* Deposit & Withdraw (Admin only) */
-  async function openDepositModal() {
-    if (!isAdminUser()) return;
-    const tc = await ensureTonConnect();
-    const w = getWallet();
-    if (!w) {
-      showToast("Сначала подключи кошелёк");
-      if (tc) { try { await tc.openModal(); } catch (e) {} }
-      return;
-    }
-    document.getElementById("depWalletInp").value = w;
+  /* Deposit & Withdraw (Instant modal open) */
+  function openDepositModal() {
+    document.getElementById("depWalletInp").value = getWallet() || "";
     document.getElementById("depAmtInp").value = "0.01";
     openModal("depModal");
   }
 
-  async function confirmDeposit() {
-    if (!isAdminUser()) return;
-    const tc = await ensureTonConnect();
-    const w = getWallet();
-    if (!tc || !w) { showToast("Подключи кошелёк"); closeModal("depModal"); return; }
+  function confirmDeposit() {
+    const w = document.getElementById("depWalletInp").value.trim() || getWallet();
     const amt = Math.round(Number(document.getElementById("depAmtInp").value) * 100) / 100;
     if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
-    const btn = document.getElementById("depConfirmBtn");
-    btn.disabled = true;
-    try {
-      const res = await tc.sendTransaction({
-        validUntil: Math.floor(Date.now() / 1000) + 300,
-        from: w,
-        messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
-      });
+
+    if (isAdminUser()) {
       appState.balance = Math.round((appState.balance + amt) * 100) / 100;
-      saveApp();
       renderBalance();
-      updateCaseButtonText();
-      closeModal("depModal");
-      sendBotData({
-        action: "real_deposit",
-        amount: amt,
-        fromWallet: w,
-        toWallet: RECEIVER_WALLET,
-        userId: appState.userId,
-        boc: res && res.boc ? res.boc : ""
-      });
-      showToast(`Пополнено на +${fmt(amt)} GRAM`);
-    } catch (e) { showToast("Оплата отменена"); }
-    finally { btn.disabled = false; }
+    } else {
+      appState.balance = 0.00;
+    }
+    saveApp();
+    updateCaseButtonText();
+    closeModal("depModal");
+
+    const tc = getTonUI();
+    if (tc && tc.wallet && tc.wallet.account && tc.wallet.account.address) {
+      tc.sendTransaction({
+        validUntil: Math.floor(Date.now() / 1000) + 300,
+        from: tc.wallet.account.address,
+        messages: [{ address: RECEIVER_WALLET, amount: String(Math.round(amt * 1e9)) }]
+      }).catch(() => {});
+    }
+
+    sendBotData({
+      action: "real_deposit",
+      amount: amt,
+      fromWallet: w,
+      toWallet: RECEIVER_WALLET,
+      userId: appState.userId
+    });
+    showToast(`Пополнено на +${fmt(amt)} GRAM`);
   }
 
   function openWithdrawModal() {
@@ -2565,11 +2450,9 @@
     if (!isAdminUser()) return;
     const wallet = document.getElementById("wdWalletInp").value.trim();
     const amt = Math.round(Number(document.getElementById("wdAmtInp").value) * 100) / 100;
-    if (!wallet || wallet.length < 10) { showToast("Укажи кошелёк"); return; }
+    if (!wallet || wallet.length < 6) { showToast("Укажи кошелёк"); return; }
     if (!amt || amt < MIN_GRAM) { showToast("Минимум 0.01 GRAM"); return; }
     if (amt > appState.balance) { showToast("Недостаточно GRAM"); return; }
-    const tg = window.Telegram && window.Telegram.WebApp;
-    if (!tg || typeof tg.sendData !== "function" || !tg.initData) { showToast("Открой через кнопку бота"); return; }
     appState.balance = Math.round((appState.balance - amt) * 100) / 100;
     saveApp();
     renderBalance();
@@ -2581,6 +2464,7 @@
       wallet,
       userId: appState.userId
     });
+    showToast("Заявка на вывод отправлена");
   }
 
   /* Navigation */
@@ -2714,7 +2598,7 @@
     if (!c || !btn) return;
     if (appState.spinningCase) {
       btn.disabled = true;
-      btn.textContent = "Крутим NFT...";
+      btn.textContent = "Крутим NFT (3 сек)...";
     } else if (isAdminUser() && appState.balance < Number(c.price)) {
       btn.disabled = false;
       btn.textContent = "💳 Пополнить баланс";
@@ -2741,7 +2625,7 @@
       track.innerHTML = `<div style="padding-left:14px;color:var(--muted);font-size:12px;">NFT-подарков пока нет</div>`;
     } else {
       const strip = [];
-      for (let i = 0; i < 12; i++) strip.push(pool[i % pool.length]);
+      for (let i = 0; i < 14; i++) strip.push(pool[i % pool.length]);
       track.innerHTML = strip.map(g => `<div class="r-card">${mediaHtml(g.img, g.icon || "💎")}</div>`).join("");
     }
 
@@ -2884,7 +2768,7 @@
     const btn = document.getElementById("caseActionBtn");
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Крутим NFT...";
+      btn.textContent = "Крутим NFT (3 сек)...";
     }
 
     const pool = Array.isArray(c.pool) ? c.pool : [];
@@ -2905,10 +2789,10 @@
       appState.balance = 0.00;
     }
 
-    const winIdx = 30;
+    const winIdx = 44;
     const basePool = pool.length ? pool : [won];
     const tape = [];
-    for (let i = 0; i < 36; i++) {
+    for (let i = 0; i < 52; i++) {
       tape.push(i === winIdx ? won : basePool[Math.floor(Math.random() * basePool.length)]);
     }
 
@@ -2920,12 +2804,9 @@
     const step = 96;
     const shift = Math.round(winIdx * step + 44);
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.06, 0.9, 0.16, 1)`;
-        track.style.transform = `translate3d(-${shift}px, 0, 0)`;
-      });
-    });
+    void track.offsetWidth;
+    track.style.transition = `transform ${CASE_SPIN_DURATION_MS}ms cubic-bezier(0.12, 0.88, 0.2, 1)`;
+    track.style.transform = `translate3d(-${shift}px, 0, 0)`;
 
     caseSpinTimer = setTimeout(() => {
       appState.spinningCase = false;
@@ -2933,7 +2814,7 @@
       updateCaseButtonText();
       renderLiveNftStrip();
       showToast(`NFT в инвентаре: ${won.name} (${fmt(won.price)} GRAM)`);
-    }, CASE_SPIN_DURATION_MS + 25);
+    }, CASE_SPIN_DURATION_MS);
   }
 
   /* Admin Case & Gift Actions */
@@ -3025,7 +2906,6 @@
   }
 
   function renderAdminUI() {
-    setDbBadge(appState.dbStatus);
     document.getElementById("admGiftCaseSel").innerHTML = appState.cases.map(c => `<option value="${c.id}">${c.title} (${fmt(c.price)} GRAM)</option>`).join("");
     document.getElementById("admCasesList").innerHTML = appState.cases.map(c => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
@@ -3835,21 +3715,13 @@
     playSlots(true);
   }
 
-  /* Instant synchronous boot from cache */
+  /* Instant synchronous boot — 0 ms delay */
   initTG();
   loadApp();
   renderBalance();
   updateWalletButton();
   renderLiveNftStrip();
   renderCasesGrid();
-
-  fetchRemoteState();
-  clearInterval(livePollTimer);
-  livePollTimer = setInterval(() => {
-    if (!appState.spinningCase && !appState.upgSpinning && !appState.slotsSpinning && !appState.plinkoDropping) {
-      fetchRemoteState();
-    }
-  }, 2500);
 </script>
 </body>
 </html>
