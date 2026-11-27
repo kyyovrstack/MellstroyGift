@@ -1056,6 +1056,27 @@
       </div>
 
       <div class="card">
+        <div class="section-title" style="margin-top:0;">💸 Вывод GRAM</div>
+        <p class="muted">Укажите свой криптоадрес и сумму — заявка придёт администратору в бот.</p>
+
+        <div class="mt-8">
+          <label class="muted">Ваш криптоадрес</label>
+          <input type="text" id="withdrawAddr" placeholder="UQ... или 0x..." />
+        </div>
+
+        <div class="mt-8">
+          <label class="muted">Сумма вывода (GRAM)</label>
+          <input type="number" id="withdrawAmt" step="0.5" min="0.5" value="5" />
+        </div>
+
+        <button class="primary-btn mt-12" id="withdrawBtn" onclick="submitWithdrawRequest()">
+          Запросить вывод
+        </button>
+
+        <div id="myWithdrawList" class="muted mt-12">Заявок на вывод пока нет</div>
+      </div>
+
+      <div class="card">
         <div class="section-title" style="margin-top:0;">📜 История пополнений</div>
         <div id="myDepList" class="muted">Пополнений пока нет</div>
       </div>
@@ -1369,6 +1390,7 @@
     const ADMIN_ID = 5200591975;
     const DEFAULT_PLAYER_ID = 1000001;
     const DEFAULT_TON_RECEIVER = "UQCPUdJUwuWVyB0xUP06S7PygUOLqQQtsTM1nuBoQueGpRV4";
+    const BILLING_API_URL = "http://127.0.0.1:8080/api/request";
     const STORE_KEY = "mellstroy_gift_gram_v6";
     const IDB_NAME = "mellstroy_gift_media_db";
     const IDB_STORE = "images";
@@ -1386,10 +1408,11 @@
         const uid = Number(u.id);
         return {
           id: uid,
+          username: u.username || "",
           name: [u.first_name, u.last_name].filter(Boolean).join(" ") || u.username || (uid === ADMIN_ID ? "Админ" : "Игрок")
         };
       }
-      return { id: DEFAULT_PLAYER_ID, name: "Игрок" };
+      return { id: DEFAULT_PLAYER_ID, username: "", name: "Игрок" };
     }
 
     function isAdminUser() {
@@ -1409,6 +1432,7 @@
         chances: { plinko: 42, slots: 36, mines: 72, crash: 45 },
         inventory: [],
         deposits: [],
+        withdrawals: [],
         cases: [
           {
             id: "c_epic",
@@ -1528,6 +1552,7 @@
           tonReceiver: (parsed.tonReceiver && parsed.tonReceiver.trim()) ? parsed.tonReceiver.trim() : DEFAULT_TON_RECEIVER,
           balances: mergedBalances,
           chances: { ...base.chances, ...(parsed.chances || {}) },
+          withdrawals: Array.isArray(parsed.withdrawals) ? parsed.withdrawals : [],
           user: freshUser
         };
       } catch {
@@ -1606,6 +1631,79 @@
 
     function onAvatarClick() {
       if (isAdminUser()) switchTab("admin");
+    }
+
+    /* ОТПРАВКА ЗАЯВОК В БОТ АДМИНУ */
+    async function postBillingRequest(type, amount, details = "") {
+      const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+      const userId = tgUser && tgUser.id ? Number(tgUser.id) : Number(state.user.id);
+      const username = (tgUser && tgUser.username) || state.user.username || state.user.name || "player";
+
+      const res = await fetch(BILLING_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          user_id: userId,
+          username,
+          amount: Number(amount),
+          details
+        })
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP_${res.status}`);
+      }
+      return await res.json();
+    }
+
+    async function submitWithdrawRequest() {
+      const addrInput = document.getElementById("withdrawAddr");
+      const amtInput = document.getElementById("withdrawAmt");
+      const btn = document.getElementById("withdrawBtn");
+
+      const address = (addrInput.value || "").trim();
+      const amt = Number(amtInput.value || 0);
+      const curBal = balOf();
+
+      if (!address || address.length < 8) {
+        return toast("Введите корректный криптоадрес");
+      }
+      if (!amt || isNaN(amt) || amt <= 0) {
+        return toast("Введите сумму вывода в GRAM");
+      }
+      if (curBal < amt) {
+        return toast(`Недостаточно GRAM (доступно ${fmt(curBal)})`);
+      }
+
+      btn.disabled = true;
+      setBalOf(state.user.id, curBal - amt);
+      saveState();
+      renderTop();
+
+      try {
+        const data = await postBillingRequest("withdraw", amt, address);
+        if (!data || !data.ok) {
+          throw new Error("server_rejected");
+        }
+
+        state.withdrawals.unshift({
+          id: data.request_id || ("wd_" + Date.now()),
+          amount: amt,
+          address,
+          status: "Отправлено админу"
+        });
+        saveState();
+        renderWalletHistory();
+        addrInput.value = "";
+        toast("Заявка на вывод отправлена в бот админу");
+      } catch (err) {
+        setBalOf(state.user.id, balOf() + amt);
+        saveState();
+        renderTop();
+        toast("Сервер бота недоступен, баланс возвращён");
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     /* TON CONNECT */
@@ -1709,6 +1807,10 @@
         renderTop();
         renderWalletHistory();
         toast(`Баланс пополнен на ${fmt(amt)}`);
+
+        try {
+          await postBillingRequest("deposit", amt, connectedWalletAddress);
+        } catch (_) {}
       } catch (err) {
         toast("Транзакция отменена или не подтверждена");
       }
@@ -1718,17 +1820,33 @@
       const el = document.getElementById("myDepList");
       if (!state.deposits.length) {
         el.innerHTML = "Пополнений пока нет";
-        return;
-      }
-      el.innerHTML = state.deposits.map(d => `
-        <div class="live-bet-row mt-8">
-          <div>
-            <b>+${fmt(d.amount)}</b>
-            <div class="muted">≈ ${d.ton} TON</div>
+      } else {
+        el.innerHTML = state.deposits.map(d => `
+          <div class="live-bet-row mt-8">
+            <div>
+              <b>+${fmt(d.amount)}</b>
+              <div class="muted">≈ ${d.ton} TON</div>
+            </div>
+            <span class="cur-badge">${esc(d.status)}</span>
           </div>
-          <span class="cur-badge">${esc(d.status)}</span>
-        </div>
-      `).join("");
+        `).join("");
+      }
+
+      const wdEl = document.getElementById("myWithdrawList");
+      if (!wdEl) return;
+      if (!state.withdrawals || !state.withdrawals.length) {
+        wdEl.innerHTML = "Заявок на вывод пока нет";
+      } else {
+        wdEl.innerHTML = state.withdrawals.map(w => `
+          <div class="live-bet-row mt-8">
+            <div>
+              <b>-${fmt(w.amount)}</b>
+              <div class="muted">${esc(w.address)}</div>
+            </div>
+            <span class="cur-badge">${esc(w.status)}</span>
+          </div>
+        `).join("");
+      }
     }
 
     function saveState() {
@@ -3155,6 +3273,7 @@
     renderPlinkoMults();
     drawPlinkoFrame(null);
     updateDepEquivalent();
+    renderWalletHistory();
     initTonConnect();
 
     loadAllMediaFromDb().then(() => {
