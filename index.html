@@ -520,43 +520,72 @@
       transform: scale(0.98);
     }
 
+    /* ЯРКИЙ НЕОНОВЫЙ PLINKO */
     .plinko-stage {
       position: relative;
-      background: radial-gradient(circle at 50% 18%, rgba(168, 85, 247, 0.4), #130e2b 76%);
-      border: 1px solid rgba(168, 85, 247, 0.38);
-      border-radius: 20px;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(236, 72, 153, 0.36), transparent 52%),
+        radial-gradient(circle at 20% 35%, rgba(6, 182, 212, 0.25), transparent 55%),
+        radial-gradient(circle at 80% 45%, rgba(168, 85, 247, 0.42), transparent 55%),
+        linear-gradient(180deg, #160c36 0%, #0b061d 100%);
+      border: 1px solid rgba(217, 70, 239, 0.55);
+      border-radius: 22px;
       overflow: hidden;
+      box-shadow:
+        0 0 28px rgba(168, 85, 247, 0.32),
+        inset 0 0 24px rgba(236, 72, 153, 0.14);
     }
 
     #plinkoCanvas {
       width: 100%;
-      height: 310px;
+      height: 325px;
       display: block;
     }
 
     .plinko-mults {
       display: grid;
-      grid-template-columns: repeat(9, 1fr);
+      grid-template-columns: repeat(11, 1fr);
       gap: 3px;
-      padding: 0 8px 10px;
+      padding: 4px 6px 10px;
     }
 
     .plinko-mult {
-      background: linear-gradient(180deg, #6d28d9, #4c1d95);
+      background: linear-gradient(180deg, rgba(139, 92, 246, 0.55), rgba(49, 16, 110, 0.92));
+      border: 1px solid rgba(232, 121, 249, 0.35);
       color: #fff;
-      border-radius: 7px;
-      padding: 6px 2px;
+      border-radius: 8px;
+      padding: 6px 1px;
       text-align: center;
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 900;
-      transition: transform 0.15s ease;
+      letter-spacing: -0.3px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .plinko-mult.tier-high {
+      background: linear-gradient(180deg, rgba(236, 72, 153, 0.85), rgba(157, 23, 77, 0.95));
+      border-color: rgba(251, 191, 36, 0.65);
+      color: #fef08a;
+    }
+
+    .plinko-mult.tier-mid {
+      background: linear-gradient(180deg, rgba(168, 85, 247, 0.72), rgba(91, 33, 182, 0.92));
+      border-color: rgba(192, 132, 252, 0.5);
+    }
+
+    .plinko-mult.tier-low {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.45), rgba(30, 27, 75, 0.92));
+      border-color: rgba(125, 211, 252, 0.35);
     }
 
     .plinko-mult.hit {
-      background: linear-gradient(135deg, #10b981, #34d399);
+      background: linear-gradient(135deg, #34d399, #10b981, #fbbf24);
+      border-color: #ffffff;
       color: #052e16;
-      transform: scale(1.08);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.75);
+      transform: scale(1.14) translateY(-2px);
+      box-shadow: 0 0 18px rgba(52, 211, 153, 0.95), 0 0 28px rgba(251, 191, 36, 0.65);
+      z-index: 3;
     }
 
     .slots-board {
@@ -1003,12 +1032,12 @@
         <div class="game-tile" onclick="openGame('plinko')">
           <span class="game-tile-emoji">🟣</span>
           <div class="game-tile-name">Plinko</div>
-          <div class="game-tile-sub">Плавный спуск до слота</div>
+          <div class="game-tile-sub">11 слотов · Неоновый шар</div>
         </div>
         <div class="game-tile" onclick="openGame('slots')">
           <span class="game-tile-emoji">🎰</span>
           <div class="game-tile-name">Слоты 5×5</div>
-          <div class="game-tile-sub">Плавная прокрутка рядов</div>
+          <div class="game-tile-sub">Бонус за 4 и 5 одинаковых</div>
         </div>
         <div class="game-tile" onclick="openGame('mines')">
           <span class="game-tile-emoji">💣</span>
@@ -1245,7 +1274,7 @@
 
       <div id="scene-plinko" style="display:none;">
         <div class="plinko-stage">
-          <canvas id="plinkoCanvas" width="420" height="310"></canvas>
+          <canvas id="plinkoCanvas" width="440" height="325"></canvas>
           <div class="plinko-mults" id="plinkoMultRow"></div>
         </div>
 
@@ -2144,7 +2173,7 @@
 
       if (name === "plinko") {
         renderPlinkoMults();
-        drawPlinkoFrame(null);
+        drawPlinkoFrame(null, -1);
       } else if (name === "slots") {
         initSlotsReels();
         updateSlotBetReadout();
@@ -2161,15 +2190,22 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* PLINKO */
+    /* ЯРКИЙ PLINKO С 11 СЛОТАМИ И НЕОНОВЫМ ШАРОМ */
     let plinkoDiff = "medium";
     let plinkoBusy = false;
+    let plinkoTrail = [];
 
     const PLINKO_MULTS = {
-      easy:   [3.0, 1.8, 1.3, 1.1, 0.8, 1.1, 1.3, 1.8, 3.0],
-      medium: [11,  4,   2,   1.2, 0.5, 1.2, 2,   4,   11],
-      hard:   [33,  11,  4,   1.5, 0.3, 1.5, 4,   11,  33]
+      easy:   [5.0, 2.8, 1.9, 1.5, 1.2, 0.8, 1.2, 1.5, 1.9, 2.8, 5.0],
+      medium: [18,  9,   4.5, 2.4, 1.4, 0.5, 1.4, 2.4, 4.5, 9,   18],
+      hard:   [50,  22,  10,  4.2, 1.7, 0.3, 1.7, 4.2, 10,  22,  50]
     };
+
+    function getPlinkoTierClass(mult) {
+      if (mult >= 4) return "tier-high";
+      if (mult >= 1.2) return "tier-mid";
+      return "tier-low";
+    }
 
     function setPlinkoDiff(d) {
       plinkoDiff = d;
@@ -2177,13 +2213,13 @@
       document.getElementById("plDiffMed").classList.toggle("active", d === "medium");
       document.getElementById("plDiffHard").classList.toggle("active", d === "hard");
       renderPlinkoMults();
-      drawPlinkoFrame(null);
+      drawPlinkoFrame(null, -1);
     }
 
     function renderPlinkoMults() {
       const arr = PLINKO_MULTS[plinkoDiff];
       document.getElementById("plinkoMultRow").innerHTML = arr
-        .map((m, idx) => `<div class="plinko-mult" id="pm_${idx}">${m}x</div>`)
+        .map((m, idx) => `<div class="plinko-mult ${getPlinkoTierClass(m)}" id="pm_${idx}">${m}x</div>`)
         .join("");
     }
 
@@ -2191,10 +2227,10 @@
       const canvas = document.getElementById("plinkoCanvas");
       const w = canvas.width;
       const h = canvas.height;
-      const rows = 8;
-      const topY = 30;
-      const rowGap = 28;
-      const colGap = 34;
+      const rows = 9;
+      const topY = 26;
+      const rowGap = 27;
+      const colGap = 32;
       const pegs = [];
 
       for (let r = 0; r < rows; r++) {
@@ -2203,15 +2239,15 @@
         const startX = (w - rowWidth) / 2;
         const y = topY + r * rowGap;
         for (let c = 0; c < count; c++) {
-          pegs.push({ x: startX + c * colGap, y, r: 3.6 });
+          pegs.push({ x: startX + c * colGap, y, r: 3.8, row: r });
         }
       }
 
-      const slotCount = 9;
-      const slotGap = 4;
-      const totalPadding = 16;
+      const slotCount = 11;
+      const slotGap = 3;
+      const totalPadding = 12;
       const slotWidth = (w - totalPadding - slotGap * (slotCount - 1)) / slotCount;
-      const slotY = h - 22;
+      const slotY = h - 18;
 
       return { w, h, pegs, rows, topY, rowGap, slotCount, slotGap, totalPadding, slotWidth, slotY };
     }
@@ -2220,26 +2256,72 @@
       return geom.totalPadding / 2 + slotIdx * (geom.slotWidth + geom.slotGap) + geom.slotWidth / 2;
     }
 
-    function drawPlinkoFrame(ball) {
+    function drawPlinkoFrame(ball, activeRow = -1, pulse = 0) {
       const canvas = document.getElementById("plinkoCanvas");
       const ctx = canvas.getContext("2d");
       const geom = getPlinkoGeometry();
       ctx.clearRect(0, 0, geom.w, geom.h);
 
+      // Лёгкие неоновые направляющие лучи от центра
+      const topGlow = ctx.createRadialGradient(geom.w / 2, 16, 4, geom.w / 2, 16, 130);
+      topGlow.addColorStop(0, "rgba(236, 72, 153, 0.34)");
+      topGlow.addColorStop(0.5, "rgba(168, 85, 247, 0.14)");
+      topGlow.addColorStop(1, "rgba(168, 85, 247, 0)");
+      ctx.fillStyle = topGlow;
+      ctx.fillRect(0, 0, geom.w, 160);
+
+      // Пины с подсветкой активного ряда
       for (const p of geom.pegs) {
+        const nearBall = ball && Math.hypot(ball.x - p.x, ball.y - p.y) < 22;
+        const isRow = p.row === activeRow;
+
+        if (nearBall || isRow) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r + 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = nearBall ? "rgba(52, 211, 153, 0.35)" : "rgba(232, 121, 249, 0.24)";
+          ctx.fill();
+        }
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = nearBall ? "#6ee7b7" : (isRow ? "#f5d0fe" : "#ffffff");
         ctx.fill();
       }
 
-      if (ball) {
+      // Неоновый шлейф шарика
+      for (let i = 0; i < plinkoTrail.length; i++) {
+        const tr = plinkoTrail[i];
+        const ratio = (i + 1) / plinkoTrail.length;
         ctx.beginPath();
-        ctx.arc(ball.x, ball.y, 7.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#10b981";
+        ctx.arc(tr.x, tr.y, 7.5 * ratio, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(16, 185, 129, ${(ratio * 0.28).toFixed(3)})`;
         ctx.fill();
-        ctx.lineWidth = 2.2;
-        ctx.strokeStyle = "#ecfdf5";
+      }
+
+      // Яркий светящийся шар
+      if (ball) {
+        const auraRadius = 19 + Math.sin(pulse * 0.35) * 3;
+        const aura = ctx.createRadialGradient(ball.x, ball.y, 2, ball.x, ball.y, auraRadius);
+        aura.addColorStop(0, "rgba(110, 231, 183, 0.92)");
+        aura.addColorStop(0.45, "rgba(16, 185, 129, 0.45)");
+        aura.addColorStop(1, "rgba(16, 185, 129, 0)");
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, auraRadius, 0, Math.PI * 2);
+        ctx.fillStyle = aura;
+        ctx.fill();
+
+        const ballGrad = ctx.createRadialGradient(ball.x - 2.5, ball.y - 2.5, 1, ball.x, ball.y, 8.2);
+        ballGrad.addColorStop(0, "#ffffff");
+        ballGrad.addColorStop(0.35, "#6ee7b7");
+        ballGrad.addColorStop(0.8, "#10b981");
+        ballGrad.addColorStop(1, "#047857");
+
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, 8.2, 0, Math.PI * 2);
+        ctx.fillStyle = ballGrad;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#fef08a";
         ctx.stroke();
       }
     }
@@ -2252,6 +2334,7 @@
       if (curBal < bet) return toast("Недостаточно GRAM");
 
       plinkoBusy = true;
+      plinkoTrail = [];
       clearBanner();
       document.querySelectorAll(".plinko-mult").forEach(el => el.classList.remove("hit"));
 
@@ -2263,9 +2346,11 @@
       const mults = PLINKO_MULTS[plinkoDiff];
       const wantGood = Math.random() < (Number(state.chances.plinko || 42) / 100);
 
+      const goodSlots = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10];
+      const badSlots = [4, 5, 6];
       const targetSlot = wantGood
-        ? [0, 1, 2, 3, 5, 6, 7, 8][Math.floor(Math.random() * 8)]
-        : (Math.random() < 0.65 ? 4 : (Math.random() < 0.5 ? 3 : 5));
+        ? goodSlots[Math.floor(Math.random() * goodSlots.length)]
+        : (Math.random() < 0.68 ? 5 : badSlots[Math.floor(Math.random() * badSlots.length)]);
 
       const finalX = getSlotCenterX(targetSlot, geom);
       const finalY = geom.slotY;
@@ -2275,7 +2360,7 @@
       for (let r = 0; r < geom.rows; r++) {
         const t = (r + 1) / geom.rows;
         const linearX = startX + (finalX - startX) * t;
-        const wiggle = (r < geom.rows - 1) ? Math.sin(r * 1.9 + targetSlot) * 8 : 0;
+        const wiggle = (r < geom.rows - 1) ? Math.sin(r * 2.1 + targetSlot) * 10 : 0;
         waypoints.push({
           x: r === geom.rows - 1 ? finalX : linearX + wiggle,
           y: geom.topY + r * geom.rowGap - 8
@@ -2285,9 +2370,11 @@
 
       let segIndex = 0;
       let segProgress = 0;
-      const stepSpeed = 0.075;
+      let frameTick = 0;
+      const stepSpeed = 0.082;
 
       function animateDrop() {
+        frameTick++;
         segProgress += stepSpeed;
         if (segProgress >= 1) {
           segIndex++;
@@ -2295,7 +2382,9 @@
         }
 
         if (segIndex >= waypoints.length - 1) {
-          drawPlinkoFrame({ x: finalX, y: finalY });
+          plinkoTrail.push({ x: finalX, y: finalY });
+          if (plinkoTrail.length > 9) plinkoTrail.shift();
+          drawPlinkoFrame({ x: finalX, y: finalY }, geom.rows - 1, frameTick);
 
           const clampedX = Math.max(geom.totalPadding / 2, Math.min(geom.w - geom.totalPadding / 2 - 1, finalX));
           const landedSlot = Math.max(
@@ -2327,17 +2416,22 @@
         const p0 = waypoints[segIndex];
         const p1 = waypoints[segIndex + 1];
         const eased = 1 - Math.pow(1 - segProgress, 2);
-        drawPlinkoFrame({
+        const curPt = {
           x: p0.x + (p1.x - p0.x) * eased,
           y: p0.y + (p1.y - p0.y) * eased
-        });
+        };
+
+        plinkoTrail.push(curPt);
+        if (plinkoTrail.length > 9) plinkoTrail.shift();
+
+        drawPlinkoFrame(curPt, Math.min(geom.rows - 1, segIndex), frameTick);
         requestAnimationFrame(animateDrop);
       }
 
       requestAnimationFrame(animateDrop);
     }
 
-    /* СЛОТЫ 5x5 */
+    /* СЛОТЫ 5x5 — НАГРАДА РАСТЁТ ЗА 3, 4 И 5 ОДИНАКОВЫХ */
     let slotBet = 1;
     let slotSpeed = 1;
     let autoSpinOn = false;
@@ -2429,9 +2523,24 @@
       const isWin = forceWin || (Math.random() * 100 < effChance);
       const winSym = forceWin ? "👑" : SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
 
+      // Определяем длину комбинации: 3, 4 или 5 одинаковых символов подряд
+      let matchLen = 0;
+      if (forceWin) {
+        matchLen = Math.random() < 0.45 ? 5 : 4;
+      } else if (isWin) {
+        const rLen = Math.random();
+        if (rLen < 0.14) matchLen = 5;
+        else if (rLen < 0.42) matchLen = 4;
+        else matchLen = 3;
+      }
+
       const finalSymbols = Array.from({ length: 5 }, (_, idx) => {
-        if (isWin && idx < 3) return winSym;
-        return SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+        if (matchLen > 0 && idx < matchLen) return winSym;
+        let sym = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+        if (matchLen > 0 && idx === matchLen && sym === winSym) {
+          sym = SLOT_SYMBOLS[(SLOT_SYMBOLS.indexOf(winSym) + 1) % SLOT_SYMBOLS.length];
+        }
+        return sym;
       });
 
       const cellHeight = 54;
@@ -2475,18 +2584,19 @@
           stripEl.style.transition = "none";
           stripEl.style.transform = "translateY(0px)";
           stripEl.innerHTML = `<div class="slot-symbol-item">${finalSymbols[col]}</div>`;
-          if (isWin && col < 3) {
+          if (matchLen > 0 && col < matchLen) {
             document.getElementById("reelCol_" + col).classList.add("win-cell");
           }
         }
 
-        const mult = forceWin ? 5.0 : (isWin ? 2.4 : 0);
+        const multByMatch = { 3: 2.4, 4: 4.2, 5: 8.5 };
+        const mult = matchLen > 0 ? (multByMatch[matchLen] || 2.4) : 0;
         const payout = Number((cost * mult).toFixed(2));
         if (payout > 0) {
           setBalOf(state.user.id, balOf() + payout);
           saveState();
           renderTop();
-          setBanner("win", `Комбинация сыграла (${mult}x)! Выигрыш: +${fmt(payout)}`);
+          setBanner("win", `${matchLen} в ряд (${mult}x)! Выигрыш: +${fmt(payout)}`);
         } else {
           setBanner("lose", `Комбинация не выпала (-${fmt(cost)})`);
         }
@@ -3291,7 +3401,7 @@
     renderCases();
     renderInv();
     renderPlinkoMults();
-    drawPlinkoFrame(null);
+    drawPlinkoFrame(null, -1);
     updateDepEquivalent();
     renderWalletHistory();
     initTonConnect();
