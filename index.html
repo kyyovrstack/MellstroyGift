@@ -520,7 +520,6 @@
       transform: scale(0.98);
     }
 
-    /* ТВОЙ ДИЗАЙН PLINKO */
     .plinko-stage {
       position: relative;
       background:
@@ -2225,7 +2224,7 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* ТВОЙ ДИЗАЙН PLINKO + МУЛЬТИШАРИКИ + МЕДЛЕННОЕ ПЛАВНОЕ ПАДЕНИЕ БЕЗ ОТСКОКОВ + УМЕНЬШЕННЫЙ ШАРИК */
+    /* НАСТОЯЩАЯ ФИЗИКА PLINKO: СТОЛКНОВЕНИЯ С ПИНАМИ, ОТСКОКИ И СКАТЫВАНИЕ */
     let plinkoSelectedBalls = 1;
     let plinkoActiveBalls = [];
     let plinkoAnimRaf = null;
@@ -2280,7 +2279,7 @@
         const startX = (w - rowWidth) / 2;
         const y = topY + r * rowGap;
         for (let c = 0; c < count; c++) {
-          pegs.push({ x: startX + c * colGap, y, r: 3.7, row: r });
+          pegs.push({ x: startX + c * colGap, y, r: 3.7, row: r, hitFlash: 0 });
         }
       }
 
@@ -2288,13 +2287,22 @@
       const slotGap = 3;
       const totalPadding = 12;
       const slotWidth = (w - totalPadding - slotGap * (slotCount - 1)) / slotCount;
-      const slotY = h - 15;
+      const slotY = h - 14;
 
-      return { w, h, pegs, rows, topY, rowGap, slotCount, slotGap, totalPadding, slotWidth, slotY };
+      return { w, h, pegs, rows, topY, rowGap, colGap, slotCount, slotGap, totalPadding, slotWidth, slotY };
     }
 
     function getSlotCenterX(slotIdx, geom) {
       return geom.totalPadding / 2 + slotIdx * (geom.slotWidth + geom.slotGap) + geom.slotWidth / 2;
+    }
+
+    let plinkoPegsCache = null;
+
+    function getPegsList(geom) {
+      if (!plinkoPegsCache || plinkoPegsCache.length !== geom.pegs.length) {
+        plinkoPegsCache = geom.pegs;
+      }
+      return plinkoPegsCache;
     }
 
     function drawPlinkoScene(pulse = 0) {
@@ -2302,6 +2310,7 @@
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       const geom = getPlinkoGeometry();
+      const pegs = getPegsList(geom);
       ctx.clearRect(0, 0, geom.w, geom.h);
 
       const topGlow = ctx.createRadialGradient(geom.w / 2, 14, 3, geom.w / 2, 14, 150);
@@ -2311,43 +2320,50 @@
       ctx.fillStyle = topGlow;
       ctx.fillRect(0, 0, geom.w, 175);
 
-      for (const p of geom.pegs) {
-        let proximity = 0;
+      for (const p of pegs) {
+        let proximity = p.hitFlash || 0;
         for (const b of plinkoActiveBalls) {
-          if (b.done) continue;
+          if (b.done || b.delay > 0) continue;
           const d = Math.hypot(b.x - p.x, b.y - p.y);
           if (d < 22) {
             proximity = Math.max(proximity, 1 - d / 22);
           }
         }
 
+        const radiusBoost = proximity > 0.35 ? (proximity - 0.35) * 1.3 : 0;
+        const drawR = p.r + radiusBoost;
+
         if (proximity > 0.05) {
-          const halo = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, p.r + 7);
-          halo.addColorStop(0, `rgba(216, 180, 254, ${(0.55 * proximity).toFixed(3)})`);
-          halo.addColorStop(0.6, `rgba(168, 85, 247, ${(0.25 * proximity).toFixed(3)})`);
+          const halo = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, drawR + 8);
+          halo.addColorStop(0, `rgba(250, 232, 255, ${(0.72 * proximity).toFixed(3)})`);
+          halo.addColorStop(0.55, `rgba(192, 132, 252, ${(0.34 * proximity).toFixed(3)})`);
           halo.addColorStop(1, "rgba(168, 85, 247, 0)");
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r + 7, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, drawR + 8, 0, Math.PI * 2);
           ctx.fillStyle = halo;
           ctx.fill();
         }
 
-        const pegGrad = ctx.createRadialGradient(p.x - 1.1, p.y - 1.1, 0.4, p.x, p.y, p.r + 0.6);
+        const pegGrad = ctx.createRadialGradient(p.x - 1.1, p.y - 1.1, 0.4, p.x, p.y, drawR + 0.6);
         pegGrad.addColorStop(0, "#ffffff");
-        pegGrad.addColorStop(0.55, proximity > 0.2 ? "#fae8ff" : "#f3e8ff");
-        pegGrad.addColorStop(1, proximity > 0.2 ? "#c084fc" : "#9333ea");
+        pegGrad.addColorStop(0.55, proximity > 0.25 ? "#fdf4ff" : "#f3e8ff");
+        pegGrad.addColorStop(1, proximity > 0.25 ? "#e879f9" : "#9333ea");
 
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, drawR, 0, Math.PI * 2);
         ctx.fillStyle = pegGrad;
         ctx.fill();
-        ctx.lineWidth = 0.8;
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
+        ctx.lineWidth = proximity > 0.3 ? 1.3 : 0.8;
+        ctx.strokeStyle = proximity > 0.3 ? "#fef08a" : "rgba(255, 255, 255, 0.65)";
         ctx.stroke();
+
+        if (p.hitFlash > 0) {
+          p.hitFlash = Math.max(0, p.hitFlash - 0.08);
+        }
       }
 
       for (const b of plinkoActiveBalls) {
-        if (b.done) continue;
+        if (b.done || b.delay > 0) continue;
 
         for (let i = 0; i < b.trail.length; i++) {
           const tr = b.trail[i];
@@ -2421,35 +2437,19 @@
       return pool[pool.length - 1].idx;
     }
 
-    function createSingleBallPath(betPerBall, targetSlot, delayFrames, seed) {
-      const geom = getPlinkoGeometry();
-      const finalX = getSlotCenterX(targetSlot, geom);
-      const finalY = geom.slotY;
-      const startX = geom.w / 2 + Math.sin(seed * 3.7) * 7;
+    function createPhysicsBall(betPerBall, targetSlot, delayFrames, seed, geom) {
+      const targetX = getSlotCenterX(targetSlot, geom);
+      const startX = geom.w / 2 + (Math.random() - 0.5) * 10;
 
-      const points = [{ x: startX, y: 10 }];
-      const ctrl1X = startX + (finalX - startX) * 0.28 + Math.cos(seed * 2.1) * 14;
-      const ctrl1Y = geom.topY + geom.rowGap * 2.5;
-      const ctrl2X = startX + (finalX - startX) * 0.72 + Math.sin(seed * 1.7) * 10;
-      const ctrl2Y = geom.topY + geom.rowGap * 6.2;
+      // Выбираем направление отклонений у рядов пинов так, чтобы шар естественно скатывался в targetSlot
+      const rowDirs = [];
+      const rowCount = geom.rows;
+      // Средний слот — 6. Сдвиг вправо = +1, влево = -1
+      const desiredOffset = targetSlot - 6;
+      const rightBias = 0.5 + (desiredOffset / 12) * 0.42;
 
-      // Больше шагов для более плавного и медленного падения
-      const steps = 82;
-      for (let i = 1; i <= steps; i++) {
-        const u = i / steps;
-        const t = u * u * 0.55 + u * 0.45;
-        const inv = 1 - t;
-        const x =
-          inv * inv * inv * startX +
-          3 * inv * inv * t * ctrl1X +
-          3 * inv * t * t * ctrl2X +
-          t * t * t * finalX;
-        const y =
-          inv * inv * inv * 10 +
-          3 * inv * inv * t * ctrl1Y +
-          3 * inv * t * t * ctrl2Y +
-          t * t * t * finalY;
-        points.push({ x, y });
+      for (let r = 0; r < rowCount; r++) {
+        rowDirs.push(Math.random() < rightBias ? 1 : -1);
       }
 
       return {
@@ -2457,11 +2457,12 @@
         targetSlot,
         mult: PLINKO_SLOTS[targetSlot],
         delay: delayFrames,
-        progress: 0,
-        speed: 0.54 + (seed % 5) * 0.025,
-        points,
         x: startX,
         y: 10,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: 1.55,
+        rowDirs,
+        lastPegHitRow: -1,
         trail: [],
         seed,
         done: false
@@ -2482,35 +2483,35 @@
       saveState();
       renderTop();
 
+      const geom = getPlinkoGeometry();
       const winChance = Number(state.chances.plinko || 42) / 100;
       let totalWin = 0;
       const landedMults = [];
-
       const usedSlots = new Set();
 
       for (let i = 0; i < count; i++) {
         const isWin = Math.random() < winChance;
-        let candidates = isWin
+        const candidates = isWin
           ? [
-              { idx: 4, w: 30 },   // 1.1x
-              { idx: 8, w: 30 },   // 1.1x
-              { idx: 3, w: 14 },   // 2x
-              { idx: 9, w: 14 },   // 2x
-              { idx: 2, w: 4.5 },  // 4x
-              { idx: 10, w: 4.5 }, // 4x
-              { idx: 1, w: 1.2 },  // 11x
-              { idx: 11, w: 1.2 }, // 11x
-              { idx: 0, w: 0.3 },  // 33x
-              { idx: 12, w: 0.3 }  // 33x
+              { idx: 4, w: 30 },
+              { idx: 8, w: 30 },
+              { idx: 3, w: 14 },
+              { idx: 9, w: 14 },
+              { idx: 2, w: 4.5 },
+              { idx: 10, w: 4.5 },
+              { idx: 1, w: 1.2 },
+              { idx: 11, w: 1.2 },
+              { idx: 0, w: 0.3 },
+              { idx: 12, w: 0.3 }
             ]
           : [
-              { idx: 6, w: 46 },   // 0.3x центр
-              { idx: 5, w: 27 },   // 0.6x
-              { idx: 7, w: 27 }    // 0.6x
+              { idx: 6, w: 46 },
+              { idx: 5, w: 27 },
+              { idx: 7, w: 27 }
             ];
 
         const unused = candidates.filter(c => !usedSlots.has(c.idx));
-        let slotIdx = pickWeightedSlot(unused.length > 0 ? unused : candidates);
+        const slotIdx = pickWeightedSlot(unused.length > 0 ? unused : candidates);
         usedSlots.add(slotIdx);
 
         const mult = PLINKO_SLOTS[slotIdx];
@@ -2518,7 +2519,7 @@
         totalWin = Number((totalWin + ballWin).toFixed(2));
         landedMults.push(mult + "x");
 
-        const ballObj = createSingleBallPath(betPerBall, slotIdx, i * 16, i + 1);
+        const ballObj = createPhysicsBall(betPerBall, slotIdx, i * 11, i + 1, geom);
         plinkoActiveBalls.push(ballObj);
       }
 
@@ -2532,7 +2533,7 @@
         plinkoAnimRaf = requestAnimationFrame(stepPlinkoLoop);
       }
 
-      const totalWaitMs = (count - 1) * 265 + 1650;
+      const totalWaitMs = (count - 1) * 190 + 1850;
       setTimeout(() => {
         if (plinkoActiveBalls.every(b => b.done)) {
           const multSummary = landedMults.join(" · ");
@@ -2547,7 +2548,15 @@
 
     function stepPlinkoLoop() {
       plinkoTick++;
+      const geom = getPlinkoGeometry();
+      const pegs = getPegsList(geom);
       let anyAlive = false;
+
+      // Скорость чуть прибавлена относительно предыдущего медленного варианта, но остаётся плавной и читаемой
+      const subSteps = 2;
+      const gravity = 0.088;
+      const restitution = 0.52;
+      const maxVy = 4.6;
 
       for (const b of plinkoActiveBalls) {
         if (b.done) continue;
@@ -2558,24 +2567,87 @@
           continue;
         }
 
-        b.progress += b.speed;
-        const maxIdx = b.points.length - 1;
-        const idx = Math.min(maxIdx, Math.floor(b.progress));
-        const pt = b.points[idx];
+        for (let s = 0; s < subSteps; s++) {
+          b.vy = Math.min(maxVy, b.vy + gravity);
+          b.x += b.vx / subSteps;
+          b.y += b.vy / subSteps;
 
-        b.x = pt.x;
-        b.y = pt.y;
-        b.trail.push({ x: b.x, y: b.y });
-        if (b.trail.length > 9) b.trail.shift();
+          // Лёгкая направляющая сила к целевому слоту в нижней части доски
+          const goalX = getSlotCenterX(b.targetSlot, geom);
+          const progressY = Math.max(0, Math.min(1, b.y / geom.slotY));
+          if (progressY > 0.35) {
+            const pull = (goalX - b.x) * 0.0024 * progressY;
+            b.vx += pull;
+          }
 
-        if (idx >= maxIdx) {
-          b.done = true;
-          const cell = document.getElementById("pm_" + b.targetSlot);
-          if (cell) {
-            cell.classList.add("hit");
-            setTimeout(() => cell.classList.remove("hit"), 520);
+          // Боковые границы доски
+          const minX = BALL_RADIUS + 8;
+          const maxX = geom.w - BALL_RADIUS - 8;
+          if (b.x < minX) {
+            b.x = minX;
+            b.vx = Math.abs(b.vx) * 0.65;
+          } else if (b.x > maxX) {
+            b.x = maxX;
+            b.vx = -Math.abs(b.vx) * 0.65;
+          }
+
+          // Столкновение и скатывание по пинам
+          for (const p of pegs) {
+            const dx = b.x - p.x;
+            const dy = b.y - p.y;
+            const minDist = BALL_RADIUS + p.r;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < minDist * minDist && distSq > 0.0001) {
+              const dist = Math.sqrt(distSq);
+              const nx = dx / dist;
+              const ny = dy / dist;
+
+              // Выталкиваем шар за пределы пина
+              const overlap = minDist - dist;
+              b.x += nx * overlap;
+              b.y += ny * overlap;
+
+              // Проекция скорости на нормаль
+              const vn = b.vx * nx + b.vy * ny;
+              if (vn < 0) {
+                // Отражение + скатывание в выбранную сторону ряда
+                const dirHint = (b.rowDirs[p.row] ?? (Math.random() < 0.5 ? 1 : -1));
+                const tangentX = -ny;
+                const tangentY = nx;
+
+                b.vx -= (1 + restitution) * vn * nx;
+                b.vy -= (1 + restitution) * vn * ny;
+
+                // Придаём импульс скатывания в сторону и чуть гасим вертикальный отскок вверх
+                b.vx += dirHint * 0.52 + tangentX * dirHint * 0.25;
+                b.vy = Math.max(0.85, b.vy * 0.84 + tangentY * 0.12);
+
+                if (b.lastPegHitRow !== p.row) {
+                  b.lastPegHitRow = p.row;
+                  p.hitFlash = 1.0;
+                }
+              }
+            }
+          }
+
+          // Приземление в слот
+          if (b.y >= geom.slotY) {
+            b.y = geom.slotY;
+            b.x += (goalX - b.x) * 0.35;
+            b.done = true;
+
+            const cell = document.getElementById("pm_" + b.targetSlot);
+            if (cell) {
+              cell.classList.add("hit");
+              setTimeout(() => cell.classList.remove("hit"), 520);
+            }
+            break;
           }
         }
+
+        b.trail.push({ x: b.x, y: b.y });
+        if (b.trail.length > 9) b.trail.shift();
       }
 
       drawPlinkoScene(plinkoTick);
