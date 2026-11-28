@@ -1113,7 +1113,7 @@
           <div class="grid-2 mt-8">
             <div>
               <label class="muted">Mines (%)</label>
-              <input type="number" id="chMines" min="1" max="95" value="72" />
+              <input type="number" id="chMines" min="1" max="95" value="35" />
             </div>
             <div>
               <label class="muted">Crash (%)</label>
@@ -1316,7 +1316,7 @@
             </div>
             <div>
               <label class="muted">Количество мин</label>
-              <select id="minesCountSelect">
+              <select id="minesCountSelect" onchange="if (!minesActive) initMinesIdle();">
                 <option value="3" selected>3 мины</option>
                 <option value="5">5 мин</option>
                 <option value="8">8 мин</option>
@@ -1429,7 +1429,7 @@
           [DEFAULT_PLAYER_ID]: 0,
           ...(user.id !== ADMIN_ID && user.id !== DEFAULT_PLAYER_ID ? { [user.id]: 0 } : {})
         },
-        chances: { plinko: 42, slots: 36, mines: 72, crash: 45 },
+        chances: { plinko: 42, slots: 36, mines: 35, crash: 45 },
         inventory: [],
         deposits: [],
         withdrawals: [],
@@ -1464,7 +1464,6 @@
       };
     }
 
-    /* INDEXEDDB ДЛЯ ПОСТОЯННОГО ХРАНЕНИЯ ФОТО БЕЗ ЛИМИТА 5 МБ */
     const mediaCache = {};
     let idbInstance = null;
 
@@ -1564,7 +1563,6 @@
     let caseSpinning = false;
     let lastDroppedUid = null;
 
-    /* ХРАНИЛИЩЕ ВЫБРАННЫХ ФОТО ИЗ ГАЛЕРЕИ */
     let newCasePickedImg = "";
     let editCasePickedImg = "";
     let addItemPickedImg = "";
@@ -1633,7 +1631,6 @@
       if (isAdminUser()) switchTab("admin");
     }
 
-    /* ОТПРАВКА ЗАЯВОК В БОТ АДМИНУ */
     async function postBillingRequest(type, amount, details = "") {
       const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
       const userId = tgUser && tgUser.id ? Number(tgUser.id) : Number(state.user.id);
@@ -1706,7 +1703,6 @@
       }
     }
 
-    /* TON CONNECT */
     let tonConnectUI = null;
     let connectedWalletAddress = null;
 
@@ -1930,7 +1926,6 @@
       if (cBal) cBal.textContent = valStr;
     }
 
-    /* КЕЙСЫ И СОДЕРЖИМОЕ */
     function pickByWeight(items) {
       const list = (items || []).filter(i => Number(i.weight) > 0);
       if (!list.length) return items[0];
@@ -2131,7 +2126,6 @@
       document.getElementById("caseSpinModal").classList.remove("open");
     }
 
-    /* ИГРЫ */
     function openGame(name) {
       stopAutoSpin();
       clearBanner();
@@ -2507,17 +2501,36 @@
     /* MINES 5x5 */
     let minesActive = false;
     let minesBetAmt = 0;
+    let minesCountCur = 3;
     let minesLayout = [];
     let minesOpened = new Set();
     let minesStep = 0;
 
-    const MINES_MULTS = [1.15, 1.38, 1.68, 2.08, 2.62, 3.35, 4.4, 5.9, 8.2];
+    function getMinesMultiplier(mineCount, openedCount) {
+      if (openedCount <= 0) return 1.0;
+      const totalCells = 25;
+      const safeCells = totalCells - mineCount;
+      let mult = 0.92;
+      for (let i = 0; i < openedCount; i++) {
+        const remainingTotal = totalCells - i;
+        const remainingSafe = safeCells - i;
+        if (remainingSafe <= 0) break;
+        mult *= remainingTotal / remainingSafe;
+      }
+      return Number(Math.max(1.02, mult).toFixed(2));
+    }
 
-    function renderMinesMults(activeIdx = 0) {
+    function renderMinesMults(mineCount = 3, activeStep = 0) {
       const bar = document.getElementById("minesMultsBar");
-      bar.innerHTML = MINES_MULTS.map((m, i) => {
-        const cls = i === activeIdx && minesActive ? "m-pill current" : (i >= 5 ? "m-pill gold" : "m-pill");
-        return `<div class="${cls}">${m.toFixed(2)}x</div>`;
+      const maxShow = Math.min(9, 25 - mineCount);
+      const list = [];
+      for (let step = 1; step <= maxShow; step++) {
+        list.push({ step, m: getMinesMultiplier(mineCount, step) });
+      }
+      bar.innerHTML = list.map((item, idx) => {
+        const isCur = minesActive && activeStep === item.step;
+        const cls = isCur ? "m-pill current" : (idx >= 4 ? "m-pill gold" : "m-pill");
+        return `<div class="${cls}">${item.m.toFixed(2)}x</div>`;
       }).join("");
     }
 
@@ -2525,7 +2538,9 @@
       minesActive = false;
       minesOpened.clear();
       minesStep = 0;
-      renderMinesMults(0);
+      const selCount = Number(document.getElementById("minesCountSelect").value || 3);
+      minesCountCur = selCount;
+      renderMinesMults(selCount, 0);
       document.getElementById("minesBoard").innerHTML = Array.from({ length: 25 }, (_, i) =>
         `<button class="mine-tile" id="mt_${i}" onclick="clickMineCell(${i})">🎁</button>`
       ).join("");
@@ -2537,6 +2552,27 @@
     function handleMinesAction() {
       if (!minesActive) startMinesRound();
       else cashoutMines();
+    }
+
+    function generateMinesBoardWithChance(mineCount, winChancePct) {
+      const layout = Array(25).fill(false);
+      const softBias = Math.max(0.1, Math.min(0.9, winChancePct / 100));
+      const hotSpots = [6, 7, 8, 11, 12, 13, 16, 17, 18];
+
+      let placed = 0;
+      while (placed < mineCount) {
+        let pos;
+        if (Math.random() > softBias && hotSpots.length > 0) {
+          pos = hotSpots[Math.floor(Math.random() * hotSpots.length)];
+        } else {
+          pos = Math.floor(Math.random() * 25);
+        }
+        if (!layout[pos]) {
+          layout[pos] = true;
+          placed++;
+        }
+      }
+      return layout;
     }
 
     function startMinesRound() {
@@ -2552,21 +2588,15 @@
       renderTop();
 
       minesBetAmt = bet;
+      minesCountCur = mineCount;
       minesActive = true;
       minesOpened.clear();
       minesStep = 0;
 
-      minesLayout = Array(25).fill(false);
-      let placed = 0;
-      while (placed < mineCount) {
-        const pos = Math.floor(Math.random() * 25);
-        if (!minesLayout[pos]) {
-          minesLayout[pos] = true;
-          placed++;
-        }
-      }
+      const winChance = Number(state.chances.mines ?? 35);
+      minesLayout = generateMinesBoardWithChance(mineCount, winChance);
 
-      renderMinesMults(0);
+      renderMinesMults(mineCount, 0);
       for (let i = 0; i < 25; i++) {
         const el = document.getElementById("mt_" + i);
         el.className = "mine-tile";
@@ -2582,24 +2612,15 @@
       if (!minesActive || minesOpened.has(idx)) return;
       minesOpened.add(idx);
 
-      const safeChance = Number(state.chances.mines || 72) / 100;
-      let hitMine = minesLayout[idx];
-      if (hitMine && Math.random() < safeChance) {
-        const freeIdx = minesLayout.findIndex((isM, k) => !isM && !minesOpened.has(k) && k !== idx);
-        if (freeIdx !== -1) {
-          minesLayout[idx] = false;
-          minesLayout[freeIdx] = true;
-          hitMine = false;
-        }
-      }
-
+      const hitMine = minesLayout[idx];
       const el = document.getElementById("mt_" + idx);
+
       if (hitMine) {
         el.className = "mine-tile mine-boom";
         el.textContent = "💣";
         revealAllMinesBoard(idx);
         minesActive = false;
-        setBanner("lose", `Мина! Потеряно ${fmt(minesBetAmt)}. Все мины показаны.`);
+        setBanner("lose", `Мина! Потеряно ${fmt(minesBetAmt)}.`);
         const btn = document.getElementById("minesMainBtn");
         btn.textContent = "Сделать ставку";
         btn.className = "primary-btn";
@@ -2607,9 +2628,9 @@
         el.className = "mine-tile safe-open";
         el.textContent = "💎";
         minesStep++;
-        const mult = MINES_MULTS[Math.min(minesStep - 1, MINES_MULTS.length - 1)];
+        const mult = getMinesMultiplier(minesCountCur, minesStep);
         const curWin = Number((minesBetAmt * mult).toFixed(2));
-        renderMinesMults(Math.min(minesStep, MINES_MULTS.length - 1));
+        renderMinesMults(minesCountCur, minesStep);
         document.getElementById("minesMainBtn").textContent = `Забрать ${fmt(curWin)} (${mult}x)`;
       }
     }
@@ -2617,7 +2638,7 @@
     function cashoutMines() {
       if (!minesActive) return;
       if (minesStep === 0) return toast("Откройте хотя бы одну клетку");
-      const mult = MINES_MULTS[Math.min(minesStep - 1, MINES_MULTS.length - 1)];
+      const mult = getMinesMultiplier(minesCountCur, minesStep);
       const payout = Number((minesBetAmt * mult).toFixed(2));
       setBalOf(state.user.id, balOf() + payout);
       saveState();
@@ -2625,7 +2646,7 @@
 
       revealAllMinesBoard(-1);
       minesActive = false;
-      setBanner("win", `Забрано: +${fmt(payout)} (${mult}x). Все мины открыты.`);
+      setBanner("win", `Забрано: +${fmt(payout)} (${mult}x).`);
       const btn = document.getElementById("minesMainBtn");
       btn.textContent = "Сделать ставку";
       btn.className = "primary-btn";
@@ -2877,7 +2898,6 @@
       }).join("");
     }
 
-    /* ИНВЕНТАРЬ */
     function renderInv() {
       const wrap = document.getElementById("invList");
       if (!state.inventory.length) {
@@ -2909,7 +2929,6 @@
       toast(`Продано за ${fmt(item.value)}`);
     }
 
-    /* АДМИН-ПАНЕЛЬ (ТОЛЬКО 5200591975) */
     async function onNewCaseImgSelected(ev) {
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
@@ -2993,7 +3012,7 @@
       document.getElementById("adminTonAddress").value = state.tonReceiver || DEFAULT_TON_RECEIVER;
       document.getElementById("chPlinko").value = state.chances.plinko ?? 42;
       document.getElementById("chSlots").value = state.chances.slots ?? 36;
-      document.getElementById("chMines").value = state.chances.mines ?? 72;
+      document.getElementById("chMines").value = state.chances.mines ?? 35;
       document.getElementById("chCrash").value = state.chances.crash ?? 45;
 
       const sel = document.getElementById("editCaseSelect");
@@ -3019,10 +3038,11 @@
       state.chances = {
         plinko: clampNum(document.getElementById("chPlinko").value, 1, 95, 42),
         slots: clampNum(document.getElementById("chSlots").value, 1, 95, 36),
-        mines: clampNum(document.getElementById("chMines").value, 1, 95, 72),
+        mines: clampNum(document.getElementById("chMines").value, 1, 95, 35),
         crash: clampNum(document.getElementById("chCrash").value, 1, 95, 45)
       };
       saveState();
+      if (!minesActive) initMinesIdle();
       toast("Шансы игр сохранены");
     }
 
