@@ -2224,11 +2224,12 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* НАСТОЯЩАЯ ФИЗИКА PLINKO: СТОЛКНОВЕНИЯ С ПИНАМИ, ОТСКОКИ И СКАТЫВАНИЕ */
+    /* НАСТОЯЩЕЕ ПЛИНКО: ВЫИГРЫШ НАЧИСЛЯЕТСЯ В МОМЕНТ ПАДЕНИЯ В РЕАЛЬНЫЙ СЛОТ, КУДА ШАР ПРИКАТИЛСЯ */
     let plinkoSelectedBalls = 1;
     let plinkoActiveBalls = [];
     let plinkoAnimRaf = null;
     let plinkoTick = 0;
+    let plinkoPendingBanner = null;
     const PLINKO_SLOTS = [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33];
     const BALL_RADIUS = 6.2;
 
@@ -2294,6 +2295,20 @@
 
     function getSlotCenterX(slotIdx, geom) {
       return geom.totalPadding / 2 + slotIdx * (geom.slotWidth + geom.slotGap) + geom.slotWidth / 2;
+    }
+
+    function findClosestSlotIndex(x, geom) {
+      let bestIdx = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < geom.slotCount; i++) {
+        const cx = getSlotCenterX(i, geom);
+        const d = Math.abs(x - cx);
+        if (d < bestDist) {
+          bestDist = d;
+          bestIdx = i;
+        }
+      }
+      return bestIdx;
     }
 
     let plinkoPegsCache = null;
@@ -2437,30 +2452,26 @@
       return pool[pool.length - 1].idx;
     }
 
-    function createPhysicsBall(betPerBall, targetSlot, delayFrames, seed, geom) {
-      const targetX = getSlotCenterX(targetSlot, geom);
-      const startX = geom.w / 2 + (Math.random() - 0.5) * 10;
+    function createPhysicsBall(betPerBall, desiredSlot, delayFrames, seed, geom) {
+      const startX = geom.w / 2 + (Math.random() - 0.5) * 8;
+      // Реалистичный разброс отскоков: на каждом ряду шар сам решает влево или вправо
+      // с лёгким смещением в сторону desiredSlot
+      const offsetFromCenter = desiredSlot - 6;
+      const rightProb = Math.max(0.18, Math.min(0.82, 0.5 + offsetFromCenter * 0.055));
 
-      // Выбираем направление отклонений у рядов пинов так, чтобы шар естественно скатывался в targetSlot
       const rowDirs = [];
-      const rowCount = geom.rows;
-      // Средний слот — 6. Сдвиг вправо = +1, влево = -1
-      const desiredOffset = targetSlot - 6;
-      const rightBias = 0.5 + (desiredOffset / 12) * 0.42;
-
-      for (let r = 0; r < rowCount; r++) {
-        rowDirs.push(Math.random() < rightBias ? 1 : -1);
+      for (let r = 0; r < geom.rows; r++) {
+        rowDirs.push(Math.random() < rightProb ? 1 : -1);
       }
 
       return {
         bet: betPerBall,
-        targetSlot,
-        mult: PLINKO_SLOTS[targetSlot],
+        desiredSlot,
         delay: delayFrames,
         x: startX,
         y: 10,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: 1.55,
+        vx: (Math.random() - 0.5) * 0.9,
+        vy: 1.5,
         rowDirs,
         lastPegHitRow: -1,
         trail: [],
@@ -2485,9 +2496,14 @@
 
       const geom = getPlinkoGeometry();
       const winChance = Number(state.chances.plinko || 42) / 100;
-      let totalWin = 0;
-      const landedMults = [];
-      const usedSlots = new Set();
+
+      plinkoPendingBanner = {
+        batchId: Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        totalCost,
+        totalWin: 0,
+        landedMults: [],
+        remaining: count
+      };
 
       for (let i = 0; i < count; i++) {
         const isWin = Math.random() < winChance;
@@ -2510,40 +2526,47 @@
               { idx: 7, w: 27 }
             ];
 
-        const unused = candidates.filter(c => !usedSlots.has(c.idx));
-        const slotIdx = pickWeightedSlot(unused.length > 0 ? unused : candidates);
-        usedSlots.add(slotIdx);
-
-        const mult = PLINKO_SLOTS[slotIdx];
-        const ballWin = Number((betPerBall * mult).toFixed(2));
-        totalWin = Number((totalWin + ballWin).toFixed(2));
-        landedMults.push(mult + "x");
-
-        const ballObj = createPhysicsBall(betPerBall, slotIdx, i * 11, i + 1, geom);
+        const desiredSlot = pickWeightedSlot(candidates);
+        const ballObj = createPhysicsBall(betPerBall, desiredSlot, i * 11, i + 1, geom);
+        ballObj.batch = plinkoPendingBanner;
         plinkoActiveBalls.push(ballObj);
-      }
-
-      if (totalWin > 0) {
-        setBalOf(state.user.id, balOf() + totalWin);
-        saveState();
-        renderTop();
       }
 
       if (!plinkoAnimRaf) {
         plinkoAnimRaf = requestAnimationFrame(stepPlinkoLoop);
       }
+    }
 
-      const totalWaitMs = (count - 1) * 190 + 1850;
-      setTimeout(() => {
-        if (plinkoActiveBalls.every(b => b.done)) {
-          const multSummary = landedMults.join(" · ");
-          if (totalWin >= totalCost) {
-            setBanner("win", `Иксы: ${multSummary} | Выигрыш: +${fmt(totalWin)}`);
+    function settleBallInSlot(b, slotIdx) {
+      const mult = PLINKO_SLOTS[slotIdx];
+      const payout = Number((b.bet * mult).toFixed(2));
+
+      if (payout > 0) {
+        setBalOf(state.user.id, balOf() + payout);
+        saveState();
+        renderTop();
+      }
+
+      const cell = document.getElementById("pm_" + slotIdx);
+      if (cell) {
+        cell.classList.add("hit");
+        setTimeout(() => cell.classList.remove("hit"), 520);
+      }
+
+      if (b.batch) {
+        b.batch.totalWin = Number((b.batch.totalWin + payout).toFixed(2));
+        b.batch.landedMults.push(mult + "x");
+        b.batch.remaining--;
+
+        if (b.batch.remaining <= 0) {
+          const multSummary = b.batch.landedMults.join(" · ");
+          if (b.batch.totalWin >= b.batch.totalCost) {
+            setBanner("win", `Иксы: ${multSummary} | Выигрыш: +${fmt(b.batch.totalWin)}`);
           } else {
-            setBanner("lose", `Иксы: ${multSummary} | Возврат: +${fmt(totalWin)} (ставка ${fmt(totalCost)})`);
+            setBanner("lose", `Иксы: ${multSummary} | Возврат: +${fmt(b.batch.totalWin)} (ставка ${fmt(b.batch.totalCost)})`);
           }
         }
-      }, totalWaitMs);
+      }
     }
 
     function stepPlinkoLoop() {
@@ -2552,10 +2575,9 @@
       const pegs = getPegsList(geom);
       let anyAlive = false;
 
-      // Скорость чуть прибавлена относительно предыдущего медленного варианта, но остаётся плавной и читаемой
       const subSteps = 2;
       const gravity = 0.088;
-      const restitution = 0.52;
+      const restitution = 0.56;
       const maxVy = 4.6;
 
       for (const b of plinkoActiveBalls) {
@@ -2572,14 +2594,6 @@
           b.x += b.vx / subSteps;
           b.y += b.vy / subSteps;
 
-          // Лёгкая направляющая сила к целевому слоту в нижней части доски
-          const goalX = getSlotCenterX(b.targetSlot, geom);
-          const progressY = Math.max(0, Math.min(1, b.y / geom.slotY));
-          if (progressY > 0.35) {
-            const pull = (goalX - b.x) * 0.0024 * progressY;
-            b.vx += pull;
-          }
-
           // Боковые границы доски
           const minX = BALL_RADIUS + 8;
           const maxX = geom.w - BALL_RADIUS - 8;
@@ -2591,7 +2605,7 @@
             b.vx = -Math.abs(b.vx) * 0.65;
           }
 
-          // Столкновение и скатывание по пинам
+          // Столкновение и скатывание по пинам без притягивания к фальшивому слоту
           for (const p of pegs) {
             const dx = b.x - p.x;
             const dy = b.y - p.y;
@@ -2603,15 +2617,12 @@
               const nx = dx / dist;
               const ny = dy / dist;
 
-              // Выталкиваем шар за пределы пина
               const overlap = minDist - dist;
               b.x += nx * overlap;
               b.y += ny * overlap;
 
-              // Проекция скорости на нормаль
               const vn = b.vx * nx + b.vy * ny;
               if (vn < 0) {
-                // Отражение + скатывание в выбранную сторону ряда
                 const dirHint = (b.rowDirs[p.row] ?? (Math.random() < 0.5 ? 1 : -1));
                 const tangentX = -ny;
                 const tangentY = nx;
@@ -2619,9 +2630,10 @@
                 b.vx -= (1 + restitution) * vn * nx;
                 b.vy -= (1 + restitution) * vn * ny;
 
-                // Придаём импульс скатывания в сторону и чуть гасим вертикальный отскок вверх
-                b.vx += dirHint * 0.52 + tangentX * dirHint * 0.25;
-                b.vy = Math.max(0.85, b.vy * 0.84 + tangentY * 0.12);
+                // Небольшая случайность в скатывании делает траекторию живой и честной
+                const jitter = (Math.random() - 0.5) * 0.36;
+                b.vx += dirHint * 0.56 + tangentX * dirHint * 0.25 + jitter;
+                b.vy = Math.max(0.85, b.vy * 0.85 + tangentY * 0.12);
 
                 if (b.lastPegHitRow !== p.row) {
                   b.lastPegHitRow = p.row;
@@ -2631,17 +2643,15 @@
             }
           }
 
-          // Приземление в слот
+          // Шар попадает ровно в тот слот, куда реально прикатился по физике
           if (b.y >= geom.slotY) {
             b.y = geom.slotY;
-            b.x += (goalX - b.x) * 0.35;
+            const actualSlot = findClosestSlotIndex(b.x, geom);
+            const slotCenter = getSlotCenterX(actualSlot, geom);
+            b.x += (slotCenter - b.x) * 0.4;
             b.done = true;
 
-            const cell = document.getElementById("pm_" + b.targetSlot);
-            if (cell) {
-              cell.classList.add("hit");
-              setTimeout(() => cell.classList.remove("hit"), 520);
-            }
+            settleBallInSlot(b, actualSlot);
             break;
           }
         }
