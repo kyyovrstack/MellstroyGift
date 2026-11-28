@@ -1039,7 +1039,7 @@
         <div class="game-tile" onclick="openGame('plinko')">
           <span class="game-tile-emoji">🟣</span>
           <div class="game-tile-name">Plinko</div>
-          <div class="game-tile-sub">0.5x – 100x · Неоновый шар</div>
+          <div class="game-tile-sub">0.5x по центру · 100x по краям</div>
         </div>
         <div class="game-tile" onclick="openGame('slots')">
           <span class="game-tile-emoji">🎰</span>
@@ -2191,10 +2191,11 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* ЯРКИЙ PLINKO: 0.5x, 0.75x, 1.2x, 1.9x, 3.0x, 5.0x, 9.0x, 100x */
+    /* ЯРКИЙ PLINKO: СИММЕТРИЯ ОТ ЦЕНТРА (0.5x по центру, рост к краям: 0.75x, 1.2x, 1.9x, 3.0x, 5.0x, 9.0x, 100x) */
     let plinkoBusy = false;
     let plinkoTrail = [];
-    const PLINKO_SLOTS = [0.5, 0.75, 1.2, 1.9, 3.0, 5.0, 9.0, 100];
+    // Индексы: 0=100x, 1=9.0x, 2=5.0x, 3=3.0x, 4=1.9x, 5=1.2x, 6=0.75x, 7=0.5x (центр/минимальный) — и в обратную сторону:
+    const PLINKO_SLOTS = [100, 9.0, 5.0, 3.0, 1.9, 1.2, 0.75, 0.5];
 
     function getPlinkoTierClass(mult) {
       if (mult >= 100) return "tier-jackpot";
@@ -2225,11 +2226,11 @@
         const startX = (w - rowWidth) / 2;
         const y = topY + r * rowGap;
         for (let c = 0; c < count; c++) {
-          pegs.push({ x: startX + c * colGap, y, r: 3.8, row: r });
+          pegs.push({ x: startX + c * colGap, y, r: 4.1, row: r });
         }
       }
 
-      const slotCount = PLINKO_SLOTS.length; // 8 слотов
+      const slotCount = PLINKO_SLOTS.length;
       const slotGap = 4;
       const totalPadding = 16;
       const slotWidth = (w - totalPadding - slotGap * (slotCount - 1)) / slotCount;
@@ -2248,63 +2249,86 @@
       const geom = getPlinkoGeometry();
       ctx.clearRect(0, 0, geom.w, geom.h);
 
-      const topGlow = ctx.createRadialGradient(geom.w / 2, 16, 4, geom.w / 2, 16, 130);
-      topGlow.addColorStop(0, "rgba(236, 72, 153, 0.34)");
-      topGlow.addColorStop(0.5, "rgba(168, 85, 247, 0.14)");
+      // Верхнее свечение запуска
+      const topGlow = ctx.createRadialGradient(geom.w / 2, 16, 4, geom.w / 2, 16, 140);
+      topGlow.addColorStop(0, "rgba(236, 72, 153, 0.38)");
+      topGlow.addColorStop(0.55, "rgba(168, 85, 247, 0.16)");
       topGlow.addColorStop(1, "rgba(168, 85, 247, 0)");
       ctx.fillStyle = topGlow;
-      ctx.fillRect(0, 0, geom.w, 160);
+      ctx.fillRect(0, 0, geom.w, 165);
 
+      // Качественные пины с объёмом и свечением рядом с шаром
       for (const p of geom.pegs) {
-        const nearBall = ball && Math.hypot(ball.x - p.x, ball.y - p.y) < 22;
+        const nearBall = ball && Math.hypot(ball.x - p.x, ball.y - p.y) < 24;
         const isRow = p.row === activeRow;
 
         if (nearBall || isRow) {
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r + 4.5, 0, Math.PI * 2);
-          ctx.fillStyle = nearBall ? "rgba(52, 211, 153, 0.35)" : "rgba(232, 121, 249, 0.24)";
+          ctx.arc(p.x, p.y, p.r + 5.5, 0, Math.PI * 2);
+          ctx.fillStyle = nearBall ? "rgba(52, 211, 153, 0.42)" : "rgba(232, 121, 249, 0.25)";
           ctx.fill();
         }
 
+        const pegGrad = ctx.createRadialGradient(p.x - 1.2, p.y - 1.2, 0.5, p.x, p.y, p.r);
+        pegGrad.addColorStop(0, "#ffffff");
+        pegGrad.addColorStop(0.7, nearBall ? "#a7f3d0" : "#f3e8ff");
+        pegGrad.addColorStop(1, nearBall ? "#10b981" : "#c084fc");
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = nearBall ? "#6ee7b7" : (isRow ? "#f5d0fe" : "#ffffff");
+        ctx.fillStyle = pegGrad;
         ctx.fill();
       }
 
+      // Плавный неоновый шлейф за зелёным шаром
       for (let i = 0; i < plinkoTrail.length; i++) {
         const tr = plinkoTrail[i];
         const ratio = (i + 1) / plinkoTrail.length;
+        const radius = Math.max(2, 8.5 * ratio);
+
+        const trailGrad = ctx.createRadialGradient(tr.x, tr.y, 0.5, tr.x, tr.y, radius * 1.4);
+        trailGrad.addColorStop(0, `rgba(110, 231, 183, ${(ratio * 0.45).toFixed(3)})`);
+        trailGrad.addColorStop(0.6, `rgba(16, 185, 129, ${(ratio * 0.24).toFixed(3)})`);
+        trailGrad.addColorStop(1, "rgba(16, 185, 129, 0)");
+
         ctx.beginPath();
-        ctx.arc(tr.x, tr.y, 7.5 * ratio, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(16, 185, 129, ${(ratio * 0.28).toFixed(3)})`;
+        ctx.arc(tr.x, tr.y, radius * 1.4, 0, Math.PI * 2);
+        ctx.fillStyle = trailGrad;
         ctx.fill();
       }
 
+      // Премиальный светящийся изумрудный шар
       if (ball) {
-        const auraRadius = 19 + Math.sin(pulse * 0.35) * 3;
+        const auraRadius = 22 + Math.sin(pulse * 0.35) * 3.5;
         const aura = ctx.createRadialGradient(ball.x, ball.y, 2, ball.x, ball.y, auraRadius);
-        aura.addColorStop(0, "rgba(110, 231, 183, 0.92)");
-        aura.addColorStop(0.45, "rgba(16, 185, 129, 0.45)");
+        aura.addColorStop(0, "rgba(167, 243, 208, 0.95)");
+        aura.addColorStop(0.4, "rgba(16, 185, 129, 0.55)");
+        aura.addColorStop(0.75, "rgba(5, 150, 105, 0.2)");
         aura.addColorStop(1, "rgba(16, 185, 129, 0)");
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, auraRadius, 0, Math.PI * 2);
         ctx.fillStyle = aura;
         ctx.fill();
 
-        const ballGrad = ctx.createRadialGradient(ball.x - 2.5, ball.y - 2.5, 1, ball.x, ball.y, 8.2);
+        const ballGrad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 1, ball.x, ball.y, 9);
         ballGrad.addColorStop(0, "#ffffff");
-        ballGrad.addColorStop(0.35, "#6ee7b7");
-        ballGrad.addColorStop(0.8, "#10b981");
-        ballGrad.addColorStop(1, "#047857");
+        ballGrad.addColorStop(0.28, "#a7f3d0");
+        ballGrad.addColorStop(0.68, "#10b981");
+        ballGrad.addColorStop(1, "#065f46");
 
         ctx.beginPath();
-        ctx.arc(ball.x, ball.y, 8.2, 0, Math.PI * 2);
+        ctx.arc(ball.x, ball.y, 9, 0, Math.PI * 2);
         ctx.fillStyle = ballGrad;
         ctx.fill();
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.2;
         ctx.strokeStyle = "#fef08a";
         ctx.stroke();
+
+        // Блик на шаре
+        ctx.beginPath();
+        ctx.ellipse(ball.x - 3, ball.y - 3.2, 2.8, 1.5, -0.55, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.fill();
       }
     }
 
@@ -2338,22 +2362,25 @@
       const winChance = Number(state.chances.plinko || 42) / 100;
       const isWin = Math.random() < winChance;
 
-      // Индексы слотов:
-      // 0: 0.5x | 1: 0.75x | 2: 1.2x | 3: 1.9x | 4: 3.0x | 5: 5.0x (редко) | 6: 9.0x (очень редко) | 7: 100x (никогда = 0)
+      // Слоты:
+      // 0: 100x (никогда = 0)
+      // 1: 9.0x (очень редко)
+      // 2: 5.0x (редко)
+      // 3: 3.0x (проигрыш / меньше ставки? Нет, 3.0x больше ставки; ниже 1.0x — 0.75x (индекс 6) и 0.5x (индекс 7))
       let targetSlot;
       if (isWin) {
         targetSlot = pickWeightedSlot([
-          { idx: 2, w: 50 },    // 1.2x
-          { idx: 3, w: 32 },    // 1.9x
-          { idx: 4, w: 13 },    // 3.0x
-          { idx: 5, w: 4.2 },   // 5.0x — редко
-          { idx: 6, w: 0.8 }    // 9.0x — очень редко
-          // idx: 7 (100x) исключён — никогда не падает
+          { idx: 5, w: 50 },    // 1.2x
+          { idx: 4, w: 32 },    // 1.9x
+          { idx: 3, w: 13 },    // 3.0x
+          { idx: 2, w: 4.2 },   // 5.0x — редко
+          { idx: 1, w: 0.8 }    // 9.0x — очень редко
+          // idx: 0 (100x) исключён — никогда не падает
         ]);
       } else {
         targetSlot = pickWeightedSlot([
-          { idx: 0, w: 55 },    // 0.5x
-          { idx: 1, w: 45 }     // 0.75x
+          { idx: 7, w: 58 },    // 0.5x (самый маленький икс)
+          { idx: 6, w: 42 }     // 0.75x
         ]);
       }
 
@@ -2388,7 +2415,7 @@
 
         if (segIndex >= waypoints.length - 1) {
           plinkoTrail.push({ x: finalX, y: finalY });
-          if (plinkoTrail.length > 9) plinkoTrail.shift();
+          if (plinkoTrail.length > 11) plinkoTrail.shift();
           drawPlinkoFrame({ x: finalX, y: finalY }, geom.rows - 1, frameTick);
 
           const exactMult = PLINKO_SLOTS[targetSlot];
@@ -2418,7 +2445,7 @@
         };
 
         plinkoTrail.push(curPt);
-        if (plinkoTrail.length > 9) plinkoTrail.shift();
+        if (plinkoTrail.length > 11) plinkoTrail.shift();
 
         drawPlinkoFrame(curPt, Math.min(geom.rows - 1, segIndex), frameTick);
         requestAnimationFrame(animateDrop);
