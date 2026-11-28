@@ -542,7 +542,6 @@
       display: block;
     }
 
-    /* 12 симметричных ячеек как на референсе: 33 11 4 2 1.1 0.6 0.3 0.6 1.1 2 4 11 33 (13 ячеек) */
     .plinko-mults {
       display: grid;
       grid-template-columns: repeat(13, 1fr);
@@ -594,6 +593,32 @@
       transform: scale(1.15) translateY(-2px);
       box-shadow: 0 0 18px rgba(52, 211, 153, 0.95), 0 0 28px rgba(251, 191, 36, 0.65);
       z-index: 3;
+    }
+
+    .ball-count-pills {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .ball-cnt-btn {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 4px;
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .ball-cnt-btn.active {
+      background: linear-gradient(135deg, var(--purple), var(--purple-bright));
+      color: #fff;
+      border-color: rgba(232, 121, 249, 0.7);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
     }
 
     .slots-board {
@@ -1287,12 +1312,19 @@
         </div>
 
         <div class="card mt-12">
-          <div class="bet-bar">
-            <span>GRAM</span>
-            <input type="number" id="plinkoBet" step="0.5" min="0.5" value="1" />
+          <div class="ball-count-pills" id="plinkoBallCountPills">
+            <button class="ball-cnt-btn active" type="button" data-balls="1" onclick="selectPlinkoBallCount(1)">1 шар</button>
+            <button class="ball-cnt-btn" type="button" data-balls="3" onclick="selectPlinkoBallCount(3)">3 шара</button>
+            <button class="ball-cnt-btn" type="button" data-balls="5" onclick="selectPlinkoBallCount(5)">5 шаров</button>
+            <button class="ball-cnt-btn" type="button" data-balls="10" onclick="selectPlinkoBallCount(10)">10 шаров</button>
           </div>
 
-          <button class="primary-btn" onclick="dropPlinkoBall()">Сделать ставку</button>
+          <div class="bet-bar">
+            <span>GRAM</span>
+            <input type="number" id="plinkoBet" step="0.5" min="0.5" value="1" oninput="updatePlinkoBtnLabel()" />
+          </div>
+
+          <button class="primary-btn" id="plinkoDropBtn" onclick="dropPlinkoBalls()">Сделать ставку</button>
         </div>
       </div>
 
@@ -2175,7 +2207,8 @@
 
       if (name === "plinko") {
         renderPlinkoMults();
-        drawPlinkoFrame(null, -1);
+        updatePlinkoBtnLabel();
+        drawPlinkoScene(0);
       } else if (name === "slots") {
         initSlotsReels();
         updateSlotBetReadout();
@@ -2192,10 +2225,31 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* ТВОЙ ДИЗАЙН PLINKO + ИКСЫ КАК НА СКРИНШОТЕ: 33 11 4 2 1.1 0.6 0.3 0.6 1.1 2 4 11 33 */
-    let plinkoBusy = false;
-    let plinkoTrail = [];
+    /* ТВОЙ ДИЗАЙН PLINKO + МУЛЬТИШАРИКИ + ПЛАВНОЕ ПАДЕНИЕ БЕЗ ОТСКОКОВ ОТ ТОЧЕК + УМЕНЬШЕННЫЙ ШАРИК */
+    let plinkoSelectedBalls = 1;
+    let plinkoActiveBalls = [];
+    let plinkoAnimRaf = null;
+    let plinkoTick = 0;
     const PLINKO_SLOTS = [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33];
+    const BALL_RADIUS = 6.2; // Чуть меньше прежнего (было ~9)
+
+    function selectPlinkoBallCount(cnt) {
+      plinkoSelectedBalls = cnt;
+      document.querySelectorAll("#plinkoBallCountPills .ball-cnt-btn").forEach(btn => {
+        btn.classList.toggle("active", Number(btn.dataset.balls) === cnt);
+      });
+      updatePlinkoBtnLabel();
+    }
+
+    function updatePlinkoBtnLabel() {
+      const bet = Math.max(0, Number(document.getElementById("plinkoBet").value || 0));
+      const total = (bet * plinkoSelectedBalls).toFixed(2);
+      const btn = document.getElementById("plinkoDropBtn");
+      if (!btn) return;
+      btn.textContent = plinkoSelectedBalls > 1
+        ? `Кинуть ${plinkoSelectedBalls} шаров (${total} GRAM)`
+        : `Сделать ставку (${total} GRAM)`;
+    }
 
     function getPlinkoTierClass(mult) {
       if (mult >= 33) return "tier-jackpot";
@@ -2226,7 +2280,7 @@
         const startX = (w - rowWidth) / 2;
         const y = topY + r * rowGap;
         for (let c = 0; c < count; c++) {
-          pegs.push({ x: startX + c * colGap, y, r: 4.1, row: r });
+          pegs.push({ x: startX + c * colGap, y, r: 3.7, row: r });
         }
       }
 
@@ -2234,7 +2288,7 @@
       const slotGap = 3;
       const totalPadding = 12;
       const slotWidth = (w - totalPadding - slotGap * (slotCount - 1)) / slotCount;
-      const slotY = h - 16;
+      const slotY = h - 15;
 
       return { w, h, pegs, rows, topY, rowGap, slotCount, slotGap, totalPadding, slotWidth, slotY };
     }
@@ -2243,86 +2297,120 @@
       return geom.totalPadding / 2 + slotIdx * (geom.slotWidth + geom.slotGap) + geom.slotWidth / 2;
     }
 
-    function drawPlinkoFrame(ball, activeRow = -1, pulse = 0) {
+    function drawPlinkoScene(pulse = 0) {
       const canvas = document.getElementById("plinkoCanvas");
+      if (!canvas) return;
       const ctx = canvas.getContext("2d");
       const geom = getPlinkoGeometry();
       ctx.clearRect(0, 0, geom.w, geom.h);
 
-      const topGlow = ctx.createRadialGradient(geom.w / 2, 16, 4, geom.w / 2, 16, 140);
-      topGlow.addColorStop(0, "rgba(236, 72, 153, 0.38)");
-      topGlow.addColorStop(0.55, "rgba(168, 85, 247, 0.16)");
+      // Мягкое объёмное свечение сверху
+      const topGlow = ctx.createRadialGradient(geom.w / 2, 14, 3, geom.w / 2, 14, 150);
+      topGlow.addColorStop(0, "rgba(236, 72, 153, 0.34)");
+      topGlow.addColorStop(0.55, "rgba(168, 85, 247, 0.14)");
       topGlow.addColorStop(1, "rgba(168, 85, 247, 0)");
       ctx.fillStyle = topGlow;
-      ctx.fillRect(0, 0, geom.w, 165);
+      ctx.fillRect(0, 0, geom.w, 175);
 
+      // Красивые объёмные точки-штифты с мягким свечением при пролёте шара рядом (без резких отскоков)
       for (const p of geom.pegs) {
-        const nearBall = ball && Math.hypot(ball.x - p.x, ball.y - p.y) < 24;
-        const isRow = p.row === activeRow;
+        let proximity = 0;
+        for (const b of plinkoActiveBalls) {
+          if (b.done) continue;
+          const d = Math.hypot(b.x - p.x, b.y - p.y);
+          if (d < 22) {
+            proximity = Math.max(proximity, 1 - d / 22);
+          }
+        }
 
-        if (nearBall || isRow) {
+        if (proximity > 0.05) {
+          const halo = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, p.r + 7);
+          halo.addColorStop(0, `rgba(216, 180, 254, ${(0.55 * proximity).toFixed(3)})`);
+          halo.addColorStop(0.6, `rgba(168, 85, 247, ${(0.25 * proximity).toFixed(3)})`);
+          halo.addColorStop(1, "rgba(168, 85, 247, 0)");
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r + 5.5, 0, Math.PI * 2);
-          ctx.fillStyle = nearBall ? "rgba(52, 211, 153, 0.42)" : "rgba(232, 121, 249, 0.25)";
+          ctx.arc(p.x, p.y, p.r + 7, 0, Math.PI * 2);
+          ctx.fillStyle = halo;
           ctx.fill();
         }
 
-        const pegGrad = ctx.createRadialGradient(p.x - 1.2, p.y - 1.2, 0.5, p.x, p.y, p.r);
+        const pegGrad = ctx.createRadialGradient(p.x - 1.1, p.y - 1.1, 0.4, p.x, p.y, p.r + 0.6);
         pegGrad.addColorStop(0, "#ffffff");
-        pegGrad.addColorStop(0.7, nearBall ? "#a7f3d0" : "#f3e8ff");
-        pegGrad.addColorStop(1, nearBall ? "#10b981" : "#c084fc");
+        pegGrad.addColorStop(0.55, proximity > 0.2 ? "#fae8ff" : "#f3e8ff");
+        pegGrad.addColorStop(1, proximity > 0.2 ? "#c084fc" : "#9333ea");
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = pegGrad;
         ctx.fill();
+        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
+        ctx.stroke();
       }
 
-      for (let i = 0; i < plinkoTrail.length; i++) {
-        const tr = plinkoTrail[i];
-        const ratio = (i + 1) / plinkoTrail.length;
-        const radius = Math.max(2, 8.5 * ratio);
+      // Отрисовка каждого активного шарика и его плавного шлейфа
+      for (const b of plinkoActiveBalls) {
+        if (b.done) continue;
 
-        const trailGrad = ctx.createRadialGradient(tr.x, tr.y, 0.5, tr.x, tr.y, radius * 1.4);
-        trailGrad.addColorStop(0, `rgba(110, 231, 183, ${(ratio * 0.45).toFixed(3)})`);
-        trailGrad.addColorStop(0.6, `rgba(16, 185, 129, ${(ratio * 0.24).toFixed(3)})`);
-        trailGrad.addColorStop(1, "rgba(16, 185, 129, 0)");
+        for (let i = 0; i < b.trail.length; i++) {
+          const tr = b.trail[i];
+          const ratio = (i + 1) / b.trail.length;
+          const tRad = Math.max(1.5, BALL_RADIUS * 0.78 * ratio);
 
-        ctx.beginPath();
-        ctx.arc(tr.x, tr.y, radius * 1.4, 0, Math.PI * 2);
-        ctx.fillStyle = trailGrad;
-        ctx.fill();
-      }
+          const trailGrad = ctx.createRadialGradient(tr.x, tr.y, 0.4, tr.x, tr.y, tRad * 1.45);
+          trailGrad.addColorStop(0, `rgba(110, 231, 183, ${(ratio * 0.36).toFixed(3)})`);
+          trailGrad.addColorStop(0.65, `rgba(16, 185, 129, ${(ratio * 0.16).toFixed(3)})`);
+          trailGrad.addColorStop(1, "rgba(16, 185, 129, 0)");
 
-      if (ball) {
-        const auraRadius = 22 + Math.sin(pulse * 0.35) * 3.5;
-        const aura = ctx.createRadialGradient(ball.x, ball.y, 2, ball.x, ball.y, auraRadius);
-        aura.addColorStop(0, "rgba(167, 243, 208, 0.95)");
-        aura.addColorStop(0.4, "rgba(16, 185, 129, 0.55)");
-        aura.addColorStop(0.75, "rgba(5, 150, 105, 0.2)");
+          ctx.beginPath();
+          ctx.arc(tr.x, tr.y, tRad * 1.45, 0, Math.PI * 2);
+          ctx.fillStyle = trailGrad;
+          ctx.fill();
+        }
+
+        const auraR = BALL_RADIUS * 2.5 + Math.sin(pulse * 0.25 + b.seed) * 1.5;
+        const aura = ctx.createRadialGradient(b.x, b.y, 1, b.x, b.y, auraR);
+        aura.addColorStop(0, "rgba(167, 243, 208, 0.85)");
+        aura.addColorStop(0.45, "rgba(16, 185, 129, 0.42)");
         aura.addColorStop(1, "rgba(16, 185, 129, 0)");
         ctx.beginPath();
-        ctx.arc(ball.x, ball.y, auraRadius, 0, Math.PI * 2);
+        ctx.arc(b.x, b.y, auraR, 0, Math.PI * 2);
         ctx.fillStyle = aura;
         ctx.fill();
 
-        const ballGrad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 1, ball.x, ball.y, 9);
+        const ballGrad = ctx.createRadialGradient(
+          b.x - BALL_RADIUS * 0.35,
+          b.y - BALL_RADIUS * 0.35,
+          0.6,
+          b.x,
+          b.y,
+          BALL_RADIUS
+        );
         ballGrad.addColorStop(0, "#ffffff");
-        ballGrad.addColorStop(0.28, "#a7f3d0");
-        ballGrad.addColorStop(0.68, "#10b981");
-        ballGrad.addColorStop(1, "#065f46");
+        ballGrad.addColorStop(0.26, "#a7f3d0");
+        ballGrad.addColorStop(0.7, "#10b981");
+        ballGrad.addColorStop(1, "#047857");
 
         ctx.beginPath();
-        ctx.arc(ball.x, ball.y, 9, 0, Math.PI * 2);
+        ctx.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI * 2);
         ctx.fillStyle = ballGrad;
         ctx.fill();
-        ctx.lineWidth = 2.2;
+        ctx.lineWidth = 1.5;
         ctx.strokeStyle = "#fef08a";
         ctx.stroke();
 
+        // Мягкий блик на шарике
         ctx.beginPath();
-        ctx.ellipse(ball.x - 3, ball.y - 3.2, 2.8, 1.5, -0.55, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.ellipse(
+          b.x - BALL_RADIUS * 0.34,
+          b.y - BALL_RADIUS * 0.36,
+          BALL_RADIUS * 0.32,
+          BALL_RADIUS * 0.16,
+          -0.55,
+          0,
+          Math.PI * 2
+        );
+        ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
         ctx.fill();
       }
     }
@@ -2337,121 +2425,179 @@
       return pool[pool.length - 1].idx;
     }
 
-    function dropPlinkoBall() {
-      if (plinkoBusy) return;
-      const bet = Number(document.getElementById("plinkoBet").value || 0);
+    function createSingleBallPath(betPerBall, targetSlot, delayFrames, seed) {
+      const geom = getPlinkoGeometry();
+      const finalX = getSlotCenterX(targetSlot, geom);
+      const finalY = geom.slotY;
+      // Небольшой разброс точки старта сверху для реалистичности нескольких шариков
+      const startX = geom.w / 2 + Math.sin(seed * 3.7) * 7;
+
+      // Плавная траектория свободного падения без резких отскоков/зигзагов от точек
+      const points = [{ x: startX, y: 10 }];
+      const ctrl1X = startX + (finalX - startX) * 0.28 + Math.cos(seed * 2.1) * 14;
+      const ctrl1Y = geom.topY + geom.rowGap * 2.5;
+      const ctrl2X = startX + (finalX - startX) * 0.72 + Math.sin(seed * 1.7) * 10;
+      const ctrl2Y = geom.topY + geom.rowGap * 6.2;
+
+      const steps = 48;
+      for (let i = 1; i <= steps; i++) {
+        // Плавное ускорение под действием гравитации (ease-in-quad)
+        const u = i / steps;
+        const t = u * u * 0.65 + u * 0.35;
+        const inv = 1 - t;
+        const x =
+          inv * inv * inv * startX +
+          3 * inv * inv * t * ctrl1X +
+          3 * inv * t * t * ctrl2X +
+          t * t * t * finalX;
+        const y =
+          inv * inv * inv * 10 +
+          3 * inv * inv * t * ctrl1Y +
+          3 * inv * t * t * ctrl2Y +
+          t * t * t * finalY;
+        points.push({ x, y });
+      }
+
+      return {
+        bet: betPerBall,
+        targetSlot,
+        mult: PLINKO_SLOTS[targetSlot],
+        delay: delayFrames,
+        progress: 0,
+        speed: 0.92 + (seed % 5) * 0.04,
+        points,
+        x: startX,
+        y: 10,
+        trail: [],
+        seed,
+        done: false
+      };
+    }
+
+    function dropPlinkoBalls() {
+      const betPerBall = Number(document.getElementById("plinkoBet").value || 0);
+      const count = plinkoSelectedBalls;
+      const totalCost = Number((betPerBall * count).toFixed(2));
       const curBal = balOf();
-      if (bet <= 0 || isNaN(bet)) return toast("Укажите ставку");
-      if (curBal < bet) return toast("Недостаточно GRAM");
 
-      plinkoBusy = true;
-      plinkoTrail = [];
+      if (betPerBall <= 0 || isNaN(betPerBall)) return toast("Укажите ставку");
+      if (curBal < totalCost) return toast(`Недостаточно GRAM (нужно ${fmt(totalCost)})`);
+
       clearBanner();
-      document.querySelectorAll(".plinko-mult").forEach(el => el.classList.remove("hit"));
-
-      setBalOf(state.user.id, curBal - bet);
+      setBalOf(state.user.id, curBal - totalCost);
       saveState();
       renderTop();
 
-      const geom = getPlinkoGeometry();
       const winChance = Number(state.chances.plinko || 42) / 100;
-      const isWin = Math.random() < winChance;
+      let totalWin = 0;
+      const landedMults = [];
 
-      // Слоты: [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33]
-      // Индексы: 0=33, 1=11, 2=4, 3=2, 4=1.1, 5=0.6, 6=0.3 (центр), 7=0.6, 8=1.1, 9=2, 10=4, 11=11, 12=33
-      let targetSlot;
-      if (isWin) {
-        targetSlot = pickWeightedSlot([
-          { idx: 4, w: 32 },   // 1.1x
-          { idx: 8, w: 32 },   // 1.1x
-          { idx: 3, w: 13 },   // 2x
-          { idx: 9, w: 13 },   // 2x
-          { idx: 2, w: 3.5 },  // 4x
-          { idx: 10, w: 3.5 }, // 4x
-          { idx: 1, w: 1.2 },  // 11x
-          { idx: 11, w: 1.2 }, // 11x
-          { idx: 0, w: 0.3 },  // 33x
-          { idx: 12, w: 0.3 }  // 33x
-        ]);
-      } else {
-        targetSlot = pickWeightedSlot([
-          { idx: 6, w: 46 },   // 0.3x центр
-          { idx: 5, w: 27 },   // 0.6x
-          { idx: 7, w: 27 }    // 0.6x
-        ]);
+      // Выбираем разные слоты (по возможности) чтобы каждый шар летел на свой икс
+      const usedSlots = new Set();
+
+      for (let i = 0; i < count; i++) {
+        const isWin = Math.random() < winChance;
+        let candidates = isWin
+          ? [
+              { idx: 4, w: 30 },   // 1.1x
+              { idx: 8, w: 30 },   // 1.1x
+              { idx: 3, w: 14 },   // 2x
+              { idx: 9, w: 14 },   // 2x
+              { idx: 2, w: 4.5 },  // 4x
+              { idx: 10, w: 4.5 }, // 4x
+              { idx: 1, w: 1.2 },  // 11x
+              { idx: 11, w: 1.2 }, // 11x
+              { idx: 0, w: 0.3 },  // 33x
+              { idx: 12, w: 0.3 }  // 33x
+            ]
+          : [
+              { idx: 6, w: 46 },   // 0.3x центр
+              { idx: 5, w: 27 },   // 0.6x
+              { idx: 7, w: 27 }    // 0.6x
+            ];
+
+        const unused = candidates.filter(c => !usedSlots.has(c.idx));
+        let slotIdx = pickWeightedSlot(unused.length > 0 ? unused : candidates);
+        usedSlots.add(slotIdx);
+
+        const mult = PLINKO_SLOTS[slotIdx];
+        const ballWin = Number((betPerBall * mult).toFixed(2));
+        totalWin = Number((totalWin + ballWin).toFixed(2));
+        landedMults.push(mult + "x");
+
+        const ballObj = createSingleBallPath(betPerBall, slotIdx, i * 11, i + 1);
+        plinkoActiveBalls.push(ballObj);
       }
 
-      const finalX = getSlotCenterX(targetSlot, geom);
-      const finalY = geom.slotY;
-      const startX = geom.w / 2;
-
-      const waypoints = [{ x: startX, y: 12 }];
-      for (let r = 0; r < geom.rows; r++) {
-        const t = (r + 1) / geom.rows;
-        const linearX = startX + (finalX - startX) * t;
-        const wiggle = (r < geom.rows - 1) ? Math.sin(r * 2.1 + targetSlot) * 10 : 0;
-        waypoints.push({
-          x: r === geom.rows - 1 ? finalX : linearX + wiggle,
-          y: geom.topY + r * geom.rowGap - 8
-        });
+      if (totalWin > 0) {
+        setBalOf(state.user.id, balOf() + totalWin);
+        saveState();
+        renderTop();
       }
-      waypoints.push({ x: finalX, y: finalY });
 
-      let segIndex = 0;
-      let segProgress = 0;
-      let frameTick = 0;
-      const stepSpeed = 0.082;
+      if (!plinkoAnimRaf) {
+        plinkoAnimRaf = requestAnimationFrame(stepPlinkoLoop);
+      }
 
-      function animateDrop() {
-        frameTick++;
-        segProgress += stepSpeed;
-        if (segProgress >= 1) {
-          segIndex++;
-          segProgress = 0;
-        }
-
-        if (segIndex >= waypoints.length - 1) {
-          plinkoTrail.push({ x: finalX, y: finalY });
-          if (plinkoTrail.length > 11) plinkoTrail.shift();
-          drawPlinkoFrame({ x: finalX, y: finalY }, geom.rows - 1, frameTick);
-
-          const exactMult = PLINKO_SLOTS[targetSlot];
-          const winAmt = Number((bet * exactMult).toFixed(2));
-          setBalOf(state.user.id, balOf() + winAmt);
-          saveState();
-          renderTop();
-
-          const hitCell = document.getElementById("pm_" + targetSlot);
-          if (hitCell) hitCell.classList.add("hit");
-
-          if (winAmt >= bet) {
-            setBanner("win", `Слот ${exactMult}x! Выигрыш: +${fmt(winAmt)}`);
+      // Показываем итог после завершения последнего шара
+      const totalWaitMs = (count - 1) * 185 + 950;
+      setTimeout(() => {
+        if (plinkoActiveBalls.every(b => b.done)) {
+          const multSummary = landedMults.join(" · ");
+          if (totalWin >= totalCost) {
+            setBanner("win", `Иксы: ${multSummary} | Выигрыш: +${fmt(totalWin)}`);
           } else {
-            setBanner("lose", `Слот ${exactMult}x. Возврат: +${fmt(winAmt)} (ставка ${fmt(bet)})`);
+            setBanner("lose", `Иксы: ${multSummary} | Возврат: +${fmt(totalWin)} (ставка ${fmt(totalCost)})`);
           }
-          plinkoBusy = false;
-          return;
         }
-
-        const p0 = waypoints[segIndex];
-        const p1 = waypoints[segIndex + 1];
-        const eased = 1 - Math.pow(1 - segProgress, 2);
-        const curPt = {
-          x: p0.x + (p1.x - p0.x) * eased,
-          y: p0.y + (p1.y - p0.y) * eased
-        };
-
-        plinkoTrail.push(curPt);
-        if (plinkoTrail.length > 11) plinkoTrail.shift();
-
-        drawPlinkoFrame(curPt, Math.min(geom.rows - 1, segIndex), frameTick);
-        requestAnimationFrame(animateDrop);
-      }
-
-      requestAnimationFrame(animateDrop);
+      }, totalWaitMs);
     }
 
-    /* СЛОТЫ 5x5 — НАГРАДА РАСТЁТ ЗА 3, 4 И 5 ОДИНАКОВЫХ */
+    function stepPlinkoLoop() {
+      plinkoTick++;
+      let anyAlive = false;
+
+      for (const b of plinkoActiveBalls) {
+        if (b.done) continue;
+        anyAlive = true;
+
+        if (b.delay > 0) {
+          b.delay--;
+          continue;
+        }
+
+        b.progress += b.speed;
+        const maxIdx = b.points.length - 1;
+        const idx = Math.min(maxIdx, Math.floor(b.progress));
+        const pt = b.points[idx];
+
+        b.x = pt.x;
+        b.y = pt.y;
+        b.trail.push({ x: b.x, y: b.y });
+        if (b.trail.length > 9) b.trail.shift();
+
+        if (idx >= maxIdx) {
+          b.done = true;
+          const cell = document.getElementById("pm_" + b.targetSlot);
+          if (cell) {
+            cell.classList.add("hit");
+            setTimeout(() => cell.classList.remove("hit"), 520);
+          }
+        }
+      }
+
+      drawPlinkoScene(plinkoTick);
+
+      if (anyAlive) {
+        plinkoAnimRaf = requestAnimationFrame(stepPlinkoLoop);
+      } else {
+        plinkoActiveBalls = plinkoActiveBalls.filter(b => !b.done);
+        plinkoAnimRaf = null;
+        drawPlinkoScene(plinkoTick);
+      }
+    }
+
+    /* СЛОТЫ 5x5 */
     let slotBet = 1;
     let slotSpeed = 1;
     let autoSpinOn = false;
@@ -3420,7 +3566,8 @@
     renderCases();
     renderInv();
     renderPlinkoMults();
-    drawPlinkoFrame(null, -1);
+    updatePlinkoBtnLabel();
+    drawPlinkoScene(0);
     updateDepEquivalent();
     renderWalletHistory();
     initTonConnect();
