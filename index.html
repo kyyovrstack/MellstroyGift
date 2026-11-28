@@ -2225,13 +2225,13 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* ТВОЙ ДИЗАЙН PLINKO + МУЛЬТИШАРИКИ + ПЛАВНОЕ ПАДЕНИЕ БЕЗ ОТСКОКОВ ОТ ТОЧЕК + УМЕНЬШЕННЫЙ ШАРИК */
+    /* ТВОЙ ДИЗАЙН PLINKO + МУЛЬТИШАРИКИ + МЕДЛЕННОЕ ПЛАВНОЕ ПАДЕНИЕ БЕЗ ОТСКОКОВ + УМЕНЬШЕННЫЙ ШАРИК */
     let plinkoSelectedBalls = 1;
     let plinkoActiveBalls = [];
     let plinkoAnimRaf = null;
     let plinkoTick = 0;
     const PLINKO_SLOTS = [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33];
-    const BALL_RADIUS = 6.2; // Чуть меньше прежнего (было ~9)
+    const BALL_RADIUS = 6.2;
 
     function selectPlinkoBallCount(cnt) {
       plinkoSelectedBalls = cnt;
@@ -2304,7 +2304,6 @@
       const geom = getPlinkoGeometry();
       ctx.clearRect(0, 0, geom.w, geom.h);
 
-      // Мягкое объёмное свечение сверху
       const topGlow = ctx.createRadialGradient(geom.w / 2, 14, 3, geom.w / 2, 14, 150);
       topGlow.addColorStop(0, "rgba(236, 72, 153, 0.34)");
       topGlow.addColorStop(0.55, "rgba(168, 85, 247, 0.14)");
@@ -2312,7 +2311,6 @@
       ctx.fillStyle = topGlow;
       ctx.fillRect(0, 0, geom.w, 175);
 
-      // Красивые объёмные точки-штифты с мягким свечением при пролёте шара рядом (без резких отскоков)
       for (const p of geom.pegs) {
         let proximity = 0;
         for (const b of plinkoActiveBalls) {
@@ -2348,7 +2346,6 @@
         ctx.stroke();
       }
 
-      // Отрисовка каждого активного шарика и его плавного шлейфа
       for (const b of plinkoActiveBalls) {
         if (b.done) continue;
 
@@ -2399,7 +2396,6 @@
         ctx.strokeStyle = "#fef08a";
         ctx.stroke();
 
-        // Мягкий блик на шарике
         ctx.beginPath();
         ctx.ellipse(
           b.x - BALL_RADIUS * 0.34,
@@ -2429,21 +2425,19 @@
       const geom = getPlinkoGeometry();
       const finalX = getSlotCenterX(targetSlot, geom);
       const finalY = geom.slotY;
-      // Небольшой разброс точки старта сверху для реалистичности нескольких шариков
       const startX = geom.w / 2 + Math.sin(seed * 3.7) * 7;
 
-      // Плавная траектория свободного падения без резких отскоков/зигзагов от точек
       const points = [{ x: startX, y: 10 }];
       const ctrl1X = startX + (finalX - startX) * 0.28 + Math.cos(seed * 2.1) * 14;
       const ctrl1Y = geom.topY + geom.rowGap * 2.5;
       const ctrl2X = startX + (finalX - startX) * 0.72 + Math.sin(seed * 1.7) * 10;
       const ctrl2Y = geom.topY + geom.rowGap * 6.2;
 
-      const steps = 48;
+      // Больше шагов для более плавного и медленного падения
+      const steps = 82;
       for (let i = 1; i <= steps; i++) {
-        // Плавное ускорение под действием гравитации (ease-in-quad)
         const u = i / steps;
-        const t = u * u * 0.65 + u * 0.35;
+        const t = u * u * 0.55 + u * 0.45;
         const inv = 1 - t;
         const x =
           inv * inv * inv * startX +
@@ -2464,7 +2458,7 @@
         mult: PLINKO_SLOTS[targetSlot],
         delay: delayFrames,
         progress: 0,
-        speed: 0.92 + (seed % 5) * 0.04,
+        speed: 0.54 + (seed % 5) * 0.025,
         points,
         x: startX,
         y: 10,
@@ -2492,7 +2486,6 @@
       let totalWin = 0;
       const landedMults = [];
 
-      // Выбираем разные слоты (по возможности) чтобы каждый шар летел на свой икс
       const usedSlots = new Set();
 
       for (let i = 0; i < count; i++) {
@@ -2525,7 +2518,7 @@
         totalWin = Number((totalWin + ballWin).toFixed(2));
         landedMults.push(mult + "x");
 
-        const ballObj = createSingleBallPath(betPerBall, slotIdx, i * 11, i + 1);
+        const ballObj = createSingleBallPath(betPerBall, slotIdx, i * 16, i + 1);
         plinkoActiveBalls.push(ballObj);
       }
 
@@ -2539,8 +2532,7 @@
         plinkoAnimRaf = requestAnimationFrame(stepPlinkoLoop);
       }
 
-      // Показываем итог после завершения последнего шара
-      const totalWaitMs = (count - 1) * 185 + 950;
+      const totalWaitMs = (count - 1) * 265 + 1650;
       setTimeout(() => {
         if (plinkoActiveBalls.every(b => b.done)) {
           const multSummary = landedMults.join(" · ");
