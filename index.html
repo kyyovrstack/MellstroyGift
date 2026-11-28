@@ -520,7 +520,7 @@
       transform: scale(0.98);
     }
 
-    /* ЯРКИЙ НЕОНОВЫЙ PLINKO */
+    /* ТВОЙ ДИЗАЙН PLINKO */
     .plinko-stage {
       position: relative;
       background:
@@ -542,23 +542,24 @@
       display: block;
     }
 
+    /* 12 симметричных ячеек как на референсе: 33 11 4 2 1.1 0.6 0.3 0.6 1.1 2 4 11 33 (13 ячеек) */
     .plinko-mults {
       display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 4px;
-      padding: 4px 8px 10px;
+      grid-template-columns: repeat(13, 1fr);
+      gap: 3px;
+      padding: 4px 6px 10px;
     }
 
     .plinko-mult {
       background: linear-gradient(180deg, rgba(139, 92, 246, 0.55), rgba(49, 16, 110, 0.92));
       border: 1px solid rgba(232, 121, 249, 0.35);
       color: #fff;
-      border-radius: 9px;
-      padding: 7px 2px;
+      border-radius: 7px;
+      padding: 6px 1px;
       text-align: center;
-      font-size: 10.5px;
+      font-size: 8.8px;
       font-weight: 900;
-      letter-spacing: -0.2px;
+      letter-spacing: -0.3px;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
       transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     }
@@ -590,7 +591,7 @@
       background: linear-gradient(135deg, #34d399, #10b981, #fbbf24);
       border-color: #ffffff;
       color: #052e16;
-      transform: scale(1.13) translateY(-2px);
+      transform: scale(1.15) translateY(-2px);
       box-shadow: 0 0 18px rgba(52, 211, 153, 0.95), 0 0 28px rgba(251, 191, 36, 0.65);
       z-index: 3;
     }
@@ -1039,7 +1040,7 @@
         <div class="game-tile" onclick="openGame('plinko')">
           <span class="game-tile-emoji">🟣</span>
           <div class="game-tile-name">Plinko</div>
-          <div class="game-tile-sub">0.5x по центру · 100x по краям</div>
+          <div class="game-tile-sub">0.3x центр · 33x края</div>
         </div>
         <div class="game-tile" onclick="openGame('slots')">
           <span class="game-tile-emoji">🎰</span>
@@ -2191,16 +2192,15 @@
       document.getElementById("gameModal").classList.remove("open");
     }
 
-    /* ЯРКИЙ PLINKO: СИММЕТРИЯ ОТ ЦЕНТРА (0.5x по центру, рост к краям: 0.75x, 1.2x, 1.9x, 3.0x, 5.0x, 9.0x, 100x) */
+    /* ТВОЙ ДИЗАЙН PLINKO + ИКСЫ КАК НА СКРИНШОТЕ: 33 11 4 2 1.1 0.6 0.3 0.6 1.1 2 4 11 33 */
     let plinkoBusy = false;
     let plinkoTrail = [];
-    // Индексы: 0=100x, 1=9.0x, 2=5.0x, 3=3.0x, 4=1.9x, 5=1.2x, 6=0.75x, 7=0.5x (центр/минимальный) — и в обратную сторону:
-    const PLINKO_SLOTS = [100, 9.0, 5.0, 3.0, 1.9, 1.2, 0.75, 0.5];
+    const PLINKO_SLOTS = [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33];
 
     function getPlinkoTierClass(mult) {
-      if (mult >= 100) return "tier-jackpot";
-      if (mult >= 5) return "tier-high";
-      if (mult >= 1.2) return "tier-mid";
+      if (mult >= 33) return "tier-jackpot";
+      if (mult >= 4) return "tier-high";
+      if (mult >= 1.1) return "tier-mid";
       return "tier-low";
     }
 
@@ -2231,10 +2231,10 @@
       }
 
       const slotCount = PLINKO_SLOTS.length;
-      const slotGap = 4;
-      const totalPadding = 16;
+      const slotGap = 3;
+      const totalPadding = 12;
       const slotWidth = (w - totalPadding - slotGap * (slotCount - 1)) / slotCount;
-      const slotY = h - 18;
+      const slotY = h - 16;
 
       return { w, h, pegs, rows, topY, rowGap, slotCount, slotGap, totalPadding, slotWidth, slotY };
     }
@@ -2249,7 +2249,6 @@
       const geom = getPlinkoGeometry();
       ctx.clearRect(0, 0, geom.w, geom.h);
 
-      // Верхнее свечение запуска
       const topGlow = ctx.createRadialGradient(geom.w / 2, 16, 4, geom.w / 2, 16, 140);
       topGlow.addColorStop(0, "rgba(236, 72, 153, 0.38)");
       topGlow.addColorStop(0.55, "rgba(168, 85, 247, 0.16)");
@@ -2257,7 +2256,6 @@
       ctx.fillStyle = topGlow;
       ctx.fillRect(0, 0, geom.w, 165);
 
-      // Качественные пины с объёмом и свечением рядом с шаром
       for (const p of geom.pegs) {
         const nearBall = ball && Math.hypot(ball.x - p.x, ball.y - p.y) < 24;
         const isRow = p.row === activeRow;
@@ -2280,7 +2278,6 @@
         ctx.fill();
       }
 
-      // Плавный неоновый шлейф за зелёным шаром
       for (let i = 0; i < plinkoTrail.length; i++) {
         const tr = plinkoTrail[i];
         const ratio = (i + 1) / plinkoTrail.length;
@@ -2297,7 +2294,6 @@
         ctx.fill();
       }
 
-      // Премиальный светящийся изумрудный шар
       if (ball) {
         const auraRadius = 22 + Math.sin(pulse * 0.35) * 3.5;
         const aura = ctx.createRadialGradient(ball.x, ball.y, 2, ball.x, ball.y, auraRadius);
@@ -2324,7 +2320,6 @@
         ctx.strokeStyle = "#fef08a";
         ctx.stroke();
 
-        // Блик на шаре
         ctx.beginPath();
         ctx.ellipse(ball.x - 3, ball.y - 3.2, 2.8, 1.5, -0.55, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
@@ -2362,25 +2357,27 @@
       const winChance = Number(state.chances.plinko || 42) / 100;
       const isWin = Math.random() < winChance;
 
-      // Слоты:
-      // 0: 100x (никогда = 0)
-      // 1: 9.0x (очень редко)
-      // 2: 5.0x (редко)
-      // 3: 3.0x (проигрыш / меньше ставки? Нет, 3.0x больше ставки; ниже 1.0x — 0.75x (индекс 6) и 0.5x (индекс 7))
+      // Слоты: [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33]
+      // Индексы: 0=33, 1=11, 2=4, 3=2, 4=1.1, 5=0.6, 6=0.3 (центр), 7=0.6, 8=1.1, 9=2, 10=4, 11=11, 12=33
       let targetSlot;
       if (isWin) {
         targetSlot = pickWeightedSlot([
-          { idx: 5, w: 50 },    // 1.2x
-          { idx: 4, w: 32 },    // 1.9x
-          { idx: 3, w: 13 },    // 3.0x
-          { idx: 2, w: 4.2 },   // 5.0x — редко
-          { idx: 1, w: 0.8 }    // 9.0x — очень редко
-          // idx: 0 (100x) исключён — никогда не падает
+          { idx: 4, w: 32 },   // 1.1x
+          { idx: 8, w: 32 },   // 1.1x
+          { idx: 3, w: 13 },   // 2x
+          { idx: 9, w: 13 },   // 2x
+          { idx: 2, w: 3.5 },  // 4x
+          { idx: 10, w: 3.5 }, // 4x
+          { idx: 1, w: 1.2 },  // 11x
+          { idx: 11, w: 1.2 }, // 11x
+          { idx: 0, w: 0.3 },  // 33x
+          { idx: 12, w: 0.3 }  // 33x
         ]);
       } else {
         targetSlot = pickWeightedSlot([
-          { idx: 7, w: 58 },    // 0.5x (самый маленький икс)
-          { idx: 6, w: 42 }     // 0.75x
+          { idx: 6, w: 46 },   // 0.3x центр
+          { idx: 5, w: 27 },   // 0.6x
+          { idx: 7, w: 27 }    // 0.6x
         ]);
       }
 
